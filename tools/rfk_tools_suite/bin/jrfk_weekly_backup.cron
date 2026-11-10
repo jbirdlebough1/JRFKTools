@@ -1,0 +1,4 @@
+# /etc/cron.d/jrfk_weekly_backup
+# JRFK Automated Weekly Backup from Internal Boot SD to External USB SD Reader
+# Default: Runs every Sunday at 03:00 AM (prior to weekly OS upgrade at 04:00 AM)
+0 3 * * 0 root /home/pi/rfk_tools/bin/rfk_backup.sh --auto > /dev/null 2>&1

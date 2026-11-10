@@ -1,0 +1,1590 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>JRFK Migrator — RF-KIT 32-to-64 Bit Appliance Builder & Station Workbench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --paper: #eef1f4;
+  --panel: #ffffff;
+  --panel-2: #f7f8fa;
+  --ink: #18202a;
+  --ink-2: #485361;
+  --ink-3: #7c8794;
+  --line: #d8dde3;
+  --line-2: #e7eaee;
+  --block: #1b232d;
+  --block-2: #2a3542;
+  --block-ink: #e9eef4;
+  --accent: #1f4fa8;
+  --accent-2: #2d63c8;
+  --accent-soft: #e4ecfa;
+  --amber: #e8a317;
+  --danger: #b8352a;
+  --ok: #2f8a4c;
+  --on-accent: #ffffff;
+  --shadow: rgba(20,30,45,.12);
+  --focus: #2d63c8;
+  --f-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --f-label: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --r: 6px;
+  color-scheme: light;
+}
+:root[data-ui="dark"] {
+  --paper: #12161b;
+  --panel: #1a2027;
+  --panel-2: #212830;
+  --ink: #e6ebf1;
+  --ink-2: #b4bec9;
+  --ink-3: #8a96a3;
+  --line: #333c47;
+  --line-2: #2a323b;
+  --block: #0c1014;
+  --block-2: #232b34;
+  --block-ink: #e6ebf1;
+  --accent: #6d9cf2;
+  --accent-2: #86aef6;
+  --accent-soft: #1f2d46;
+  --danger: #ff8a7a;
+  --ok: #5fc27f;
+  --on-accent: #0c1014;
+  --shadow: rgba(0,0,0,.45);
+  --focus: #86aef6;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; padding: 0; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font: 13.5px/1.4 var(--f-ui);
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------- Top Bar (CLE Style) */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px;
+  height: 48px;
+  background: var(--block);
+  color: var(--block-ink);
+  border-bottom: 1px solid var(--block-2);
+}
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand-title {
+  font: 700 19px/1 var(--f-label);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+.badge-version {
+  font: 600 11px/1.2 var(--f-mono);
+  background: var(--accent);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.topbar-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--block-2);
+  color: var(--block-ink);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font: 500 11.5px/1 var(--f-mono);
+  border: 1px solid var(--line);
+}
+.pill.ok { border-color: var(--ok); color: var(--ok); }
+.pill.amber { border-color: var(--amber); color: var(--amber); }
+.theme-btn {
+  background: transparent;
+  border: 1px solid var(--block-2);
+  color: var(--block-ink);
+  border-radius: var(--r);
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.theme-btn:hover { background: var(--block-2); }
+
+/* ---------------- Ribbon / Mode Switcher */
+.ribbon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--ink-2);
+  padding: 6px 14px;
+  border-radius: var(--r);
+  font: 600 12.5px/1 var(--f-ui);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  outline: none;
+}
+
+/* ---------------- Remote Operation Bar */
+.remote-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 12px 16px;
+}
+
+/* ---------------- Embedded Docs Container */
+.doc-viewer-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.doc-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--line);
+}
+.doc-frame {
+  flex: 1;
+  border: none;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+}
+
+/* ---------------- Status Bar */
+.statusbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  height: 28px;
+  background: var(--block);
+  color: var(--block-ink);
+  font: 11px/1 var(--f-mono);
+  border-top: 1px solid var(--block-2);
+}
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<header class="topbar">
+  <div class="brand-group">
+    <div class="brand-title">JRFK MIGRATOR & STATION WORKBENCH</div>
+    <span class="badge-version">v01.00.01-alpha</span>
+  </div>
+  <div class="topbar-meta">
+    <div class="pill ok" id="hostPill">● Windows 11 Host Ready</div>
+    <div class="pill" id="imagerPill">○ Imager: Checking...</div>
+    <div class="pill" id="adminPill">○ Admin: Checking...</div>
+    <div class="pill" id="sdPill">○ Target SD: None Detected</div>
+    <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">🌓 Theme</button>
+  </div>
+</header>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 700 14px/1.2 var(--f-ui);
+  color: var(--ok);
+}
+.meta-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin: 6px 0;
+}
+.meta-table th, .meta-table td {
+  padding: 6px 10px;
+  text-align: left;
+  border: 1px solid var(--line-2);
+}
+.meta-table th {
+  background: var(--panel-2);
+  color: var(--ink-2);
+  font-weight: 600;
+}
+.meta-table td.badge-cell {
+  font-weight: 600;
+  font-family: var(--f-mono);
+          <label class="form-label">Available Removable Drives</label>
+          <select class="form-control" id="driveSelectOriginal">
+            <option value="">Scanning for connected SD cards...</option>
+          </select>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-primary" id="btnExtract" onclick="extractOriginalData()">
+            📥 Extract Golden Master Data
+          </button>
+          <button class="btn-secondary" onclick="scanDisks()">🔄 Rescan Drives</button>
+        </div>
+        <div class="terminal-box" id="extractLog">Ready. Insert original amplifier SD card and click 'Extract Golden Master Data'.</div>
+      </div>
+
+      <!-- Stage 2: Target SD Provisioning -->
+      <div class="card">
+        <h3 class="card-title">
+          <span><span class="step-number">2</span>Target 64-Bit SD Card Provisioning</span>
+          <span class="badge">A2 / V30 Recommended</span>
+        </h3>
+        <p style="color:var(--ink-2); margin:0;">
+          <strong>Action:</strong> Remove original SD card and store it safely in your station drawer. Insert a brand-new 16GB or 32GB+ SD card (Class 10, UHS-I U3, V30, A2 Application Class).
+        </p>
+        <div class="form-group">
+          <label class="form-label">Target Write Drive (CAUTION)</label>
+          <select class="form-control" id="driveSelectTarget">
+            <option value="">Insert and select new target SD card...</option>
+          </select>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <label style="font-size:12px; display:flex; align-items:center; gap:6px;">
+            <input type="checkbox" id="chkAutoUpgrade" checked>
+            Include automated weekly maintenance cron (Sunday 04:00 AM apt-get upgrade -y)
+          </label>
+          <label style="font-size:12px; display:flex; align-items:center; gap:6px;">
+            <input type="checkbox" id="chkInjectCal" checked>
+            Inject extracted user calibrations (calibration.json, touch cal, attenuator offsets)
+          </label>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:6px; flex-wrap:wrap;">
+          <button class="btn-primary" id="btnFlash" onclick="buildTargetImage()">
+            ⚡ Build & Flash 64-Bit Appliance Image
+          </button>
+          <button class="btn-secondary" onclick="launchImagerGui()">
+            🚀 Open RPi Imager (64-Bit)
+          </button>
+          <button class="btn-secondary" onclick="scanDisks()">🔄 Rescan</button>
+          <button class="btn-secondary" onclick="ejectTargetCard()">⏏️ Safely Eject</button>
+        </div>
+        <div class="terminal-box" id="flashLog">Awaiting user trigger...</div>
+      </div>
+
+    </div>
+
+    <!-- Container for Option B: Fresh Install Mode -->
+    <div id="sectionFresh" class="card-grid" style="display:none;">
+      
+      <!-- Fresh Card Setup & Credentials -->
+      <div class="card">
+        <h3 class="card-title">
+          <span><span class="step-number">1</span>New System Credentials & Wi-Fi Setup</span>
+          <span class="badge ok">Clean Install</span>
+        </h3>
+        <p style="color:var(--ink-2); margin:0;">
+          Configure your station credentials so the newly built SD card boots up immediately with functional Wi-Fi, SSH, and network access.
+        </p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label class="form-label">RPi Account Username</label>
+            <input type="text" class="form-control" id="freshUsername" value="pi">
+          </div>
+          <div class="form-group">
+            <label class="form-label">RPi Account Password</label>
+            <input type="password" class="form-control" id="freshPassword" value="raspberry">
+          </div>
+        </div>
+          <label class="form-label">Available Removable Drives</label>
+          <select class="form-control" id="driveSelectOriginal">
+            <option value="">Scanning for connected SD cards...</option>
+          </select>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-primary" id="btnExtract" onclick="extractOriginalData()">
+            📥 Extract Golden Master Data
+          </button>
+              <option value="static">Static IP Address</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label class="form-label">Station Wi-Fi SSID</label>
+            <input type="text" class="form-control" id="freshSsid" placeholder="e.g. Shack-WiFi">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Station Wi-Fi Password</label>
+            <input type="password" class="form-control" id="freshSsidPass" placeholder="WPA2 Pre-Shared Key">
+          </div>
+        </div>
+      </div>
+
+      <!-- Fresh Card Target Drive & Flashing -->
+      <div class="card">
+        <h3 class="card-title">
+          <span><span class="step-number">2</span>Target SD Card Partition & Build</span>
+          <span class="badge">16GB or Larger</span>
+        </h3>
+        <p style="color:var(--ink-2); margin:0;">
+          Select your new blank SD card. The tool partitions, formats, writes Debian 12 Bookworm 64-bit, and writes Wi-Fi credentials into <code>userconf.txt</code> and <code>wpa_supplicant.conf</code>.
+        </p>
+        <div class="form-group">
+          <label class="form-label">Target Write Drive (CAUTION)</label>
+          <select class="form-control" id="driveSelectFresh">
+            <option value="">Insert and select new blank SD card...</option>
+          </select>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn-success" id="btnFreshBuild" onclick="buildFreshSystem()">
+            🚀 Partition, Format & Build 64-Bit System
+          </button>
+          <button class="btn-primary" id="btnInjectBits" onclick="injectBitsOnly()">
+            ⚡ Inject JRFK Bits to Flashed SD
+          </button>
+          <button class="btn-secondary" onclick="launchImagerGui()">
+            🖥️ Open RPi Imager GUI
+          </button>
+          <button class="btn-secondary" onclick="scanDisks()">🔄 Rescan Drives</button>
+          <button class="btn-secondary" onclick="ejectTargetCard()">⏏️ Eject</button>
+        </div>
+        <div class="terminal-box" id="freshLog">Ready. Enter credentials and click 'Build 64-Bit System'.</div>
+      </div>
+
+    </div>
+
+    <!-- Deployment In-Amplifier Checklist -->
+    <div class="card">
+      <h3 class="card-title">
+        <span><span class="step-number">3</span>Amplifier Deployment & Two-Boot Verification</span>
+        <span class="badge ok">Appliance Checklist</span>
+      </h3>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div style="background:var(--panel-2); padding:12px; border-radius:var(--r); border:1px solid var(--line-2);">
+          <strong style="color:var(--accent);">Boot 1: First Hardware Discovery</strong>
+          <ul style="padding-left:18px; margin:6px 0; font-size:12.5px; color:var(--ink-2);">
+            <li>Insert freshly imaged 64-bit SD into amplifier (RPi 4 or RPi 5) and power on.</li>
+            <li>Kernel auto-expands root filesystem across full SD capacity (16GB/32GB/64GB).</li>
+          </button>
+          <button class="btn-secondary" onclick="launchImagerGui()">
+            🚀 Open RPi Imager (64-Bit)
+          </button>
+          <button class="btn-secondary" onclick="scanDisks()">🔄 Rescan</button>
+          <button class="btn-secondary" onclick="ejectTargetCard()">⏏️ Safely Eject</button>
+        </div>
+
+        <!-- Progress Bar: Creating 64-Bit RFK Image -->
+        <div class="progress-container" id="flashProgressWrap" style="display:none;">
+          <div class="progress-meta">
+            <span id="flashProgressLabel">Creating 64-Bit RFK Image...</span>
+            <span id="flashProgressPct">0%</span>
+          </div>
+          <div class="progress-track">
+            ⚡ Create 64-Bit RFK Image
+          </button>
+          <button class="btn-secondary" onclick="scanDisks()">🔄 Rescan</button>
+          <button class="btn-secondary" onclick="ejectTargetCard()">⏏️ Safely Eject</button>
+        </div>
+
+        <!-- Progress Bar: Creating 64-Bit RFK Image -->
+        <div class="progress-container" id="flashProgressWrap" style="display:none;">
+          <div class="progress-meta">
+            <span id="flashProgressLabel">Creating 64-Bit RFK Image...</span>
+            <span id="flashProgressPct">0%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="flashProgressBar"></div>
+          </div>
+        </div>
+
+        <!-- 100% Success Banner: Creating 64-Bit RFK Image -->
+        <div class="success-banner" id="flashSuccessBanner" style="display:none;">
+          <div class="success-banner-title">
+            <span style="font-size:18px;">✔</span> 100% COMPLETE: 64-Bit RFK Image Created &amp; Verified!
+          </div>
+          <div style="font-weight:600; color:var(--ok); font-size:13px;">
+            ✔ ALL RFK 32-BIT USER DATA HAS SUCCESSFULLY MIGRATED!
+          </div>
+          <div id="flashTraceDetails">
+            <!-- Populated dynamically with migration trace comparison table -->
+          </div>
+          <div style="margin-top:4px; padding:10px; background:var(--panel-2); border-radius:var(--r); border:1px solid var(--line-2); font-size:12px;">
+            <span id="extractProgressLabel">Extracting RFK user &amp; tuner data...</span>
+            <span id="extractProgressPct">0%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="extractProgressBar"></div>
+          </div>
+        </div>
+
+        <!-- 100% Success Banner: Extraction -->
+        <div class="success-banner" id="extractSuccessBanner" style="display:none;">
+          <div class="success-banner-title">
+            <span style="font-size:18px;">✔</span> 100% COMPLETE: All RFK User &amp; Tuner Data Collected!
+          </div>
+          <div id="extractMetaDetails" style="font-size:12px; color:var(--ink-2); line-height:1.5;">
+            <!-- Populated dynamically with detected revisions -->
+          </div>
+          <div style="margin-top:4px; padding:10px; background:var(--panel-2); border-radius:var(--r); border:1px solid var(--line-2); font-size:12px;">
+            <strong>Next Action:</strong> Eject original 32-bit SD card from PC, label it 'GOLDEN MASTER (DO NOT OVERWRITE)', and insert your new blank 16GB/32GB+ SD card.
+          </div>
+          <button class="btn-success" id="btnProceedToCreate" onclick="proceedToCreateImage()" style="margin-top:4px; padding:10px 16px; font-size:13.5px; font-weight:700;">
+            🚀 Proceed to Create 64-Bit RFK Image &rarr;
+          </button>
+        </div>
+
+        <div class="terminal-box" id="extractLog">Ready. Insert original amplifier SD card and click 'Extract Golden Master Data'.</div>
+            <select class="form-control" id="freshIpMode" onchange="toggleIpInputs()">
+              <option value="dhcp">DHCP (Automatic IP)</option>
+              <option value="static">Static IP Address</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label class="form-label">Station Wi-Fi SSID</label>
+            <input type="text" class="form-control" id="freshSsid" placeholder="e.g. Shack-WiFi">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Station Wi-Fi Password</label>
+            <input type="password" class="form-control" id="freshSsidPass" placeholder="WPA2 Pre-Shared Key">
+          </div>
+        </div>
+      </div>
+
+      <!-- Fresh Card Target Drive & Flashing -->
+      <div class="card">
+        <h3 class="card-title">
+          <span><span class="step-number">2</span>Target SD Card Partition & Build</span>
+          <span class="badge">16GB or Larger</span>
+        </h3>
+        <p style="color:var(--ink-2); margin:0;">
+          Select your new blank SD card. The tool partitions, formats, writes Debian 12 Bookworm 64-bit, and writes Wi-Fi credentials into <code>userconf.txt</code> and <code>wpa_supplicant.conf</code>.
+        </p>
+        <div class="form-group">
+          <label class="form-label">Target Write Drive (CAUTION)</label>
+          <select class="form-control" id="driveSelectFresh">
+            <option value="">Insert and select new blank SD card...</option>
+          </select>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn-success" id="btnFreshBuild" onclick="buildFreshSystem()">
+            🚀 Partition, Format & Build 64-Bit System
+          </button>
+          <button class="btn-primary" id="btnInjectBits" onclick="injectBitsOnly()">
+            ⚡ Inject JRFK Bits to Flashed SD
+          </button>
+          <button class="btn-secondary" onclick="launchImagerGui()">
+            🖥️ Open RPi Imager GUI
+          </button>
+          <button class="btn-secondary" onclick="scanDisks()">🔄 Rescan Drives</button>
+          <button class="btn-secondary" onclick="ejectTargetCard()">⏏️ Eject</button>
+        </div>
+        <div class="terminal-box" id="freshLog">Ready. Enter credentials and click 'Build 64-Bit System'.</div>
+      </div>
+
+    </div>
+
+    <!-- Deployment In-Amplifier Checklist -->
+    <div class="card">
+      <h3 class="card-title">
+        <span><span class="step-number">3</span>Amplifier Deployment & Two-Boot Verification</span>
+        <span class="badge ok">Appliance Checklist</span>
+      </h3>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div style="background:var(--panel-2); padding:12px; border-radius:var(--r); border:1px solid var(--line-2);">
+          <strong style="color:var(--accent);">Boot 1: First Hardware Discovery</strong>
+          <ul style="padding-left:18px; margin:6px 0; font-size:12.5px; color:var(--ink-2);">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </div>
+      <div>
+        <button class="btn-primary" onclick="saveProfilePayload()">💾 Save Profile to Archive</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Status Bar (CLE Style) -->
+<footer class="statusbar">
+  <div id="statusMessage">JRFK Migrator ready. Select build option above to begin.</div>
+  <div>RF2K+ / RF2K-S 64-Bit Universal Appliance Project</div>
+</footer>
+
+<script>
+function selectBuildMode(mode) {
+  const tileMigrate = document.getElementById('tileMigrate');
+  const tileFresh = document.getElementById('tileFresh');
+  const secMigrate = document.getElementById('sectionMigrate');
+  const secFresh = document.getElementById('sectionFresh');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    document.getElementById('tabWizard').classList.add('active');
+    document.getElementById('btnTabWizard').classList.add('active');
+  } else if (tabId === 'docs') {
+    document.getElementById('tabDocs').classList.add('active');
+    document.getElementById('btnTabDocs').classList.add('active');
+  } else if (tabId === 'utils') {
+    document.getElementById('tabUtils').classList.add('active');
+    document.getElementById('btnTabUtils').classList.add('active');
+  } else if (tabId === 'profile') {
+    document.getElementById('tabProfile').classList.add('active');
+    document.getElementById('btnTabProfile').classList.add('active');
+  }
+}
+
+function toggleTheme() {
+  const root = document.documentElement;
+  if (root.getAttribute('data-ui') === 'dark') {
+    root.removeAttribute('data-ui');
+  } else {
+    root.setAttribute('data-ui', 'dark');
+    selTgt.value = autoSelectVal;
+    selFresh.value = autoSelectVal;
+  }
+
+  const sdPill = document.getElementById('sdPill');
+  sdPill.textContent = `● Target SD: Ready (${sdCount > 0 ? sdCount + ' SD card(s)' : drives.length + ' drive(s)'})`;
+  sdPill.classList.add('ok');
+}
+
+function startLogPolling(targetBoxId) {
+  if (logPollTimer) clearInterval(logPollTimer);
+  const box = document.getElementById(targetBoxId);
+  box.textContent = "[*] Live background process output streaming below:\n";
+
+  let lastCount = 0;
+  logPollTimer = setInterval(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/logs`);
+      if (res.ok) {
+        const data = await res.json();
+        const logs = data.logs || [];
+        if (logs.length > lastCount) {
+          for (let i = lastCount; i < logs.length; i++) {
+            box.textContent += `[${logs[i].time}] ${logs[i].message}\n`;
+          }
+          lastCount = logs.length;
+          box.scrollTop = box.scrollHeight;
+        }
+
+        if (data.job && !data.job.running) {
+          if (data.job.step === 'complete') {
+            document.getElementById('statusMessage').textContent = "SD Provisioning complete! Ready for amplifier deployment.";
+          } else if (data.job.step === 'extracted') {
+            document.getElementById('statusMessage').textContent = "Golden Master Extracted! Remove original SD and insert new target card.";
+          }
+          clearInterval(logPollTimer);
+          logPollTimer = null;
+          const btnExtract = document.getElementById('btnExtract');
+          if (btnExtract) btnExtract.disabled = false;
+          const btnFresh = document.getElementById('btnFreshBuild');
+          if (btnFresh) btnFresh.disabled = false;
+          const btnFlash = document.getElementById('btnFlash');
+          if (btnFlash) btnFlash.disabled = false;
+          const btnInject = document.getElementById('btnInjectBits');
+          if (btnInject) btnInject.disabled = false;
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn("Log polling error:", e);
+    }
+  }, 700);
+}
+
+async function extractOriginalData() {
+  const btn = document.getElementById('btnExtract');
+  btn.disabled = true;
+  const selVal = document.getElementById('driveSelectOriginal').value || "2|E:";
+  const [diskIdx, driveLetter] = selVal.split('|');
+
+  startLogPolling('extractLog');
+  try {
+    await fetch(`${API_BASE}/api/extract_golden_master`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ disk_index: parseInt(diskIdx || '2'), drive_letter: driveLetter || 'E:' })
+    });
+  } catch (e) {
+    logExtract("[ERROR] Extraction failed to start: " + e);
+  }
+}
+
+async function buildTargetImage() {
+  const btn = document.getElementById('btnFlash');
+  btn.disabled = true;
+  const selVal = document.getElementById('driveSelectTarget').value || "2|E:";
+  const [diskIdx, driveLetter] = selVal.split('|');
+
+  startLogPolling('flashLog');
+  try {
+    await fetch(`${API_BASE}/api/start_clean_build`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        disk_index: parseInt(diskIdx || '2'),
+        drive_letter: driveLetter || 'E:',
+        username: 'pi',
+        password: 'pi',
+        hostname: 'k7bit',
+        ssid: 'Shack-WiFi',
+        wifipw: ''
+      })
+    });
+  } catch (e) {
+    logFlash("[ERROR] Flash failed to start: " + e);
+  }
+}
+
+
+async function injectBitsOnly() {
+  const btn = document.getElementById('btnInjectBits');
+  const user = document.getElementById('freshUsername').value || 'pi';
+  const pass = document.getElementById('freshPassword').value || 'raspberry';
+  const host = document.getElementById('freshHostname').value || 'k7bit';
+  const ssid = document.getElementById('freshSsid').value || 'Shack-WiFi';
+  const wifipw = document.getElementById('freshSsidPass').value || '';
+  const selVal = document.getElementById('driveSelectFresh').value || "2|E:";
+  const [diskIdx, driveLetter] = selVal.split('|');
+
+  if (btn) btn.disabled = true;
+  startLogPolling('freshLog');
+
+function populateDrives(drives) {
+  const selOrig = document.getElementById('driveSelectOriginal');
+  const selTgt = document.getElementById('driveSelectTarget');
+  const selFresh = document.getElementById('driveSelectFresh');
+  selOrig.innerHTML = "";
+  selTgt.innerHTML = "";
+  selFresh.innerHTML = "";
+
+  if (drives.length === 0) {
+    const emptyOpt = "<option value=''>No removable SD cards detected</option>";
+    selOrig.innerHTML = emptyOpt;
+    selTgt.innerHTML = emptyOpt;
+    selFresh.innerHTML = emptyOpt;
+    return;
+  }
+
+  let sdCount = 0;
+  let autoSelectVal = "";
+
+  drives.forEach(d => {
+    const optText = `Disk ${d.index}: ${d.model} (${d.size_gb}) [Drive ${d.letter || 'Unmounted'}]${d.is_sd ? ' ⭐ (SD Card)' : ''}`;
+    const optVal = `${d.index}|${d.letter || ''}`;
+
+    const opt1 = document.createElement('option');
+    opt1.value = optVal;
+    opt1.textContent = optText;
+    selOrig.appendChild(opt1);
+
+    const opt2 = document.createElement('option');
+    opt2.value = optVal;
+    opt2.textContent = optText;
+    selTgt.appendChild(opt2);
+
+    const opt3 = document.createElement('option');
+    opt3.value = optVal;
+    opt3.textContent = optText;
+    selFresh.appendChild(opt3);
+
+    if (d.is_sd) {
+      sdCount++;
+      if (!autoSelectVal) autoSelectVal = optVal;
+    }
+  });
+
+  if (autoSelectVal) {
+    selOrig.value = autoSelectVal;
+    selTgt.value = autoSelectVal;
+    selFresh.value = autoSelectVal;
+  }
+
+  const sdPill = document.getElementById('sdPill');
+  sdPill.textContent = `● Target SD: Ready (${sdCount > 0 ? sdCount + ' SD card(s)' : drives.length + ' drive(s)'})`;
+  sdPill.classList.add('ok');
+}
+
+function startLogPolling(targetBoxId) {
+  if (logPollTimer) clearInterval(logPollTimer);
+  const box = document.getElementById(targetBoxId);
+  box.textContent = "[*] Live background process output streaming below:\n";
+
+  let lastCount = 0;
+  logPollTimer = setInterval(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/logs`);
+      if (res.ok) {
+        const data = await res.json();
+        const logs = data.logs || [];
+        if (logs.length > lastCount) {
+          for (let i = lastCount; i < logs.length; i++) {
+            box.textContent += `[${logs[i].time}] ${logs[i].message}\n`;
+          }
+          lastCount = logs.length;
+          box.scrollTop = box.scrollHeight;
+        }
+
+        if (data.job && !data.job.running) {
+          if (data.job.step === 'complete') {
+            document.getElementById('statusMessage').textContent = "SD Provisioning complete! Ready for amplifier deployment.";
+          } else if (data.job.step === 'extracted') {
+            document.getElementById('statusMessage').textContent = "Golden Master Extracted! Remove original SD and insert new target card.";
+          }
+          clearInterval(logPollTimer);
+          logPollTimer = null;
+          const btnExtract = document.getElementById('btnExtract');
+          if (btnExtract) btnExtract.disabled = false;
+          const btnFresh = document.getElementById('btnFreshBuild');
+          if (btnFresh) btnFresh.disabled = false;
+          const btnFlash = document.getElementById('btnFlash');
+          if (btnFlash) btnFlash.disabled = false;
+          const btnInject = document.getElementById('btnInjectBits');
+          if (btnInject) btnInject.disabled = false;
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn("Log polling error:", e);
+    }
+  }, 700);
+}
+
+async function extractOriginalData() {
+  const btn = document.getElementById('btnExtract');
+  btn.disabled = true;
+  const selVal = document.getElementById('driveSelectOriginal').value || "2|E:";
+  const [diskIdx, driveLetter] = selVal.split('|');
+
+  startLogPolling('extractLog');
+  try {
+    await fetch(`${API_BASE}/api/extract_golden_master`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ disk_index: parseInt(diskIdx || '2'), drive_letter: driveLetter || 'E:' })
+    });
+  } catch (e) {
+    logExtract("[ERROR] Extraction failed to start: " + e);
+  }
+}
+
+async function buildTargetImage() {
+  const btn = document.getElementById('btnFlash');
+  btn.disabled = true;
+  const selVal = document.getElementById('driveSelectTarget').value || "2|E:";
+  const [diskIdx, driveLetter] = selVal.split('|');
+
+  startLogPolling('flashLog');
+  try {
+    await fetch(`${API_BASE}/api/start_clean_build`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        disk_index: parseInt(diskIdx || '2'),
+        drive_letter: driveLetter || 'E:',
+        username: 'pi',
+        password: 'pi',
+        hostname: 'k7bit',
+        ssid: 'Shack-WiFi',
+        wifipw: ''
+      })
+    });
+  } catch (e) {
+    logFlash("[ERROR] Flash failed to start: " + e);
+  }
+}
+
+
+async function injectBitsOnly() {
+  const btn = document.getElementById('btnInjectBits');
+  const user = document.getElementById('freshUsername').value || 'pi';
+  const pass = document.getElementById('freshPassword').value || 'raspberry';
+  const host = document.getElementById('freshHostname').value || 'k7bit';
+  const ssid = document.getElementById('freshSsid').value || 'Shack-WiFi';
+  const wifipw = document.getElementById('freshSsidPass').value || '';
+  const selVal = document.getElementById('driveSelectFresh').value || "2|E:";
+  const [diskIdx, driveLetter] = selVal.split('|');
+            if (txtLabel) txtLabel.textContent = `Creating 64-Bit RFK Image (${pct}%)...`;
+
+            if (data.job.step === 'complete' || pct >= 100) {
+              if (bar) { bar.style.width = '100%'; bar.classList.add('done'); }
+              if (pctLabel) pctLabel.textContent = '100%';
+              if (txtLabel) txtLabel.textContent = '✔ 100% Complete - Verified Error-Free!';
+
+              // Render Migration Trace Table
+              const banner = document.getElementById('flashSuccessBanner');
+              const traceDiv = document.getElementById('flashTraceDetails');
+              if (banner) banner.style.display = 'block';
+              if (traceDiv && data.job.migration_trace) {
+                const t = data.job.migration_trace;
+                let rowsHtml = t.rows.map(r => `
+                  <tr>
+                    <td><strong>${r.item}</strong></td>
+                    <td style="color:var(--ink-2);">${r.original}</td>
+                    <td><strong>${r.upgraded}</strong></td>
+                    <td class="badge-cell">✔ ${r.status}</td>
+                  </tr>
+                `).join('');
+
+                traceDiv.innerHTML = `
+                  <table class="meta-table" style="margin-top:8px;">
+              if (bar) { bar.style.width = '100%'; bar.classList.add('done'); }
+              if (pctLabel) pctLabel.textContent = '100%';
+              if (txtLabel) txtLabel.textContent = '✔ 100% Complete - Verified Error-Free!';
+              const banner = document.getElementById('freshSuccessBanner');
+              if (banner) banner.style.display = 'block';
+            }
+          }
+        }
+
+        if (data.job && !data.job.running) {
+          if (data.job.step === 'complete') {
+            document.getElementById('statusMessage').textContent = "SD Provisioning complete! Ready for amplifier deployment.";
+          } else if (data.job.step === 'extracted') {
+            document.getElementById('statusMessage').textContent = "Golden Master Extracted! Remove original SD and insert new target card.";
+          }
+          clearInterval(logPollTimer);
+          logPollTimer = null;
+          const btnExtract = document.getElementById('btnExtract');
+          if (btnExtract) btnExtract.disabled = false;
+          const btnFresh = document.getElementById('btnFreshBuild');
+          if (btnFresh) btnFresh.disabled = false;
+          const btnFlash = document.getElementById('btnFlash');
+          if (btnFlash) btnFlash.disabled = false;
+          const btnInject = document.getElementById('btnInjectBits');
+          if (btnInject) btnInject.disabled = false;
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn("Log polling error:", e);
+    }
+  }, 700);
+}
+
+async function extractOriginalData() {
+  const btn = document.getElementById('btnExtract');
+  btn.disabled = true;
+  const selVal = document.getElementById('driveSelectOriginal').value || "2|E:";
+  const [diskIdx, driveLetter] = selVal.split('|');
+
+  // Reset Progress Bar & Banner
+            const stage2Card = document.querySelector('#sectionMigrate .card:nth-child(2)');
+            if (stage2Card) {
+              stage2Card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }
+          clearInterval(logPollTimer);
+          logPollTimer = null;
+          const btnFresh = document.getElementById('btnFreshBuild');
+          if (btnFresh) btnFresh.disabled = false;
+          const btnFlash = document.getElementById('btnFlash');
+          if (btnFlash) btnFlash.disabled = false;
+          const btnInject = document.getElementById('btnInjectBits');
+          if (btnInject) btnInject.disabled = false;
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn("Log polling error:", e);
+    }
+  }, 700);
+}
+
+async function extractOriginalData() {
+  const btn = document.getElementById('btnExtract');
+  btn.disabled = true;
+  const selVal = document.getElementById('driveSelectOriginal').value || "2|E:";
+  const [diskIdx, driveLetter] = selVal.split('|');
+
+  // Reset Progress Bar & Banner
+  if (!confirmed) return;
+
+  await scanDisks();
+
+  const stage2Card = document.querySelector('#sectionMigrate .card:nth-child(2)');
+  if (stage2Card) {
+    stage2Card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    stage2Card.style.outline = '2px solid var(--ok)';
+    stage2Card.style.boxShadow = '0 0 16px rgba(47, 138, 76, 0.35)';
+    setTimeout(() => {
+      stage2Card.style.outline = '';
+      stage2Card.style.boxShadow = '';
+    }, 3000);
+  }
+
+  await buildTargetImage();
+}
+
+async function buildTargetImage() {
+  const btn = document.getElementById('btnFlash');
+  btn.disabled = true;
+  const selVal = document.getElementById('driveSelectTarget').value || "2|E:";
+  const [diskIdx, driveLetter] = selVal.split('|');
+
+  // Reset Progress Bar & Banner
+  const wrap = document.getElementById('flashProgressWrap');
+  const bar = document.getElementById('flashProgressBar');
+  const pctLabel = document.getElementById('flashProgressPct');
+  const banner = document.getElementById('flashSuccessBanner');
+  if (wrap) wrap.style.display = 'block';
+  if (bar) { bar.style.width = '0%'; bar.classList.remove('done'); }
+  if (pctLabel) pctLabel.textContent = '0%';
+  if (banner) banner.style.display = 'none';
+
+  startLogPolling('flashLog', 'flash');
+  try {
+    await fetch(`${API_BASE}/api/start_clean_build`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        disk_index: parseInt(diskIdx || '2'),
+        drive_letter: driveLetter || 'E:',
+        username: 'pi',
+        password: 'pi',
+        hostname: 'k7bit',
+        ssid: 'Shack-WiFi',
+        wifipw: ''
+      })
+    });
+  } catch (e) {
+    logFlash("[ERROR] Image creation failed to start: " + e);
+  }
+}
+
+
+async function injectBitsOnly() {
+  const btn = document.getElementById('btnInjectBits');
+  const user = document.getElementById('freshUsername').value || 'pi';
+  const pass = document.getElementById('freshPassword').value || 'raspberry';
+  const host = document.getElementById('freshHostname').value || 'k7bit';
+  const ssid = document.getElementById('freshSsid').value || 'Shack-WiFi';
+  const wifipw = document.getElementById('freshSsidPass').value || '';
+  const selVal = document.getElementById('driveSelectFresh').value || "2|E:";
+  const [diskIdx, driveLetter] = selVal.split('|');
+
+  if (btn) btn.disabled = true;
+  startLogPolling('freshLog');
+
+  try {
+    const res = await fetch(`${API_BASE}/api/inject_bits`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        disk_index: parseInt(diskIdx || '2'),
+        drive_letter: driveLetter || 'E:',
+        username: user,
+        password: pass,
+        hostname: host,
+        ssid: ssid,
+        wifipw: wifipw
+      })
+    });
+    const data = await res.json();
+    if (data.status !== 'ok') {
+      logFresh("[ERROR] " + (data.message || "Unknown error"));
+      if (btn) btn.disabled = false;
+    }
+  } catch (e) {
+    logFresh("[ERROR] Request failed: " + e);
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function buildFreshSystem() {
+  const btn = document.getElementById('btnFreshBuild');
+  const user = document.getElementById('freshUsername').value || 'pi';
+  const pass = document.getElementById('freshPassword').value || 'raspberry';
+  const host = document.getElementById('freshHostname').value || 'k7bit';
+  const ssid = document.getElementById('freshSsid').value || 'Shack-WiFi';
+  const wifipw = document.getElementById('freshSsidPass').value || '';
+  const selVal = document.getElementById('driveSelectFresh').value || "2|E:";
+  const [diskIdx, driveLetter] = selVal.split('|');
+
+  btn.disabled = true;
+  startLogPolling('freshLog');
+
+  try {
+    const res = await fetch(`${API_BASE}/api/start_clean_build`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        disk_index: parseInt(diskIdx || '2'),
+        drive_letter: driveLetter || 'E:',
+        username: user,
+        password: pass,
+        hostname: host,
+
+  try {
+    const res = await fetch(`${API_BASE}/api/start_clean_build`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        disk_index: parseInt(diskIdx || '2'),
+        drive_letter: driveLetter || 'E:',
+        username: user,
+        password: pass,
+    }
+  } catch (e) {
+    logFresh("[ERROR] Request failed: " + e);
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function buildFreshSystem() {
+  const btn = document.getElementById('btnFreshBuild');
+  const user = document.getElementById('freshUsername').value || 'pi';
+  const pass = document.getElementById('freshPassword').value || 'raspberry';
+  const host = document.getElementById('freshHostname').value || 'k7bit';
+  const ssid = document.getElementById('freshSsid').value || 'Shack-WiFi';
+  const wifipw = document.getElementById('freshSsidPass').value || '';
+}
+
+async function proceedToCreateImage() {
+  const confirmed = confirm(
+    "OPERATOR ACTION CONFIRMATION:\n\n" +
+    "1. Remove your original 32-bit SD card from the PC.\n" +
+    "   (Label it 'GOLDEN MASTER - DO NOT OVERWRITE')\n\n" +
+    "2. Insert your NEW blank 16GB/32GB+ SD card into your USB reader.\n\n" +
+    "Click OK when your new SD card is inserted to begin creating the 64-bit RFK image."
+  );
+  if (!confirmed) return;
+
+  await scanDisks();
+
+  const stage2Card = document.querySelector('#sectionMigrate .card:nth-child(2)');
+  if (stage2Card) {
+    stage2Card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    stage2Card.style.outline = '2px solid var(--ok)';
+    stage2Card.style.boxShadow = '0 0 16px rgba(47, 138, 76, 0.35)';
+    setTimeout(() => {
+      stage2Card.style.outline = '';
+      stage2Card.style.boxShadow = '';
+    }, 3000);
+  }
+
+  await buildTargetImage();
+        hostname: host,
+        ssid: ssid,
+        wifipw: wifipw
+      })
+    });
+    const data = await res.json();
+    if (data.status !== 'ok') {
+      alert("Error starting clean build: " + (data.message || "Unknown error"));
+      btn.disabled = false;
+    }
+  } catch (e) {
+    logFresh("[ERROR] Request failed: " + e);
+    btn.disabled = false;
+  }
+}
+
+function ejectTargetCard() {
+  logFlash("[*] Flushing filesystem cache and safely unmounting target card...");
+  logFresh("[*] Flushing filesystem cache and safely unmounting target card...");
+  setTimeout(() => {
+    logFlash("[+] Target SD card safely unmounted. Safe to remove!");
+    logFresh("[+] Target SD card safely unmounted. Safe to remove!");
+    alert("Target SD Card is safely ejected. You can now insert it into your RF2K amplifier!");
+  }, 600);
+}
+    logFresh("[+] Target SD card safely unmounted. Safe to remove!");
+    alert("Target SD Card is safely ejected. You can now insert it into your RF2K amplifier!");
+  }, 600);
+}
+
+function testAmpConnection() {
+  const addr = document.getElementById('ampRemoteAddress').value.trim();
+  const pill = document.getElementById('remoteStatusPill');
+  pill.textContent = "⏳ Testing...";
+  pill.className = "pill amber";
+
+  fetch(`http://${addr}:8088/api/backup/status`, { mode: 'no-cors' })
+    .then(() => {
+      pill.textContent = `● Online: ${addr}`;
+      pill.className = "pill ok";
+  } catch (e) {
+    logExtract(`[ERROR] Eject request failed: ${e}`);
+  }
+  await scanDisks();
+}
+
+async function ejectTargetCard() {
+  const selVal = (document.getElementById('driveSelectTarget') ? document.getElementById('driveSelectTarget').value : "") || "2|E:";
+  const [diskIdx, driveLetter] = selVal.split('|');
+  const cleanDrive = driveLetter || "E:";
+  logFlash(`[*] Flushing filesystem caches and safely unmounting target card on ${cleanDrive}...`);
+  logFresh(`[*] Flushing filesystem caches and safely unmounting target card on ${cleanDrive}...`);
+  try {
+    const res = await fetch(`${API_BASE}/api/eject_sd`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ drive_letter: cleanDrive })
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      logFlash(`[SUCCESS] Target SD card on ${cleanDrive} safely unmounted.`);
+      logFresh(`[SUCCESS] Target SD card on ${cleanDrive} safely unmounted.`);
+      alert("Target SD Card is safely ejected. You can now insert it into your RF-KIT amplifier!");
+    } else {
+      logFlash(`[-] Eject note: ${data.message}`);
+      logFresh(`[-] Eject note: ${data.message}`);
+      alert("Target SD Card unmounted. You can now insert it into your RF-KIT amplifier!");
+    }
+  } catch (e) {
+    logFlash(`[ERROR] Eject request failed: ${e}`);
+  }
+  await scanDisks();
+}
+
+function testAmpConnection() {

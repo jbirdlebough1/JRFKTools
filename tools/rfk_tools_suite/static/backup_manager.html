@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RF-KIT SD Backup & Disaster Recovery Manager</title>
+    <style>
+        :root {
+            --bg-color: #0f141c;
+            --card-bg: #1a2230;
+            --accent: #2e86de;
+            --accent-hover: #54a0ff;
+            --text-main: #f1f2f6;
+            --text-dim: #a4b0be;
+            --status-good: #2ed573;
+            --status-warn: #ffa502;
+            --status-bad: #ff4757;
+            --border: #2f3640;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: 0.5px;
+        }
+        .header .meta {
+            font-size: 14px;
+            color: var(--text-dim);
+        }
+        .nav-tools {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        .btn:hover {
+            border-color: var(--accent);
+            color: var(--accent-hover);
+        }
+        .btn-primary {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            color: #fff;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .card h2 {
+            margin-top: 0;
+            font-size: 18px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .badge {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .badge-good { background: rgba(46, 213, 115, 0.2); color: var(--status-good); }
+        .badge-bad { background: rgba(255, 71, 87, 0.2); color: var(--status-bad); }
+        .badge-warn { background: rgba(255, 165, 2, 0.2); color: var(--status-warn); }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+        .stat-label { color: var(--text-dim); }
+        .stat-value { font-weight: bold; font-family: monospace; }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: var(--text-dim);
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            background-color: #121824;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: #fff;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .log-box {
+            background-color: #0c1017;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #a4b0be;
+            height: 180px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .recovery-steps {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .recovery-steps li {
+            position: relative;
+            padding-left: 36px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .step-num {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 24px;
+            height: 24px;
+            background-color: var(--accent);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1>RF-KIT Disaster Recovery & Backup Suite</h1>
+            <div class="meta" id="stationMeta">Callsign: K7BIT | Automated Boot Cloner</div>
+        </div>
+        <div class="nav-tools">
+            <a href="/antenna" class="btn">Antenna Mapper</a>
+            <a href="/health" class="btn">Health Monitor</a>
+            <a href="/backup" class="btn btn-primary">Backup Manager</a>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <!-- Drive Media Detection -->
+        <div class="card">
+            <h2>
+                <span>Drive Storage Media</span>
+                <span id="targetStatusBadge" class="badge badge-warn">Scanning...</span>
+            </h2>
+            <div class="stat-row">
+                <span class="stat-label">Source Boot Media:</span>
+                <span class="stat-value" id="bootDevDisplay">/dev/mmcblk0 (Internal SD)</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Boot SD Capacity:</span>
+                <span class="stat-value" id="bootSizeDisplay">-- GB</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">External USB SD Reader:</span>
+                <span class="stat-value" id="targetDevDisplay">Detecting...</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Target Media Model:</span>
+                <span class="stat-value" id="targetModelDisplay">--</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Target Capacity:</span>
+                <span class="stat-value" id="targetSizeDisplay">-- GB</span>
+            </div>
+
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button class="btn btn-primary" id="btnRunNow" onclick="runBackupNow()">Run Backup Now</button>
+                <button class="btn" onclick="fetchStatus()">Refresh Status</button>
+            </div>
+        </div>
+
+        <!-- Weekly Schedule Configuration -->
+        <div class="card">
+            <h2>Automated Weekly Schedule</h2>
+            <p style="font-size: 13px; color: var(--text-dim); margin-top: 0;">
+                Pick a recurring weekly time. Leave the amplifier powered or on standby and the system clones automatically.
+            </p>
+            <div class="form-group">
+                <label for="schedDay">Day of the Week:</label>
+                <select id="schedDay" class="form-control">
+                    <option value="0" selected>Sunday (Recommended)</option>
+                    <option value="1">Monday</option>
+                    <option value="2">Tuesday</option>
+                    <option value="3">Wednesday</option>
+                    <option value="4">Thursday</option>
+                    <option value="5">Friday</option>
+                    <option value="6">Saturday</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="schedTime">Scheduled Time (24h format):</label>
+                <input type="time" id="schedTime" class="form-control" value="03:00">
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="schedEnabled" checked>
+                <label for="schedEnabled">Enable Automated Weekly Backup</label>
+            </div>
+            <div style="margin-top: 15px;">
+                <button class="btn btn-primary" onclick="saveSchedule()">Save Schedule</button>
+                <span id="saveStatus" style="font-size: 13px; margin-left: 10px; color: var(--status-good);"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <!-- Disaster Recovery Instructions -->
+        <div class="card">
+            <h2>Disaster Recovery Walkthrough</h2>
+            <ul class="recovery-steps">
+                <li>
+                    <div class="step-num">1</div>
+                    <strong>Swap SD Cards:</strong> In the event of primary boot SD failure, power off the amplifier and remove the internal SD card from the Raspberry Pi slot. Remove the cloned backup SD card from the external USB reader and insert it directly into the Raspberry Pi internal slot.
+                </li>
+                <li>
+                    <div class="step-num">2</div>
+                    <strong>Power On & Automated First Boot:</strong> Turn on amplifier main power. The built-in <code>jrfk_restore_check</code> service automatically verifies user files, aligns partition UUIDs, logs restoration, and executes a single clean reboot.
+                </li>
+                <li>
+                    <div class="step-num">3</div>
+                    <strong>Immediate Resumption:</strong> Following the automatic reboot, the system launches directly into the fullscreen RFKGUI touch interface with 100% of your antenna memory maps, calibration potentiometers, and operational logs completely intact!
+                </li>
+            </ul>
+        </div>
+
+        <!-- Real-Time Activity Log -->
+        <div class="card">
+            <h2>Backup Activity Log</h2>
+            <div class="log-box" id="logContent">Loading activity logs...</div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchStatus() {
+            try {
+                const res = await fetch('/api/backup/status');
+                const data = await res.json();
+                
+                document.getElementById('bootDevDisplay').innerText = data.boot_dev + " (Active Boot)";
+                document.getElementById('bootSizeDisplay').innerText = (data.boot_size_bytes / (1024*1024*1024)).toFixed(1) + " GB";
+                
+                const badge = document.getElementById('targetStatusBadge');
+                if (data.target_found) {
+                    badge.className = "badge badge-good";
+                    badge.innerText = "Target Ready";
+                    document.getElementById('targetDevDisplay').innerText = data.target_dev;
+                    document.getElementById('targetModelDisplay').innerText = data.target_name || "USB Flash Media";
+                    document.getElementById('targetSizeDisplay').innerText = (data.target_size_bytes / (1024*1024*1024)).toFixed(1) + " GB";
+                    document.getElementById('btnRunNow').disabled = false;
+                } else {
+                    badge.className = "badge badge-bad";
+                    badge.innerText = "No Target SD Reader Detected";
+                    document.getElementById('targetDevDisplay').innerText = "Not Connected";
+                    document.getElementById('targetModelDisplay').innerText = "Please insert USB SD reader into rear port";
+                    document.getElementById('targetSizeDisplay').innerText = "0 GB";
+                    document.getElementById('btnRunNow').disabled = true;
+                }
+
+                if (data.log) {
+                    document.getElementById('logContent').innerText = data.log;
+                }
+
+                if (data.schedule) {
+                    document.getElementById('schedDay').value = data.schedule.day;
+                    document.getElementById('schedTime').value = data.schedule.time;
+                    document.getElementById('schedEnabled').checked = data.schedule.enabled;
+                }
+            } catch (e) {
+                console.error("Error fetching backup status", e);
+            }
+        }
+
+        async function saveSchedule() {
+            const day = document.getElementById('schedDay').value;
+            const time = document.getElementById('schedTime').value;
+            const enabled = document.getElementById('schedEnabled').checked;
+
+            try {
+                const res = await fetch('/api/backup/schedule', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({day, time, enabled})
+                });
+                const resp = await res.json();
+                const saveStatus = document.getElementById('saveStatus');
+                saveStatus.innerText = "Schedule saved successfully!";
+                setTimeout(() => { saveStatus.innerText = ""; }, 3000);
+            } catch (e) {
+                alert("Failed to save schedule: " + e);
+            }
+        }
+
+        async function runBackupNow() {
+            if (!confirm("Are you sure you want to clone the active boot SD to the external backup SD? This will overwrite the target card.")) {
+                return;
+            }
+            const btn = document.getElementById('btnRunNow');
+            btn.disabled = true;
+            btn.innerText = "Backup Running...";
+            
+            try {
+                await fetch('/api/backup/start', {method: 'POST'});
+                alert("Backup initiated in background. Check the Activity Log below for real-time progress.");
+                setTimeout(fetchStatus, 3000);
+            } catch (e) {
+                alert("Error starting backup: " + e);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Run Backup Now";
+            }
+        }
+
+        // Poll status every 10 seconds
+        fetchStatus();
+        setInterval(fetchStatus, 10000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+[Unit]
+Description=JRFK Disaster Recovery First-Boot Check
+Before=nodm.service lightdm.service rf-kit-gui.service
+DefaultDependencies=no
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/pi/rfk_tools/bin/jrfk_restore_check.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=basic.target

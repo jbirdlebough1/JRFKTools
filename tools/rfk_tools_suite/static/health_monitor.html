@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RF-KIT Amplifier Health & Thermal Monitor</title>
+    <style>
+        :root {
+            --bg: #0f141c;
+            --card: #1a2230;
+            --border: #2f3640;
+            --text: #f1f2f6;
+            --dim: #a4b0be;
+            --power: #ff4757;
+            --volt: #2ed573;
+            --curr: #ffa502;
+            --temp: #3742fa;
+            --fan: #00d2d3;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .header h1 { margin: 0; font-size: 24px; }
+        .nav-tools { display: flex; gap: 10px; }
+        .btn {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn:hover { background: #2f3542; }
+        .btn-active { background: #2e86de !important; border-color: #2e86de; }
+        .pane-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .pane-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px 20px;
+        }
+        .pane-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .pane-title { font-weight: bold; font-size: 16px; }
+        .live-stat { font-size: 18px; font-weight: bold; }
+        canvas {
+            width: 100%;
+            height: 180px;
+            display: block;
+        }
+        .telemetry-bar {
+            background: #1e272e;
+            border: 1px solid #34495e;
+            border-radius: 8px;
+            padding: 15px 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+        }
+        .stat-item .label { font-size: 12px; color: var(--dim); text-transform: uppercase; margin-bottom: 4px; }
+        .stat-item .val { font-size: 20px; font-weight: bold; }
+        @media print {
+            body { background: white !important; color: black !important; }
+            .header, .pane-card, .telemetry-bar { background: white !important; border-color: #ccc !important; color: black !important; }
+            .nav-tools { display: none !important; }
+            canvas { border: 1px solid #ddd; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1>RF-KIT Amplifier Health & Thermal Monitor</h1>
+            <div style="font-size:14px; color:var(--dim);">Real-time Telemetry & Power Supply Regulation | K7BIT</div>
+        </div>
+        <div class="nav-tools">
+            <button class="btn btn-active" id="btn-1h" onclick="setWindow('1h')">1-Hour High-Res (5s)</button>
+            <button class="btn" id="btn-24h" onclick="setWindow('24h')">24-Hour Session Accum</button>
+            <button class="btn" onclick="window.print()">🖨️ Print Log</button>
+            <a href="/antenna" class="btn">🗺️ Antenna Mapper</a>
+        </div>
+    </div>
+
+    <div class="telemetry-bar">
+        <div class="stat-item">
+            <div class="label">Forward Power</div>
+            <div class="val" id="stat-pwr" style="color:var(--power);">1,450 W</div>
+        </div>
+        <div class="stat-item">
+            <div class="label">Reflected Power</div>
+            <div class="val" id="stat-refl" style="color:var(--dim);">14 W (1.18:1)</div>
+        </div>
+        <div class="stat-item">
+            <div class="label">DC Rail Voltage</div>
+            <div class="val" id="stat-volt" style="color:var(--volt);">53.4 V</div>
+        </div>
+        <div class="stat-item">
+            <div class="label">DC Drain Current</div>
+            <div class="val" id="stat-curr" style="color:var(--curr);">28.4 A</div>
+        </div>
+        <div class="stat-item">
+            <div class="label">PA Heatsink Temp</div>
+            <div class="val" id="stat-temp" style="color:var(--fan);">43.5 °C (Fans Active)</div>
+        </div>
+    </div>
+    <div style="margin-top:20px;"></div>
+
+    <div class="pane-grid">
+        <!-- Pane 1: RF Power -->
+        <div class="pane-card">
+            <div class="pane-header">
+                <span class="pane-title" style="color:var(--power);">RF Output Power (Forward & Reflected Envelope)</span>
+                <span class="live-stat" id="live-pwr-stat">Peak: 1,510 W</span>
+            </div>
+            <canvas id="pwrChart"></canvas>
+        </div>
+
+        <!-- Pane 2: DC Voltage & Current -->
+        <div class="pane-card">
+            <div class="pane-header">
+                <span class="pane-title" style="color:var(--volt);">53.5V DC Rail Stability & Drain Current Under Key-Down</span>
+                <span class="live-stat" id="live-dc-stat">53.4 V @ 28.4 A</span>
+            </div>
+            <canvas id="dcChart"></canvas>
+        </div>
+
+        <!-- Pane 3: Temperature & Fan Cycle -->
+        <div class="pane-card">
+            <div class="pane-header">
+                <span class="pane-title" style="color:var(--fan);">PA Heatsink Thermal Profile vs. Fan Trigger Thresholds</span>
+                <span class="live-stat" id="live-temp-stat">43.5 °C (Fan On > 42°C | Fan Off < 38°C)</span>
+            </div>
+            <canvas id="tempChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let curWindow = '1h';
+
+        function setWindow(w) {
+            curWindow = w;
+            document.getElementById('btn-1h').classList.toggle('btn-active', w === '1h');
+            document.getElementById('btn-24h').classList.toggle('btn-active', w === '24h');
+            renderAll();
+        }
+
+        function drawPane(canvasId, lineColor, dataPoints, minY, maxY, thresholdY, threshLabel) {
+            let c = document.getElementById(canvasId);
+            c.width = c.parentElement.clientWidth - 40;
+            c.height = 180;
+            let ctx = c.getContext('2d');
+            let w = c.width;
+            let h = c.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Grid lines
+            ctx.strokeStyle = '#2f3640';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(40, 20); ctx.lineTo(w - 20, 20);
+            ctx.moveTo(40, h/2); ctx.lineTo(w - 20, h/2);
+            ctx.moveTo(40, h - 25); ctx.lineTo(w - 20, h - 25);
+            ctx.stroke();
+
+            // Threshold line if present (e.g. 42C Fan trigger)
+            if (thresholdY !== undefined) {
+                let ty = h - 25 - ((thresholdY - minY) / (maxY - minY)) * (h - 45);
+                ctx.strokeStyle = '#00d2d388';
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.moveTo(40, ty); ctx.lineTo(w - 20, ty);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#00d2d3';
+                ctx.font = '11px sans-serif';
+                ctx.fillText(threshLabel, w - 120, ty - 5);
+            }
+
+            // Curve
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            let n = dataPoints.length;
+            dataPoints.forEach((val, i) => {
+                let x = 40 + (i / (n - 1)) * (w - 60);
+                let y = h - 25 - ((val - minY) / (maxY - minY)) * (h - 45);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            // Axis labels
+            ctx.fillStyle = '#a4b0be';
+            ctx.font = '11px sans-serif';
+            ctx.fillText(maxY, 5, 24);
+            ctx.fillText(minY, 5, h - 22);
+        }
+
+        function renderAll() {
+            // Generate telemetry curve samples
+            let points = 60;
+            let pwrData = [], dcData = [], tempData = [];
+            for (let i = 0; i < points; i++) {
+                let keydown = (i % 8 < 5);
+                pwrData.push(keydown ? 1400 + Math.sin(i) * 80 : 0);
+                dcData.push(keydown ? 53.2 + Math.random()*0.3 : 53.7);
+                tempData.push(34 + (i / points) * 11 + Math.sin(i * 0.5) * 1.5);
+            }
+
+            drawPane('pwrChart', '#ff4757', pwrData, 0, 2000);
+            drawPane('dcChart', '#2ed573', dcData, 50.0, 55.0);
+            drawPane('tempChart', '#3742fa', tempData, 20, 60, 42, '42°C Fan On Trigger');
+        }
+
+        window.addEventListener('resize', renderAll);
+        renderAll();
+        // Periodic live refresh every 5s
+        setInterval(renderAll, 5000);
+    </script>
+</body>
+</html>

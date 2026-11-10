@@ -1,0 +1,15 @@
+
+# Disk raw images (saved on disk outside git tracking)
+*.img
+*.img.gz
+
+# Disk raw images (saved on disk outside git tracking)
+*.img
+*.img.gz
+
+.pio/
+__pycache__/
+*.pyc
+*.db
+*.wasm
+*.wasm.gz

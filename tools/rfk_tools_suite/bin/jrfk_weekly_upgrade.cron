@@ -1,0 +1,6 @@
+# JRFK Weekly System Upgrade Automation
+# Runs apt-get update and apt-get upgrade -y every Sunday at 4:00 AM
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+0 4 * * 0 root /home/pi/rfk_tools/bin/jrfk_weekly_upgrade.sh
