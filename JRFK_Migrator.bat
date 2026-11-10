@@ -20,8 +20,8 @@ echo [*] Checking Python 3 runtime...
 set "PYTHON_EXE=python"
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
-    if exist "D:\Espressif\tools\python\python.exe" (
-        set "PYTHON_EXE=D:\Espressif\tools\python\python.exe"
+    if exist "C:\Program Files\CLE\python_runtime\python.exe" (
+        set "PYTHON_EXE=C:\Program Files\CLE\python_runtime\python.exe"
     ) else (
         echo [ERROR] Python is not found in PATH!
         echo Please install Python 3.10+ from python.org or the Microsoft Store.
