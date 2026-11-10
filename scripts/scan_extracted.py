@@ -5,9 +5,10 @@ import sqlite3
 import hashlib
 from pathlib import Path
 
-EXTRACTED_DIR = Path(r"D:\JRFK\extracted")
-DB_PATH = Path(r"D:\JRFK\db\rfk_discovery.db")
-DOC_PATH = Path(r"D:\JRFK\docs\JRFK_EM.md")
+_ROOT = Path(__file__).resolve().parent.parent
+EXTRACTED_DIR = _ROOT / "extracted"
+DB_PATH = _ROOT / "db" / "rfk_discovery.db"
+DOC_PATH = _ROOT / "docs" / "JRFK_EM.md"
 
 def get_file_hash(filepath):
     try:

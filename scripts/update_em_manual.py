@@ -1,7 +1,7 @@
 import os
 import re
 
-MD_PATH = r"D:\JRFK\docs\JRFK_EM.md"
+MD_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "docs", "JRFK_EM.md")
 
 with open(MD_PATH, "r", encoding="utf-8") as f:
     content = f.read()

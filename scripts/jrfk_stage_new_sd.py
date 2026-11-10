@@ -12,7 +12,7 @@ Mounts the new partitions, injects the automigration bundle, udev rules,
 and firstboot service unit.
 """
 
-JRFK_DIR = Path(r"D:\JRFK")
+JRFK_DIR = Path(__file__).resolve().parent.parent
 BUNDLE_FILE = JRFK_DIR / "extracted" / "rfk_bundle.tar.gz"
 SETTINGS_DIR = JRFK_DIR / "extracted" / "user_settings_backup"
 FIRSTBOOT_SCRIPT = JRFK_DIR / "scripts" / "firstboot_setup.sh"

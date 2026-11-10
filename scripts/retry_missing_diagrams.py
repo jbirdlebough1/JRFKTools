@@ -4,10 +4,12 @@ import os
 import time
 import sys
 
-sys.path.insert(0, r"D:\JRFK\scripts")
+from pathlib import Path
+_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_ROOT / "scripts"))
 from render_diagrams import diagrams, convert_foreign_object_to_native_text
 
-DIAGRAM_DIR = r"D:\JRFK\docs\images\diagrams"
+DIAGRAM_DIR = str(_ROOT / "docs" / "images" / "diagrams")
 missing = ['lifecycle_stage2_target_sd', 'calibration_phase1', 'calibration_phase2', 'calibration_phase3']
 
 for name in missing:
