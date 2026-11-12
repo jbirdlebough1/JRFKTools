@@ -134,6 +134,8 @@
    * 15.4 Circular Telemetry Logging (10 MB Rotating File)
    * 15.5 Live Remote Web Screen Console (/screen)
    * 15.6 Backup & Disaster Recovery Web Manager (/backup)
+   * 15.7 JRFK Complete Station System Report (/report)
+   * 15.8 Centralized Log Viewer (/logs)
 16. [System Configuration, Database Engine & Station Personalization](#16-system-configuration-database-engine--station-personalization)
    * 16.1 Display Themes: Cross-Pointer vs Standard Bar Meters
    * 16.2 Station Callsign, Antenna Port Aliasing & Band Allocation
@@ -1348,10 +1350,30 @@ To facilitate remote station operation and shack monitoring, the JRFK Tools Suit
 ---
 
 ### 15.6 Backup & Disaster Recovery Web Manager (`/backup`)
-Web interface managing the automated replication of `/dev/mmcblk0` to an external USB 3.0 MicroSD reader (`/dev/sda`):
+Web interface managing the automated replication of `/dev/mmcblk0` to an external USB 2.0 MicroSD reader (`/dev/sda`):
 * **One-Click Manual Replication:** Triggers `rfk_backup.sh` in the background with real-time log streaming.
 * **Weekly Automated Cron Management:** Commits execution schedules to `/etc/cron.d/jrfk_weekly_backup` (default: Sunday 03:00 UTC).
 * **Storage Media Sizing Guard:** Verifies target media capacity meets or exceeds boot drive capacity before initiating block-level copy.
+
+---
+
+### 15.7 JRFK Complete Station System Report (`/report`)
+Unified technical audit interface in Medium Blueprint format:
+* **Endpoint:** `http://<station-ip>:8088/report`
+* **Station Parameters:** Complete extraction of `/home/pi/rf-kit-statics/config.json`, callsign, transceiver link, operate mode.
+* **Storage Utilization:** Partition statistics (`/dev/mmcblk0p1` FAT32 boot, `/dev/mmcblk0p2` EXT4 rootfs), used/free percentages, and wear leveling status for high-endurance A2 media.
+* **RF Calibration Values:** Null voltages for forward and reflected detectors, scale factors, and SWR bridge baseline.
+* **Network & Display:** Shack Wi-Fi RSSI, IP address, MAC, SSH port 22 access status, and 1024x600 CVT modeline configuration.
+* **ATU Band Segment Map:** Matrix across all 11 amateur bands (160m–6m) mapping each segment to assigned antenna port, physical inductance range (nH), capacitance range (pF), and topology.
+
+---
+
+### 15.8 Centralized Log Viewer (`/logs`)
+Live terminal diagnostic suite on Port 8088:
+* **Endpoint:** `http://<station-ip>:8088/logs`
+* **Log Stream Coverage:** Directly inspects `rf-kit-gui.log` (core app), `telemetry_rolling.log` (10MB circular log), `rfk_backup.log` (cloning log), `jrfk_firstboot.log` (migration log), and `Xorg.0.log` (display server).
+* **Search & Auto-Scroll:** Interactive client-side filtering, automatic scroll-to-bottom, and 4-second background refresh.
+* **Station Archival Printing:** `@media print` CSS outputs clean white paper log sheets for shack records.
 
 ---
 

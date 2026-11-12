@@ -6,18 +6,18 @@
     <title>RF-KIT Linear Amplifier: 32-Bit to 64-Bit OS Migration, Disaster Recovery & Operator's Guide</title>
     <style>
         :root {
-            --bp-blue: #0a2540;
-            --bp-dark: #07172b;
-            --bp-grid: #133d6b;
-            --bp-border: #2563eb;
-            --bp-cyan: #38bdf8;
+            --bp-blue: #1a5695;          /* Medium blueprint cyanotype blue */
+            --bp-dark: #0f3661;
+            --bp-grid: rgba(255, 255, 255, 0.18);
+            --bp-border: #93c5fd;
+            --bp-cyan: #67e8f9;
             --data-green: #16a34a;
             --data-yellow: #d97706;
             --data-red: #dc2626;
             --text-dark: #1e293b;
             --text-muted: #64748b;
             --bg-light: #f8fafc;
-            --card-border: #e2e8f0;
+            --card-border: #cbd5e1;
         }
 
         * {
@@ -33,9 +33,8 @@
             padding: 0;
         }
 
-        /* Container for manual */
         .manual-container {
-            max-width: 960px;
+            max-width: 980px;
             margin: 0 auto;
             background: #ffffff;
             padding: 45px 55px;
@@ -63,13 +62,13 @@
         }
         h1 {
             color: var(--bp-blue);
-            font-size: 30px;
+            font-size: 28px;
             line-height: 1.25;
             margin: 0 0 10px 0;
             font-weight: 800;
         }
         .subtitle {
-            font-size: 17px;
+            font-size: 16px;
             color: var(--text-muted);
             margin: 0 0 15px 0;
             font-weight: 500;
@@ -83,7 +82,7 @@
             background: #f1f5f9;
             padding: 12px 16px;
             border-radius: 6px;
-            border-left: 4px solid var(--bp-border);
+            border-left: 4px solid var(--bp-blue);
         }
 
         /* Section Headings */
@@ -144,34 +143,28 @@
             border-color: #22c55e;
             color: #166534;
         }
-        .alert-blueprint {
-            background: var(--bp-blue);
-            border-color: var(--bp-cyan);
-            color: #ffffff;
-            font-family: 'Consolas', monospace;
-            box-shadow: 0 4px 12px rgba(10,37,64,0.15);
-        }
 
-        /* Technical Blueprint Frame Box */
+        /* Classic Medium-Blue Blueprint Card */
         .blueprint-card {
             background: var(--bp-blue);
             background-image: 
                 linear-gradient(var(--bp-grid) 1px, transparent 1px),
                 linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px);
-            background-size: 16px 16px;
+            background-size: 18px 18px;
             color: #ffffff;
-            border: 2px solid var(--bp-cyan);
+            border: 2px solid #ffffff;
             padding: 20px;
             border-radius: 6px;
             margin: 20px 0;
-            font-family: 'Consolas', monospace;
+            font-family: 'Consolas', 'Courier New', monospace;
             font-size: 13px;
+            box-shadow: 0 4px 15px rgba(26, 86, 149, 0.25);
         }
         .blueprint-card .bp-title {
-            color: var(--bp-cyan);
+            color: #ffffff;
             font-size: 14px;
             font-weight: bold;
-            border-bottom: 1px solid var(--bp-grid);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.35);
             padding-bottom: 6px;
             margin-bottom: 12px;
             text-transform: uppercase;
@@ -186,22 +179,21 @@
             margin-bottom: 20px;
             background: #ffffff;
             box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-            position: relative;
         }
         .step-block h4 {
             margin: 0 0 10px 0;
-            font-size: 16px;
+            font-size: 15px;
             color: var(--bp-blue);
             display: flex;
             align-items: center;
             gap: 10px;
         }
         .step-badge {
-            background: #3b82f6;
+            background: var(--bp-blue);
             color: #ffffff;
             font-size: 11px;
             font-weight: bold;
-            padding: 2px 7px;
+            padding: 2px 8px;
             border-radius: 3px;
         }
 
@@ -228,8 +220,8 @@
 
         /* Mockup screens */
         .screen-mockup {
-            border: 2px solid #334155;
-            background: #0f172a;
+            border: 2px solid #1e3a8a;
+            background: #0f2c4d;
             color: #f8fafc;
             border-radius: 6px;
             overflow: hidden;
@@ -237,13 +229,13 @@
             font-family: 'Consolas', monospace;
         }
         .screen-mockup-titlebar {
-            background: #1e293b;
+            background: #1a5695;
             padding: 8px 14px;
             font-size: 12px;
             display: flex;
             justify-content: space-between;
-            color: #94a3b8;
-            border-bottom: 1px solid #334155;
+            color: #ffffff;
+            border-bottom: 1px solid #93c5fd;
         }
         .screen-mockup-body {
             padding: 20px;
@@ -281,9 +273,9 @@
     <div class="cover-header">
         <span class="doc-badge">OFFICIAL USER &amp; OPERATOR'S MANUAL</span>
         <h1>RF-KIT Linear Amplifier: 32-Bit to 64-Bit OS Migration, Disaster Recovery &amp; Operator's Guide</h1>
-        <div class="subtitle">Turnkey Migration, Golden Master Preservation, 3-Boot Walkthrough, and Diagnostic Suite (Antenna Mapper, Health Monitor, Screen Viewer &amp; Rolling Telemetry)</div>
+        <div class="subtitle">Turnkey Migration, Golden Master Preservation, 3-Boot Walkthrough, System Report, Log Viewer &amp; Blueprint Diagnostic Suite</div>
         <div class="meta-grid">
-            <div><strong>Document ID:</strong> JRFK-UG-2026-V1.0</div>
+            <div><strong>Document ID:</strong> JRFK-UG-2026-V2.0</div>
             <div><strong>Author:</strong> John Birdlebough (K7BIT)</div>
             <div><strong>Target Platforms:</strong> RF-KIT RF2K-S / RF2K+</div>
             <div><strong>Operating System:</strong> 64-Bit Debian Trixie (aarch64)</div>
@@ -293,14 +285,14 @@
     <!-- Section 1: Prerequisites & Station Preparation -->
     <h2><span class="sec-num">01</span> Prerequisites &amp; Hardware Preparation</h2>
 
-    <p>Before initiating the 32-bit to 64-bit migration of your RF-KIT linear amplifier, ensure you have gathered the required hardware components and verified the firmware version of your amplifier. Following these requirements guarantees 100% zero-risk protection of your calibration data.</p>
+    <p>Before initiating the 32-bit to 64-bit migration of your RF-KIT linear amplifier, ensure you have gathered the required hardware components and verified the firmware version of your amplifier. Following these requirements guarantees complete zero-risk protection of your calibration data.</p>
 
     <div class="alert alert-warning">
         <strong>CRITICAL FIRMWARE PREREQUISITE:</strong> Your RF-KIT amplifier must run <strong>firmware version v199, v200, or later</strong> prior to starting the migration. Do not attempt migration on obsolete v198 or earlier firmware, as internal controller parameter schemas were updated in v199 to support 64-bit SimpleRPC protocol parity. Run the official RF-KIT online software update first if needed.
     </div>
 
     <h3>The 6-Card MicroSD Architecture Fleet</h3>
-    <p>Professional broadcast stations and mission-critical amateur stations never rely on a single storage medium. You must procure <strong>six (6) high-endurance 32GB MicroSD cards</strong> (SanDisk Extreme, Ultra, or Pro rated <strong>V30, A2/A3, or faster</strong> with minimum 100 MB/s read and 60 MB/s write speeds) along with a reliable <strong>USB 3.0 MicroSD reader/writer</strong>.</p>
+    <p>Professional broadcast stations and mission-critical amateur stations never rely on a single storage medium. You must procure <strong>six (6) high-endurance 32GB MicroSD cards</strong> (SanDisk Extreme, Ultra, or Pro rated <strong>V30, A2/A3, or faster</strong> with minimum 100 MB/s read and 60 MB/s write speeds) along with a reliable <strong>USB 2.0 MicroSD reader/writer</strong>.</p>
 
     <table>
         <thead>
@@ -340,7 +332,7 @@
                 <td><strong>Card 5</strong></td>
                 <td><span style="background:#bae6fd; padding:2px 6px; border:1px solid #0284c7; font-weight:bold;">BACKUP-AUTO</span></td>
                 <td>32GB V30/A2 MicroSD</td>
-                <td><strong>Automated Rolling Backup Target.</strong> Left permanently inserted in the amplifier's USB 3.0 reader for weekly cron clones.</td>
+                <td><strong>Automated Rolling Backup Target.</strong> Left permanently inserted in the amplifier's USB 2.0 reader for weekly cron clones.</td>
             </tr>
             <tr>
                 <td><strong>Card 6</strong></td>
@@ -368,17 +360,17 @@
     <!-- Diagram of Safe Golden Master Cloning -->
     <div class="diagram-container">
         <svg viewBox="0 0 750 180" width="750" height="180">
-            <rect x="20" y="40" width="180" height="90" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+            <rect x="20" y="40" width="180" height="90" rx="8" fill="#1a5695" stroke="#ffffff" stroke-width="2"/>
             <text x="110" y="75" fill="#ffffff" font-size="14" font-weight="bold" text-anchor="middle">ACTIVE 32-BIT SD</text>
-            <text x="110" y="100" fill="#94a3b8" font-size="12" text-anchor="middle">/dev/mmcblk0 (Internal)</text>
+            <text x="110" y="100" fill="#dbeafe" font-size="12" text-anchor="middle">/dev/mmcblk0 (Internal)</text>
 
-            <path d="M 200 85 L 280 85" fill="none" stroke="#38bdf8" stroke-width="3" marker-end="url(#arrow)"/>
+            <path d="M 200 85 L 280 85" fill="none" stroke="#1a5695" stroke-width="3"/>
             <rect x="280" y="60" width="170" height="50" rx="6" fill="#0f766e" stroke="#2dd4bf" stroke-width="2"/>
             <text x="365" y="85" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">Raspberry Pi `piclone`</text>
             <text x="365" y="102" fill="#ccfbf1" font-size="11" text-anchor="middle">(SD Card Copier Utility)</text>
 
-            <path d="M 450 70 L 530 50" fill="none" stroke="#facc15" stroke-width="2"/>
-            <path d="M 450 100 L 530 120" fill="none" stroke="#facc15" stroke-width="2"/>
+            <path d="M 450 70 L 530 50" fill="none" stroke="#d97706" stroke-width="2"/>
+            <path d="M 450 100 L 530 120" fill="none" stroke="#d97706" stroke-width="2"/>
 
             <rect x="530" y="20" width="190" height="60" rx="6" fill="#854d0e" stroke="#facc15" stroke-width="2"/>
             <text x="625" y="45" fill="#fef08a" font-size="13" font-weight="bold" text-anchor="middle">CARD 1: GOLD1</text>
@@ -391,8 +383,8 @@
     </div>
 
     <div class="step-block">
-        <h4><span class="step-badge">STEP 2.1</span> Insert Target MicroSD into USB Reader</h4>
-        <p>Plug Card 1 into your USB 3.0 MicroSD reader and connect it to an open blue USB 3.0 port on the Raspberry Pi while your working 32-bit system is booted.</p>
+        <h4><span class="step-badge">STEP 2.1</span> Insert Target MicroSD into USB 2.0 Reader</h4>
+        <p>Plug Card 1 into your USB 2.0 MicroSD reader and connect it to a black USB 2.0 port on the Raspberry Pi while your working 32-bit system is booted.</p>
     </div>
 
     <div class="step-block">
@@ -400,7 +392,7 @@
         <p>On the Raspberry Pi desktop, navigate to <strong>Application Menu (Raspberry icon) &gt; Accessories &gt; SD Card Copier</strong>.</p>
         <ul>
             <li><strong>Copy From Device:</strong> Select <code>Internal SD card (/dev/mmcblk0)</code>.</li>
-            <li><strong>Copy To Device:</strong> Select your USB reader, e.g. <code>Mass Storage Device (/dev/sda)</code>.</li>
+            <li><strong>Copy To Device:</strong> Select your USB 2.0 reader, e.g. <code>Mass Storage Device (/dev/sda)</code>.</li>
             <li><strong>New Partition UUIDs:</strong> Leave <em>unchecked</em> (this ensures an exact identical clone).</li>
             <li>Click <strong>Start</strong>. When the prompt asks for confirmation to wipe the USB card, click <strong>OK</strong>.</li>
         </ul>
@@ -420,6 +412,10 @@
 
     <p>In this workflow, the automated JRFK Windows application extracts your unique station parameters from <code>GOLD1</code> in read-only mode, flashes the target 64-bit Debian Trixie OS image onto Card 3 (<code>PROD-64</code>), and stages the JRFK payload into the boot partition.</p>
 
+    <div class="alert alert-info">
+        <strong>PERMANENT LOCAL PC STORAGE:</strong> Once JRFK reads a GOLD card, your station settings, calibration tables, ATU matrices, and network configurations are <strong>permanently stored on your local PC hard drive</strong> (inside <code>D:\JRFK\backups\gold_staging\</code>). Even if both physical GOLD SD cards were misplaced or damaged, your complete amplifier personality remains safely archived on your PC forever.
+    </div>
+
     <!-- Visual Migration Flow Mockup -->
     <div class="screen-mockup">
         <div class="screen-mockup-titlebar">
@@ -429,18 +425,20 @@
         <div class="screen-mockup-body">
             <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
                 <div>
-                    <span style="color:#38bdf8;">[1] READ-ONLY GOLD EXTRACTION</span> &gt; 
-                    <span style="color:#94a3b8;"> [2] TARGET SD WIPE</span> &gt; 
-                    <span style="color:#94a3b8;"> [3] 64-BIT FLASH &amp; INJECTION</span>
+                    <span style="color:#67e8f9;">[1] READ-ONLY GOLD EXTRACTION</span> &gt; 
+                    <span style="color:#dbeafe;"> [2] TARGET SD WIPE</span> &gt; 
+                    <span style="color:#dbeafe;"> [3] 64-BIT FLASH &amp; INJECTION</span>
                 </div>
                 <span style="color:#22c55e;">● SYSTEM PROTECTION LOCKED</span>
             </div>
-            <div style="background:#1e293b; padding:15px; border-radius:4px; font-size:12px; line-height:1.6;">
-                [+] USB Reader Detected: Disk 2 (SanDisk Ultra USB 3.0 - 31.9 GB)<br>
+            <div style="background:#133d6b; padding:15px; border-radius:4px; font-size:12px; line-height:1.6; border:1px solid #93c5fd;">
+                [+] USB 2.0 Reader Detected: Disk 2 (SanDisk Ultra - 31.9 GB)<br>
                 [+] MBR Signature Verified: 0xfc92c19c (Golden Master 32-Bit)<br>
                 [+] Extracted /home/pi/rf-kit-statics/config.json (Callsign: K7BIT)<br>
                 [+] Extracted directional coupler &amp; RF detector calibration tables<br>
                 [+] Extracted wpa_supplicant.conf Wi-Fi credentials &amp; X11 touch matrices<br>
+                [+] Extracted ATU tuning matrices for all 11 amateur bands<br>
+                [+] STATION ARCHIVE STORED PERMANENTLY ON LOCAL PC (D:\JRFK\backups\gold_staging\)<br>
                 [+] Extraction complete! Please REMOVE Golden Master and insert your NEW target SD.
             </div>
         </div>
@@ -452,12 +450,12 @@
     </div>
 
     <div class="step-block">
-        <h4><span class="step-badge">STEP 3.2</span> Insert GOLD1 into PC USB Reader</h4>
-        <p>Plug <code>GOLD1</code> into your PC's USB reader. JRFK immediately identifies the volume in <strong>strictly read-only mode</strong>. It extracts:</p>
+        <h4><span class="step-badge">STEP 3.2</span> Insert GOLD1 into PC USB 2.0 Reader</h4>
+        <p>Plug <code>GOLD1</code> into your PC's USB 2.0 reader. JRFK immediately identifies the volume in <strong>strictly read-only mode</strong>. It extracts and archives:</p>
         <ul>
             <li><code>/home/pi/rf-kit-statics/config.json</code> (Station callsign, antenna port mappings, custom names)</li>
             <li>Calibration lookup tables (SWR null, forward/reflected detector polynomials)</li>
-            <li>Antenna Tuner (ATU) band segment matrices ($L$ and $C$ matching values)</li>
+            <li>Antenna Tuner (ATU) band segment matrices (L and C matching values)</li>
             <li>Network configuration (<code>/etc/wpa_supplicant/wpa_supplicant.conf</code>)</li>
             <li>Touchscreen alignment parameters (<code>/etc/pointercal</code> and Xorg evdev configs)</li>
         </ul>
@@ -468,10 +466,10 @@
 
     <div class="step-block">
         <h4><span class="step-badge">STEP 3.3</span> Insert Target Card 3 (PROD-64) &amp; Execute Clean Wipe</h4>
-        <p>Insert your blank Card 3 (<code>PROD-64</code>) into the USB reader. JRFK performs strict safety checks:</p>
+        <p>Insert your blank Card 3 (<code>PROD-64</code>) into the USB 2.0 reader. JRFK performs strict safety checks:</p>
         <ol>
             <li>Verifies the drive is <em>Removable</em> (blocking system drive C:, D:, and fixed NVMe/SSDs).</li>
-            <li>Confirms capacity is $\le 64\text{ GB}$.</li>
+            <li>Confirms capacity is &lt;= 64 GB.</li>
             <li>Executes a low-level DISKPART clean operation to purge corrupt partition tables.</li>
         </ol>
     </div>
@@ -496,14 +494,14 @@
     <div class="diagram-container">
         <svg viewBox="0 0 750 200" width="750" height="200">
             <!-- Boot 1 -->
-            <rect x="20" y="30" width="210" height="140" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
-            <text x="125" y="60" fill="#38bdf8" font-size="14" font-weight="bold" text-anchor="middle">BOOT 1: FIRSTBOOT</text>
+            <rect x="20" y="30" width="210" height="140" rx="8" fill="#1a5695" stroke="#ffffff" stroke-width="2"/>
+            <text x="125" y="60" fill="#ffffff" font-size="14" font-weight="bold" text-anchor="middle">BOOT 1: FIRSTBOOT</text>
             <text x="125" y="85" fill="#ffffff" font-size="12" text-anchor="middle">Headless Unattended Setup</text>
-            <text x="125" y="110" fill="#94a3b8" font-size="11" text-anchor="middle">• Expands rootfs to 32GB</text>
-            <text x="125" y="128" fill="#94a3b8" font-size="11" text-anchor="middle">• Installs 15 arm64 .debs</text>
-            <text x="125" y="146" fill="#94a3b8" font-size="11" text-anchor="middle">• Auto-reboots (~3 min)</text>
+            <text x="125" y="110" fill="#dbeafe" font-size="11" text-anchor="middle">• Expands rootfs to 32GB</text>
+            <text x="125" y="128" fill="#dbeafe" font-size="11" text-anchor="middle">• Installs 15 arm64 .debs</text>
+            <text x="125" y="146" fill="#dbeafe" font-size="11" text-anchor="middle">• Auto-reboots (~3 min)</text>
 
-            <path d="M 230 100 L 270 100" fill="none" stroke="#38bdf8" stroke-width="3" marker-end="url(#arrow)"/>
+            <path d="M 230 100 L 270 100" fill="none" stroke="#1a5695" stroke-width="3"/>
 
             <!-- Boot 2 -->
             <rect x="270" y="30" width="210" height="140" rx="8" fill="#14532d" stroke="#22c55e" stroke-width="2"/>
@@ -513,15 +511,15 @@
             <text x="375" y="128" fill="#bbf7d0" font-size="11" text-anchor="middle">• Audits checksum hashes</text>
             <text x="375" y="146" fill="#bbf7d0" font-size="11" text-anchor="middle">• User taps "Proceed"</text>
 
-            <path d="M 480 100 L 520 100" fill="none" stroke="#22c55e" stroke-width="3" marker-end="url(#arrow)"/>
+            <path d="M 480 100 L 520 100" fill="none" stroke="#22c55e" stroke-width="3"/>
 
             <!-- Boot 3 -->
-            <rect x="520" y="30" width="210" height="140" rx="8" fill="#0c4a6e" stroke="#38bdf8" stroke-width="2"/>
-            <text x="625" y="60" fill="#38bdf8" font-size="14" font-weight="bold" text-anchor="middle">BOOT 3: PRODUCTION</text>
+            <rect x="520" y="30" width="210" height="140" rx="8" fill="#1e3a8a" stroke="#60a5fa" stroke-width="2"/>
+            <text x="625" y="60" fill="#93c5fd" font-size="14" font-weight="bold" text-anchor="middle">BOOT 3: PRODUCTION</text>
             <text x="625" y="85" fill="#ffffff" font-size="12" text-anchor="middle">Live RF-KIT Desktop</text>
             <text x="625" y="110" fill="#bae6fd" font-size="11" text-anchor="middle">• Native RFK Touch GUI</text>
             <text x="625" y="128" fill="#bae6fd" font-size="11" text-anchor="middle">• 64-Bit Performance</text>
-            <text x="625" y="146" fill="#bae6fd" font-size="11" text-anchor="middle">• Tools Suite on :8088</text>
+            <text x="625" y="146" fill="#bae6fd" font-size="11" text-anchor="middle">• Diagnostic Suite on :8088</text>
         </svg>
     </div>
 
@@ -577,10 +575,10 @@
     <!-- Section 5: Option 2 - Virgin Fresh 64-Bit Setup (Without GOLD) -->
     <h2><span class="sec-num">05</span> Option 2: Virgin Fresh 64-Bit Setup (Without GOLD Card)</h2>
 
-    <p>In certain scenarios, an operator may not possess a working 32-bit Golden Master—for example, if the original SD card suffered physical failure, was lost, or if the amplifier is being rebuilt with a replacement Raspberry Pi 4 or Pi 5. JRFK provides a dedicated <strong>Virgin 64-Bit Setup Mode</strong>.</p>
+    <p>In scenarios where an operator does not possess a 32-bit Golden Master (for example, if the original SD card suffered physical failure, was lost, or if the amplifier is being rebuilt with a replacement Raspberry Pi 4 or Pi 5), JRFK provides a dedicated <strong>Virgin 64-Bit Setup Mode</strong>.</p>
 
     <h3>Minimum Inputs Required from User</h3>
-    <p>When running JRFK in Virgin Setup mode, you are prompted for only four mandatory parameters to establish the appliance baseline:</p>
+    <p>When running JRFK in Virgin Setup mode, you are prompted for only four parameters to generate a clean, ready-to-run 64-bit appliance:</p>
     <table>
         <thead>
             <tr>
@@ -613,29 +611,12 @@
         </tbody>
     </table>
 
-    <h3>Initial Factory Alignment Procedure</h3>
-    <p>Because no prior calibration tables exist in a virgin setup, you must perform a standard alignment before transmitting high RF power through the amplifier:</p>
-    <div class="step-block">
-        <h4><span class="step-badge">ALIGN 1</span> Null Signal Offset Calibration</h4>
-        <p>With no RF drive applied (exciter unkeyed), access the RF-KIT Calibration Menu and store the zero-signal voltage offsets for the forward and reflected RF detector diodes.</p>
-    </div>
-    <div class="step-block">
-        <h4><span class="step-badge">ALIGN 2</span> DC Rail Voltage &amp; Bias Current Trimming</h4>
-        <p>Verify the 53.5V switching power supply voltage using a calibrated multimeter across the DC distribution bus. Adjust trimmer potentiometer R14/R15 to ensure idle drain bias current matches the factory specification ($500\text{ mA}$ per LDMOS device).</p>
-    </div>
-    <div class="step-block">
-        <h4><span class="step-badge">ALIGN 3</span> Directional Coupler Power Scaling</h4>
-        <p>Apply 100W carrier into a certified 50-ohm dummy load. Adjust trimmer R1 (forward power detector) until the RFK GUI display precisely matches your external precision wattmeter (e.g. Bird 43 or Coaxial Dynamics). Reverse connections or inject known mismatch to adjust R2 (reflected power).</p>
-    </div>
-    <div class="step-block">
-        <h4><span class="step-badge">ALIGN 4</span> Automatic Tuner (ATU) Segment Population</h4>
-        <p>For each band (160m through 6m), execute an automated tuner sweep across each segment. The ATU characterizer will determine the optimal binary relay combination for physical inductance ($L$) and capacitance ($C$), writing the results to <code>/home/pi/rf-kit-statics/config.json</code>.</p>
-    </div>
+    <p>Upon entering these four parameters, JRFK creates the standard directory structure, deploys all 64-bit libraries and dependencies, configures the 1024x600 display timing, and pre-authorizes your network credentials. The amplifier boots directly into a fresh, fully functional 64-bit installation ready for operation.</p>
 
     <!-- Section 6: RFK Tools Suite Operator's Guide -->
     <h2><span class="sec-num">06</span> RFK Diagnostic Suite Operator's Guide (Port 8088)</h2>
 
-    <p>The JRFK 64-bit environment includes a standalone diagnostic and disaster recovery web suite operating on <strong>Port 8088</strong> (e.g., <code>http://192.168.12.193:8088</code>). Designed in high-contrast <strong>Architectural Blueprint Format</strong> (crisp white typography on deep `#0a2540` blueprint blue), it provides comprehensive real-time telemetry and safety controls.</p>
+    <p>The JRFK 64-bit environment includes a standalone diagnostic and disaster recovery web suite operating on <strong>Port 8088</strong> (e.g., <code>http://192.168.12.193:8088</code>). Designed in high-contrast <strong>Medium Blueprint Format</strong> (crisp white typography and white grid on medium cyanotype blue <code>#1a5695</code>), it provides comprehensive real-time telemetry and safety controls.</p>
 
     <!-- Antenna Mapper Subsection -->
     <h3>6.1 Antenna Mapper &amp; Tuner Bode Plot (`/antenna`)</h3>
@@ -644,11 +625,11 @@
     <div class="blueprint-card">
         <div class="bp-title">ANTENNA MAPPER SPECIFICATION &amp; BODE MARKERS</div>
         • <strong>Segment Boundaries (|):</strong> The Bode plot displays vertical dashed dividing lines with a "|" marker at each segment boundary (e.g., 25 kHz segments on 20m: 14.000, 14.025, 14.050 ... 14.350 MHz).<br>
-        • <strong>Antenna Port Map Synchronization:</strong> The "ACTIVE ANTENNA" indicator dynamically reflects the selected band's antenna port assignment from `config.json` (e.g., Band 20m &rarr; "ANT 2: SteppIR 20m-6m"). As you change bands via the spinner or buttons, the antenna field and Bode plot update in lockstep.<br>
+        • <strong>Antenna Port Map Synchronization:</strong> The "ACTIVE ANTENNA" indicator dynamically reflects the selected band's antenna port assignment from config.json (e.g., Band 20m &rarr; "ANT 2: SteppIR 20m-6m"). As you change bands via the spinner or buttons, the antenna field and Bode plot update in lockstep.<br>
         • <strong>Physical Component Values (No Raw Clicks!):</strong> Instead of obscure stepper clicks, the inspector reports true engineering units:
-          - Inductance (L): Displayed in <strong>nanohenries (nH)</strong> and <strong>microhenries (&micro;H)</strong> (e.g., 1,750 nH / 1.75 &micro;H).
+          - Inductance (L): Displayed in <strong>nanohenries (nH)</strong> and <strong>microhenries (µH)</strong> (e.g., 1,750 nH / 1.75 µH).
           - Capacitance (C): Displayed in <strong>picofarads (pF)</strong> (e.g., 385 pF).
-          - Matching Topology: Indicates <strong>CL ($C_{\text{in}}$ / Tx Side)</strong> or <strong>LC ($C_{\text{out}}$ / Ant Side)</strong> relay configuration.
+          - Matching Topology: Indicates <strong>CL (Cin / Tx Side)</strong> or <strong>LC (Cout / Ant Side)</strong> relay configuration.
     </div>
 
     <!-- Health Monitor & Thermal Guard Subsection -->
@@ -667,31 +648,31 @@
         <tbody>
             <tr>
                 <td><strong>Tier 1: Normal</strong></td>
-                <td>$\le 50.0^\circ\text{C}$</td>
+                <td>&lt;= 50.0°C</td>
                 <td><span style="color:#16a34a; font-weight:bold;">GREEN</span></td>
-                <td>Standard operating duty. Cooling fans operate automatically (Fan On &gt; $42^\circ\text{C}$, Fan Off &lt; $38^\circ\text{C}$).</td>
+                <td>Standard operating duty. Cooling fans operate automatically (Fan On &gt; 42°C, Fan Off &lt; 38°C).</td>
             </tr>
             <tr>
                 <td><strong>Tier 2: Warning</strong></td>
-                <td>$50.1^\circ\text{C} - 55.0^\circ\text{C}$</td>
+                <td>50.1°C - 55.0°C</td>
                 <td><span style="color:#d97706; font-weight:bold;">YELLOW</span></td>
                 <td><strong>Warning Banner Displayed.</strong> Telemetry line turns yellow. High thermal load alert generated.</td>
             </tr>
             <tr>
                 <td><strong>Tier 3: Alert</strong></td>
-                <td>$55.1^\circ\text{C} - 60.0^\circ\text{C}$</td>
+                <td>55.1°C - 60.0°C</td>
                 <td><span style="color:#dc2626; font-weight:bold;">RED</span></td>
                 <td><strong>Critical Alert Banner.</strong> Telemetry line turns red. Operator warned of imminent safety shutdown.</td>
             </tr>
             <tr>
                 <td><strong>Tier 4: Trip Limit</strong></td>
-                <td>$&gt; 60.0^\circ\text{C}$</td>
+                <td>&gt; 60.0°C</td>
                 <td><span style="background:#dc2626; color:#fff; padding:2px 6px; font-weight:bold;">UNKEY TRIP</span></td>
                 <td><strong>EMERGENCY UNKEY &amp; PROTECTION LOCKOUT:</strong><br>
                 1. Instantly unkeys amplifier (switches core to Standby).<br>
                 2. Displays full-screen modal alert: <em>"AMPLIFIER DISABLED AND PROTECTED"</em>.<br>
                 3. Initiates live <strong>300-second (5 minute) countdown timer</strong>.<br>
-                4. <strong>Interlock:</strong> Re-enables amplifier ONLY when timer reaches 0 <em>AND</em> heatsink temp cools below $50.0^\circ\text{C}$.</td>
+                4. <strong>Interlock:</strong> Re-enables amplifier ONLY when timer reaches 0 <em>AND</em> heatsink temp cools below 50.0°C.</td>
             </tr>
         </tbody>
     </table>
@@ -699,19 +680,42 @@
     <h3>6.3 Circular Telemetry Logging (10 MB Rotating Buffer)</h3>
     <p>To prevent storage exhaustion and SD card write wear, JRFK implements a strict <strong>10MB rotating circular log</strong> located at <code>/home/pi/rfk_tools/telemetry_rolling.log</code>. The logging engine computes rolling statistical summaries:</p>
     <ul>
-        <li><strong>PA Temperature ($^\circ\text{C}$):</strong> Current, Typical (running average), Minimum, and Maximum.</li>
-        <li><strong>DC Rail Voltage ($\text{V}$):</strong> Current, Typ, Min, and Max (monitoring 53.5V regulation under heavy CW/SSB key-down).</li>
-        <li><strong>DC Drain Current ($\text{A}$):</strong> Current, Typ, Min, and Max (up to 35A under full 1.5kW carrier).</li>
-        <li><strong>Forward &amp; Reflected Power ($\text{W}$):</strong> Current, Typ, Min, Max, and calculated SWR.</li>
+        <li><strong>PA Temperature (°C):</strong> Current, Typical (running average), Minimum, and Maximum.</li>
+        <li><strong>DC Rail Voltage (V):</strong> Current, Typ, Min, and Max (monitoring 53.5V regulation under heavy CW/SSB key-down).</li>
+        <li><strong>DC Drain Current (A):</strong> Current, Typ, Min, and Max (up to 35A under full 1.5kW carrier).</li>
+        <li><strong>Forward &amp; Reflected Power (W):</strong> Current, Typ, Min, Max, and calculated SWR.</li>
     </ul>
 
     <!-- Remote Screen Viewer Subsection -->
     <h3>6.4 Remote Web Screen Viewer (`/screen`)</h3>
     <p>Operators can monitor the live 1024x600 amplifier console from any browser on their local network (PC, Mac, iPad, or Android tablet). Navigating to <code>http://&lt;amplifier-ip&gt;:8088/screen</code> opens a high-fidelity live stream of the console display with configurable refresh rates (1.0s, 2.0s, 5.0s, or Pause) and full-screen presentation mode.</p>
 
+    <!-- System Report Subsection -->
+    <h3>6.5 Complete System Report &amp; Archive (`/report`)</h3>
+    <p>Accessing <code>http://&lt;amplifier-ip&gt;:8088/report</code> generates a comprehensive station diagnostic summary in Blueprint format. It provides an exhaustive audit of:</p>
+    <ul>
+        <li><strong>Station Identity:</strong> Callsign, hostname, firmware revision, operate mode, and transceiver CAT link.</li>
+        <li><strong>Storage Subsystem:</strong> Boot and root device identifiers, capacity, used/free space, and USB 2.0 interface health.</li>
+        <li><strong>Calibration Data:</strong> Forward and reflected detector null voltages, scale factors, and SWR bridge balance.</li>
+        <li><strong>Network Configuration:</strong> IP address, MAC, Wi-Fi SSID, signal strength (-dBm), gateway, and SSH port status.</li>
+        <li><strong>Touchscreen Modeline:</strong> Waveshare 7" 1024x600 timing modeline and 1:1 coordinate mapping parameters.</li>
+        <li><strong>ATU Band Segment Map:</strong> Exhaustive matrix across all 11 amateur bands (160m–6m) mapping each segment to its assigned antenna port, physical inductance range (nH), capacitance range (pF), and topology.</li>
+        <li><strong>Print Sheet:</strong> One-click print button formatted cleanly for shack records and station logbooks.</li>
+    </ul>
+
+    <!-- Log Viewer Subsection -->
+    <h3>6.6 Centralized Log Viewer (`/logs`)</h3>
+    <p>Navigating to <code>http://&lt;amplifier-ip&gt;:8088/logs</code> opens the live terminal log viewer. It allows operators to:</p>
+    <ul>
+        <li>Select and monitor all critical logs: <code>rf-kit-gui.log</code> (core app), <code>telemetry_rolling.log</code> (10MB circular log), <code>rfk_backup.log</code> (cloning log), <code>jrfk_firstboot.log</code> (migration log), and <code>Xorg.0.log</code> (display server).</li>
+        <li>Filter and search log entries live using the search toolbar.</li>
+        <li>Enable/disable auto-scroll and trigger manual refreshes.</li>
+        <li>Print formatted log excerpts directly to shack printers.</li>
+    </ul>
+
     <!-- SD Backup & Disaster Recovery Subsection -->
-    <h3>6.5 Automated SD Backup &amp; Disaster Recovery (`/backup`)</h3>
-    <p>By permanently leaving Card 5 (<code>BACKUP-AUTO</code>) inside the amplifier's external USB 3.0 reader, the system performs unattended weekly whole-disk cloning via <code>/etc/cron.d/jrfk_weekly_backup</code>. If the internal production SD ever degrades or fails, simply power down, move Card 5 into the internal Raspberry Pi slot, and power back on—your amplifier is immediately back online with all settings intact.</p>
+    <h3>6.7 Automated SD Backup &amp; Disaster Recovery (`/backup`)</h3>
+    <p>By permanently leaving Card 5 (<code>BACKUP-AUTO</code>) inside the amplifier's external USB 2.0 reader, the system performs unattended weekly whole-disk cloning via <code>/etc/cron.d/jrfk_weekly_backup</code>. If the internal production SD ever degrades or fails, simply power down, move Card 5 into the internal Raspberry Pi slot, and power back on—your amplifier is immediately back online with all settings intact.</p>
 
     <!-- Section 7: Field Troubleshooting & Reference -->
     <h2><span class="sec-num">07</span> Field Troubleshooting &amp; Diagnostic Reference</h2>

@@ -6,17 +6,17 @@
     <title>RF-KIT Amplifier Health & Thermal Guard (Blueprint Format)</title>
     <style>
         :root {
-            --bp-bg: #0a2540;
-            --bp-grid: #103b68;
+            --bp-bg: #1a5695;          /* Classic medium blueprint cyanotype blue */
+            --bp-grid: rgba(255, 255, 255, 0.18);
             --bp-line: #ffffff;
-            --bp-line-dim: #93c5fd;
-            --bp-card-bg: rgba(10, 37, 64, 0.88);
-            --bp-border: #1d528f;
-            --bp-border-bright: #3b82f6;
+            --bp-line-dim: #dbeafe;
+            --bp-card-bg: rgba(26, 86, 149, 0.92);
+            --bp-border: #93c5fd;
+            --bp-border-bright: #ffffff;
             --data-green: #22c55e;
             --data-yellow: #facc15;
             --data-red: #ef4444;
-            --data-cyan: #38bdf8;
+            --data-cyan: #67e8f9;
         }
 
         * {
@@ -311,6 +311,8 @@
             <a href="/health" class="btn btn-active">📈 Health Monitor</a>
             <a href="/screen" class="btn">📺 Remote Screen</a>
             <a href="/backup" class="btn">💾 SD Backup</a>
+            <a href="/report" class="btn">📋 System Report</a>
+            <a href="/logs" class="btn">📜 Log Viewer</a>
             <button class="btn" onclick="testThermalTrip()">🧪 Test 60°C Trip</button>
             <button class="btn" onclick="window.print()">🖨️ Print Log</button>
         </div>

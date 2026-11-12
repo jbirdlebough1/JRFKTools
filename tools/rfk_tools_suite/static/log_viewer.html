@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JRFK Station Diagnostic Log Viewer (Blueprint Format)</title>
+    <style>
+        :root {
+            --bp-bg: #1a5695;          /* Classic medium blueprint cyanotype blue */
+            --bp-grid: rgba(255, 255, 255, 0.18);
+            --bp-line: #ffffff;
+            --bp-line-dim: #dbeafe;
+            --bp-card-bg: rgba(26, 86, 149, 0.92);
+            --bp-border: #93c5fd;
+            --bp-border-bright: #ffffff;
+            --data-green: #22c55e;
+            --data-yellow: #facc15;
+            --data-red: #ef4444;
+            --data-cyan: #67e8f9;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', -apple-system, sans-serif;
+            background-color: var(--bp-bg);
+            background-image: 
+                linear-gradient(var(--bp-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--bp-line);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid var(--bp-line);
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            background: var(--bp-card-bg);
+            position: relative;
+        }
+        .header::after {
+            content: "DWG NO. JRFK-LOG-006 | REV 2.5 | CENTRALIZED SYSTEM LOG AUDIT";
+            position: absolute;
+            bottom: 3px;
+            right: 15px;
+            font-size: 10px;
+            color: var(--bp-line-dim);
+            letter-spacing: 1px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 22px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+        .header .meta {
+            font-size: 13px;
+            color: var(--bp-line-dim);
+            margin-top: 4px;
+        }
+
+        .nav-tools {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background-color: var(--bp-bg);
+            border: 1px solid var(--bp-line);
+            color: var(--bp-line);
+            padding: 7px 12px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+        .btn-active {
+            background-color: #1e40af !important;
+            border-color: #ffffff !important;
+        }
+
+        .log-controls-card {
+            background: var(--bp-card-bg);
+            border: 1px solid var(--bp-line);
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .select-style, .search-style {
+            background: #0f3661;
+            color: #ffffff;
+            border: 1px solid var(--bp-line);
+            padding: 6px 12px;
+            font-family: inherit;
+            font-size: 13px;
+        }
+        .search-style {
+            width: 250px;
+        }
+
+        .terminal-box {
+            background: #092340;
+            border: 2px solid var(--bp-line);
+            padding: 16px 20px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.45;
+            color: #dbeafe;
+            height: 560px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.4);
+        }
+
+        .meta-footer {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--bp-line-dim);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        @media print {
+            body { background: white !important; color: black !important; background-image: none !important; }
+            .header, .terminal-box { background: white !important; border-color: #000 !important; color: black !important; }
+            .nav-tools, .log-controls-card { display: none !important; }
+            .terminal-box { height: auto !important; overflow: visible !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1>RF-KIT Centralized Diagnostic Log Viewer</h1>
+            <div class="meta">STATION CALLSIGN: K7BIT | DEBIAN 13 AARCH64 LOG SUBSYSTEM</div>
+        </div>
+        <div class="nav-tools">
+            <a href="/antenna" class="btn">🗺️ Antenna Mapper</a>
+            <a href="/health" class="btn">📈 Health Monitor</a>
+            <a href="/screen" class="btn">📺 Remote Screen</a>
+            <a href="/backup" class="btn">💾 SD Backup</a>
+            <a href="/report" class="btn">📋 System Report</a>
+            <a href="/logs" class="btn btn-active">📜 Log Viewer</a>
+            <button class="btn" onclick="window.print()">🖨️ Print Sheet</button>
+        </div>
+    </div>
+
+    <div class="log-controls-card">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <span>Target Log Stream:</span>
+            <select class="select-style" id="logSelect" onchange="loadLog()">
+                <option value="rfk_gui" selected>RF-KIT Core GUI Log (rf-kit-gui.log)</option>
+                <option value="telemetry">10MB Rolling Circular Telemetry (telemetry_rolling.log)</option>
+                <option value="backup">SD Disaster Recovery &amp; Cloning (rfk_backup.log)</option>
+                <option value="firstboot">First-Boot Migration Automation (jrfk_firstboot.log)</option>
+                <option value="xorg">Display Modeline &amp; X11 (Xorg.0.log)</option>
+            </select>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:12px;">
+            <input type="text" class="search-style" id="searchInput" placeholder="Filter / Search in log..." oninput="filterLog()">
+            <label style="font-size:12px; display:flex; align-items:center; gap:6px;">
+                <input type="checkbox" id="autoScrollCheck" checked> Auto-Scroll
+            </label>
+            <button class="btn" style="padding:6px 10px;" onclick="loadLog()">⚡ Refresh</button>
+        </div>
+    </div>
+
+    <div class="terminal-box" id="terminal">Loading log stream from host...</div>
+
+    <div class="meta-footer">
+        <span id="filePathLabel">Active Path: /home/pi/rf-kit-statics/rf-kit-gui.log</span>
+        <span id="lineCountLabel">Total Lines: 0</span>
+    </div>
+
+    <script>
+        let rawLines = [];
+
+        function loadLog() {
+            let logKey = document.getElementById('logSelect').value;
+            fetch(`/api/logs/read?log=${logKey}`)
+                .then(r => r.json())
+                .then(d => {
+                    rawLines = d.lines || [];
+                    document.getElementById('filePathLabel').innerText = `Active Path: ${d.file_path}`;
+                    document.getElementById('lineCountLabel').innerText = `Total Lines Rendered: ${rawLines.length} (of ${d.total_lines})`;
+                    renderLines(rawLines);
+                })
+                .catch(err => {
+                    document.getElementById('terminal').innerText = "Failed to load log stream: " + err;
+                });
+        }
+
+        function filterLog() {
+            let q = document.getElementById('searchInput').value.toLowerCase();
+            if (!q) {
+                renderLines(rawLines);
+                return;
+            }
+            let filtered = rawLines.filter(l => l.toLowerCase().includes(q));
+            renderLines(filtered);
+        }
+
+        function renderLines(lines) {
+            let box = document.getElementById('terminal');
+            box.innerText = lines.join('');
+            if (document.getElementById('autoScrollCheck').checked) {
+                box.scrollTop = box.scrollHeight;
+            }
+        }
+
+        // Initialize and auto-refresh every 4s
+        loadLog();
+        setInterval(() => {
+            if (!document.getElementById('searchInput').value) {
+                loadLog();
+            }
+        }, 4000);
+    </script>
+</body>
+</html>

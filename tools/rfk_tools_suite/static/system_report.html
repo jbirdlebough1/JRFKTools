@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JRFK Station System Report & Calibration Matrix (Blueprint)</title>
+    <style>
+        :root {
+            --bp-bg: #1a5695;          /* Classic medium blueprint cyanotype blue */
+            --bp-grid: rgba(255, 255, 255, 0.18);
+            --bp-line: #ffffff;
+            --bp-line-dim: #dbeafe;
+            --bp-card-bg: rgba(26, 86, 149, 0.92);
+            --bp-border: #93c5fd;
+            --bp-border-bright: #ffffff;
+            --data-green: #22c55e;
+            --data-yellow: #facc15;
+            --data-red: #ef4444;
+            --data-cyan: #67e8f9;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', -apple-system, sans-serif;
+            background-color: var(--bp-bg);
+            background-image: 
+                linear-gradient(var(--bp-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--bp-line);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid var(--bp-line);
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            background: var(--bp-card-bg);
+            position: relative;
+        }
+        .header::after {
+            content: "DWG NO. JRFK-SYS-005 | REV 3.0 | COMPLETE SYSTEM AUDIT & ARCHIVE";
+            position: absolute;
+            bottom: 3px;
+            right: 15px;
+            font-size: 10px;
+            color: var(--bp-line-dim);
+            letter-spacing: 1px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 22px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+        .header .meta {
+            font-size: 13px;
+            color: var(--bp-line-dim);
+            margin-top: 4px;
+        }
+
+        .nav-tools {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background-color: var(--bp-bg);
+            border: 1px solid var(--bp-line);
+            color: var(--bp-line);
+            padding: 7px 12px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+        .btn-active {
+            background-color: #1e40af !important;
+            border-color: #ffffff !important;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: var(--bp-card-bg);
+            border: 1px solid var(--bp-line);
+            padding: 18px 22px;
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            margin-top: 0;
+            font-size: 15px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--bp-border);
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            color: var(--bp-line);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .param-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 15px;
+            font-size: 12px;
+        }
+        .param-item {
+            background: rgba(15, 52, 96, 0.6);
+            border: 1px solid var(--bp-border);
+            padding: 8px 12px;
+        }
+        .param-item .lbl {
+            font-size: 10px;
+            color: var(--bp-line-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+        .param-item .val {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid var(--bp-border);
+            padding: 8px 10px;
+            text-align: left;
+        }
+        th {
+            background: rgba(15, 52, 96, 0.8);
+            color: var(--bp-line);
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+        tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        @media print {
+            body { background: white !important; color: black !important; background-image: none !important; }
+            .header, .card, .param-item, th, td { background: white !important; border-color: #000 !important; color: black !important; }
+            .nav-tools { display: none !important; }
+            .param-item .val { color: black !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1>RF-KIT Complete System Report &amp; Calibration Archive</h1>
+            <div class="meta" id="headerMeta">CALLSIGN: K7BIT | GENERATED: 2026-11-12 12:45 UTC | HOSTNAME: k7bit</div>
+        </div>
+        <div class="nav-tools">
+            <a href="/antenna" class="btn">🗺️ Antenna Mapper</a>
+            <a href="/health" class="btn">📈 Health Monitor</a>
+            <a href="/screen" class="btn">📺 Remote Screen</a>
+            <a href="/backup" class="btn">💾 SD Backup</a>
+            <a href="/report" class="btn btn-active">📋 System Report</a>
+            <a href="/logs" class="btn">📜 Log Viewer</a>
+            <button class="btn" onclick="window.print()">🖨️ Print Sheet</button>
+        </div>
+    </div>
+
+    <!-- Section: Station Identity & Storage Subsystem -->
+    <div class="grid-2">
+        <div class="card">
+            <h2>Station Identity &amp; Firmware Profile</h2>
+            <div class="param-list">
+                <div class="param-item">
+                    <div class="lbl">Station Callsign</div>
+                    <div class="val" id="repCall">K7BIT</div>
+                </div>
+                <div class="param-item">
+                    <div class="lbl">RFK Firmware / OS</div>
+                    <div class="val" id="repSw">v200 (Debian 13 Trixie Pure aarch64)</div>
+                </div>
+                <div class="param-item">
+                    <div class="lbl">Operate Decoding Mode</div>
+                    <div class="val" id="repMode">Auto Band Decoded (CI-V / CAT)</div>
+                </div>
+                <div class="param-item">
+                    <div class="lbl">Transceiver Link</div>
+                    <div class="val" id="repRig">ICOM IC-7610 (Baud 19200)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Storage Utilization (USB 2.0 / MicroSD)</h2>
+            <div class="param-list">
+                <div class="param-item">
+                    <div class="lbl">Boot &amp; Root Devices</div>
+                    <div class="val">/dev/mmcblk0p1 &amp; p2</div>
+                </div>
+                <div class="param-item">
+                    <div class="lbl">Storage Capacity</div>
+                    <div class="val">31.9 GB (8.5 GB Used / 26.5%)</div>
+                </div>
+                <div class="param-item">
+                    <div class="lbl">Interface Standard</div>
+                    <div class="val">USB 2.0 / Internal SDIO Bus</div>
+                </div>
+                <div class="param-item">
+                    <div class="lbl">Wear-Leveling Health</div>
+                    <div class="val" style="color:var(--data-green);">Healthy (A2 High-Endurance)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section: Calibration & Hardware Matrices -->
+    <div class="grid-2">
+        <div class="card">
+            <h2>RF Detector Calibration Tables</h2>
+            <div class="param-list">
+                <div class="param-item">
+                    <div class="lbl">Forward Detector Null Voltage</div>
+                    <div class="val">0.042 V (Zero RF Baseline)</div>
+                </div>
+                <div class="param-item">
+                    <div class="lbl">Reflected Detector Null Voltage</div>
+                    <div class="val">0.038 V (Zero RF Baseline)</div>
+                </div>
+                <div class="param-item">
+                    <div class="lbl">Forward Power Scaling</div>
+                    <div class="val">Factor 1.048 (1500W Benchmark)</div>
+                </div>
+                <div class="param-item">
+                    <div class="lbl">SWR Bridge Null Alignment</div>
+                    <div class="val" style="color:var(--data-green);">0.00V Null @ 50 Ohm Load</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Shack Network &amp; Touchscreen Modeline</h2>
+            <div class="param-list">
+                <div class="param-item">
+                    <div class="lbl">Primary Station IP / SSH</div>
+                    <div class="val" id="repIp">192.168.12.193 (Port 22 Key Auth)</div>
+                </div>
+                <div class="param-item">
+                    <div class="lbl">Wi-Fi Connection &amp; RSSI</div>
+                    <div class="val">TMOBILE-C252 (-54 dBm 5GHz)</div>
+                </div>
+                <div class="param-item">
+                    <div class="lbl">Display Timing Modeline</div>
+                    <div class="val">1024x600 @ 60.00 Hz (Pure KMS)</div>
+                </div>
+                <div class="param-item">
+                    <div class="lbl">Coordinate Mapping</div>
+                    <div class="val">1:1 Direct Mapping (Zero Drift)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section: Full ATU Band Segment Mapping Table -->
+    <div class="card">
+        <h2>ATU Band Segments Mapped to Antenna Ports (All 11 Bands)</h2>
+        <div style="overflow-x: auto;">
+            <table id="atuTable">
+                <thead>
+                    <tr>
+                        <th>Band</th>
+                        <th>Frequency Span</th>
+                        <th>Assigned Antenna Port</th>
+                        <th>Antenna Name</th>
+                        <th>Tuning Segments</th>
+                        <th>Physical L Range (nH)</th>
+                        <th>Physical C Range (pF)</th>
+                        <th>Matching Topology</th>
+                    </tr>
+                </thead>
+                <tbody id="atuTableBody">
+                    <tr><td colspan="8">Loading ATU segment tables from controller...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function fetchSystemReport() {
+            fetch('/api/system_report')
+                .then(r => r.json())
+                .then(d => {
+                    if (d.station) {
+                        document.getElementById('repCall').innerText = d.station.callsign;
+                        document.getElementById('repSw').innerText = d.station.sw_version;
+                        document.getElementById('repMode').innerText = d.station.operate_mode;
+                        document.getElementById('repRig').innerText = d.station.transceiver;
+                        document.getElementById('headerMeta').innerText = 
+                            `CALLSIGN: ${d.station.callsign} | GENERATED: ${d.generated_at} | HOSTNAME: ${d.station.hostname}`;
+                    }
+                    if (d.network) {
+                        document.getElementById('repIp').innerText = `${d.network.primary_ip} (Port 22 SSH)`;
+                    }
+
+                    // Render ATU Segments Table
+                    if (d.atu_segments) {
+                        let tbody = document.getElementById('atuTableBody');
+                        tbody.innerHTML = '';
+                        for (let bName in d.atu_segments) {
+                            let b = d.atu_segments[bName];
+                            let segs = b.segments || [];
+                            if (segs.length === 0) continue;
+
+                            let minF = (segs[0].f_start_khz / 1000).toFixed(3);
+                            let maxF = (segs[segs.length - 1].f_end_khz / 1000).toFixed(3);
+                            let lMin = Math.min(...segs.map(s => s.l_nh));
+                            let lMax = Math.max(...segs.map(s => s.l_nh));
+                            let cMin = Math.min(...segs.map(s => s.c_pf));
+                            let cMax = Math.max(...segs.map(s => s.c_pf));
+                            let topo = segs[0].topology;
+
+                            let tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td><strong>${bName}</strong></td>
+                                <td>${minF} - ${maxF} MHz</td>
+                                <td><span style="color:var(--data-cyan); font-weight:bold;">${b.antenna_port}</span></td>
+                                <td>${b.antenna_name}</td>
+                                <td>${segs.length} Segments</td>
+                                <td>${lMin.toLocaleString()} - ${lMax.toLocaleString()} nH</td>
+                                <td>${cMin} - ${cMax} pF</td>
+                                <td>${topo}</td>
+                            `;
+                            tbody.appendChild(tr);
+                        }
+                    }
+                })
+                .catch(() => {});
+        }
+
+        fetchSystemReport();
+    </script>
+</body>
+</html>
