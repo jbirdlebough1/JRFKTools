@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RF-KIT Amplifier Health & Thermal Guard (Blueprint Format)</title>
+    <style>
+        :root {
+            --bp-bg: #1a5695;          /* Classic medium blueprint cyanotype blue */
+            --bp-grid: rgba(255, 255, 255, 0.18);
+            --bp-line: #ffffff;
+            --bp-line-dim: #dbeafe;
+            --bp-card-bg: rgba(26, 86, 149, 0.92);
+            --bp-border: #93c5fd;
+            --bp-border-bright: #ffffff;
+            --data-green: #22c55e;
+            --data-yellow: #facc15;
+            --data-red: #ef4444;
+            --data-cyan: #67e8f9;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', -apple-system, sans-serif;
+            background-color: var(--bp-bg);
+            background-image: 
+                linear-gradient(var(--bp-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--bp-line);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* Technical Blueprint Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid var(--bp-line);
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            background: var(--bp-card-bg);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .header::after {
+            content: "DWG NO. RFK-PWR-002 | REV 3.1 | REF: B26-RF01 PA THERMAL & DC RAIL";
+            position: absolute;
+            bottom: 3px;
+            right: 15px;
+            font-size: 10px;
+            color: var(--bp-line-dim);
+            letter-spacing: 1px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 22px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+        .header .meta {
+            font-size: 13px;
+            color: var(--bp-line-dim);
+            margin-top: 4px;
+        }
+
+        .nav-tools {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            background-color: var(--bp-bg);
+            border: 1px solid var(--bp-line);
+            color: var(--bp-line);
+            padding: 8px 14px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background-color: var(--bp-border-bright);
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+        .btn-active {
+            background-color: #1e40af !important;
+            border-color: #60a5fa !important;
+            color: #ffffff !important;
+        }
+
+        /* Thermal Alert Banner */
+        .thermal-alert-banner {
+            border: 2px solid var(--data-green);
+            background: rgba(34, 197, 94, 0.12);
+            color: var(--data-green);
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        .banner-warn {
+            border-color: var(--data-yellow) !important;
+            background: rgba(250, 204, 21, 0.15) !important;
+            color: var(--data-yellow) !important;
+        }
+        .banner-alert {
+            border-color: var(--data-red) !important;
+            background: rgba(239, 68, 68, 0.2) !important;
+            color: var(--data-red) !important;
+            animation: pulse-red 1s infinite alternate;
+        }
+        @keyframes pulse-red {
+            from { box-shadow: 0 0 5px rgba(239,68,68,0.4); }
+            to { box-shadow: 0 0 20px rgba(239,68,68,0.8); }
+        }
+
+        /* Critical Thermal Trip Modal Overlay */
+        .trip-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 20, 35, 0.95);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .trip-box {
+            background: #0a2540;
+            border: 3px solid var(--data-red);
+            padding: 35px 45px;
+            max-width: 650px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(239, 68, 68, 0.8);
+        }
+        .trip-title {
+            color: var(--data-red);
+            font-size: 26px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .trip-desc {
+            font-size: 15px;
+            color: #ffffff;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        .countdown-display {
+            font-size: 64px;
+            font-weight: 900;
+            color: var(--data-yellow);
+            margin: 20px 0;
+            border: 2px solid var(--data-yellow);
+            padding: 15px;
+            background: #07172b;
+            font-family: monospace;
+        }
+        .recovery-condition {
+            font-size: 14px;
+            color: var(--bp-line-dim);
+            margin-top: 15px;
+            line-height: 1.5;
+        }
+
+        /* Telemetry Summary Grid with Typ, Min, Max */
+        .telemetry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .telemetry-card {
+            background: var(--bp-card-bg);
+            border: 2px solid var(--bp-border);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            padding: 16px 20px;
+        }
+        .telemetry-card .card-label {
+            font-size: 11px;
+            color: var(--bp-line-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+        .telemetry-card .cur-val {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .stat-subrow {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--bp-line-dim);
+            border-top: 1px solid var(--bp-border);
+            padding-top: 6px;
+        }
+        .stat-subrow span strong {
+            color: #ffffff;
+        }
+
+        /* 10MB Circular Log Info Box */
+        .log-info-box {
+            background: var(--bp-card-bg);
+            border: 1px solid var(--bp-border);
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--bp-line-dim);
+        }
+
+        /* Chart Panels */
+        .pane-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .pane-card {
+            background: var(--bp-card-bg);
+            border: 2px solid var(--bp-border);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            padding: 18px 22px;
+        }
+        .pane-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--bp-border);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .pane-title {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .live-stat {
+            font-size: 15px;
+            font-weight: bold;
+        }
+        canvas {
+            width: 100%;
+            height: 190px;
+            display: block;
+        }
+
+        @media print {
+            body { background: white !important; color: black !important; background-image: none !important; }
+            .header, .telemetry-card, .pane-card, .log-info-box { background: white !important; border-color: #000 !important; color: black !important; }
+            .nav-tools, .trip-overlay { display: none !important; }
+            canvas { border: 1px solid #333; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Technical Header -->
+    <div class="header">
+        <div>
+            <h1>RF-KIT Amplifier Health &amp; Thermal Guard</h1>
+            <div class="meta" id="station-meta">STATION CALLSIGN: K7BIT | PA: 1.5kW LDMOS | 53.5V SWITCH-MODE SUPPLY</div>
+        </div>
+        <div class="nav-tools">
+            <a href="/docs" class="btn">📖 Station Docs</a>
+            <a href="/antenna" class="btn">🗺️ Antenna Mapper</a>
+            <a href="/health" class="btn btn-active">📈 Health Monitor</a>
+            <a href="/screen" class="btn">📺 Remote Screen</a>
+            <a href="/backup" class="btn">💾 SD Backup</a>
+            <a href="/report" class="btn">📋 System Report</a>
+            <a href="/logs" class="btn">📜 Log Viewer</a>
+        </div>
+    </div>
+
+    <!-- 60°C Critical Thermal Trip Modal Overlay with 300s Countdown -->
+    <div class="trip-overlay" id="thermalTripModal">
+        <div class="trip-box">
+            <div class="trip-title">⚠️ THERMAL SAFETY TRIP (>60°C) ⚠️</div>
+            <div class="trip-desc">
+                PA Heatsink temperature exceeded 60°C safety ceiling!<br>
+                <strong>AMPLIFIER HAS BEEN UNKEYED &amp; SWITCHED TO STANDBY</strong><br>
+                Forced 300-second cooling cycle initiated to prevent LDMOS damage.
+            </div>
+            
+            <div class="countdown-display" id="cooldownTimer">300s</div>
+
+            <div class="recovery-condition">
+                AUTOMATIC RECOVERY INTERLOCK:<br>
+                Amplifier will automatically re-enable when countdown completes <strong>AND</strong> heatsink drops <strong>&lt; 50.0°C</strong>.
+            </div>
+
+            <div style="margin-top: 25px; display: flex; justify-content: center; gap: 15px;">
+                <button class="btn" onclick="resetThermalTrip()">Manual Reset (Admin Override)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thermal Alert Banner -->
+    <div class="thermal-alert-banner" id="thermalBanner">
+        <span id="bannerText">PA HEATSINK NOMINAL: 34.5°C (&lt;= 50°C) | FAN AUTOMATION NORMAL</span>
+        <span id="bannerThresholdInfo">FAN ON &gt;42°C | WARN &gt;50°C | RED &gt;55°C | UNKEY TRIP &gt;60°C</span>
+    </div>
+
+    <!-- 10MB Circular Telemetry Logging Info Bar -->
+    <div class="log-info-box">
+        <span>📁 CIRCULAR TELEMETRY LOG: <strong>/home/pi/rfk_tools/telemetry_rolling.log</strong> (Max 10 MB Rotating)</span>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn" style="padding:4px 8px; font-size:11px; border-color:var(--data-yellow); color:var(--data-yellow);" onclick="testThermalTrip()">🧪 Test 60°C Trip</button>
+            <a href="/api/telemetry/log" target="_blank" style="color:var(--data-cyan); font-weight:bold; text-decoration:none;">[View Raw Log]</a>
+        </div>
+    </div>
+
+    <!-- Telemetry Statistics Summary Grid (Typ, Min, Max) -->
+    <div class="telemetry-grid">
+        <!-- Temperature -->
+        <div class="telemetry-card">
+            <div class="card-label">PA Heatsink Temperature</div>
+            <div class="cur-val" id="val-temp" style="color:var(--data-green);">--.- °C</div>
+            <div class="stat-subrow">
+                <span>TYP: <strong id="typ-temp">--.- °C</strong></span>
+                <span>MIN: <strong id="min-temp">--.- °C</strong></span>
+                <span>MAX: <strong id="max-temp">--.- °C</strong></span>
+            </div>
+        </div>
+
+        <!-- Forward Power -->
+        <div class="telemetry-card">
+            <div class="card-label">RF Forward Power (Peak)</div>
+            <div class="cur-val" id="val-pfwd" style="color:var(--data-cyan);">0 W</div>
+            <div class="stat-subrow">
+                <span>TYP: <strong id="typ-pfwd">0 W</strong></span>
+                <span>MIN: <strong id="min-pfwd">0 W</strong></span>
+                <span>MAX: <strong id="max-pfwd">0 W</strong></span>
+            </div>
+        </div>
+
+        <!-- Reflected Power & SWR -->
+        <div class="telemetry-card">
+            <div class="card-label">Reflected Power &amp; SWR</div>
+            <div class="cur-val" id="val-refl" style="color:var(--data-green);">0 W (1.00:1)</div>
+            <div class="stat-subrow">
+                <span>TYP SWR: <strong id="typ-swr">1.00:1</strong></span>
+                <span>MAX REFL: <strong id="max-refl">0 W</strong></span>
+                <span>MAX SWR: <strong id="max-swr">1.00:1</strong></span>
+            </div>
+        </div>
+
+        <!-- DC Rail Voltage -->
+        <div class="telemetry-card">
+            <div class="card-label">53.5V DC Rail Voltage</div>
+            <div class="cur-val" id="val-volt" style="color:#ffffff;">53.5 V</div>
+            <div class="stat-subrow">
+                <span>TYP: <strong id="typ-volt">53.5 V</strong></span>
+                <span>MIN: <strong id="min-volt">53.5 V</strong></span>
+                <span>MAX: <strong id="max-volt">53.5 V</strong></span>
+            </div>
+        </div>
+
+        <!-- DC Drain Current -->
+        <div class="telemetry-card">
+            <div class="card-label">DC Drain Current</div>
+            <div class="cur-val" id="val-curr" style="color:var(--data-yellow);">0.0 A</div>
+            <div class="stat-subrow">
+                <span>TYP: <strong id="typ-curr">0.0 A</strong></span>
+                <span>MIN: <strong id="min-curr">0.0 A</strong></span>
+                <span>MAX: <strong id="max-curr">0.0 A</strong></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Diagnostic Chart Panes -->
+    <div class="pane-grid">
+        <!-- Pane 1: PA Heatsink Thermal Profile with Dynamic Line Color -->
+        <div class="pane-card">
+            <div class="pane-header">
+                <span class="pane-title" style="color:var(--data-green);" id="temp-pane-title">PA Heatsink Thermal Profile vs. Safety Limits</span>
+                <span class="live-stat" id="live-temp-line-stat">Line Color: GREEN (&lt;= 50°C)</span>
+            </div>
+            <canvas id="tempChart"></canvas>
+        </div>
+
+        <!-- Pane 2: RF Output Power -->
+        <div class="pane-card">
+            <div class="pane-header">
+                <span class="pane-title" style="color:var(--data-cyan);">RF Output Power (Forward &amp; Reflected Envelope)</span>
+                <span class="live-stat" id="live-pwr-stat">1,450 W Forward | 14 W Reflected</span>
+            </div>
+            <canvas id="pwrChart"></canvas>
+        </div>
+
+        <!-- Pane 3: DC Rail Regulation & Drain Current -->
+        <div class="pane-card">
+            <div class="pane-header">
+                <span class="pane-title" style="color:var(--data-yellow);">53.5V Switching Rail Stability &amp; Drain Current</span>
+                <span class="live-stat" id="live-dc-stat">53.4 V @ 28.4 A (1.52 kW DC Input)</span>
+            </div>
+            <canvas id="dcChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let telemetryData = [];
+        let statsData = {};
+        let thermalState = {};
+
+        function fetchTelemetry() {
+            fetch('/api/telemetry')
+                .then(r => r.json())
+                .then(data => {
+                    telemetryData = data.points || [];
+                    statsData = data.stats || {};
+                    thermalState = data.thermal || {};
+                    let isReal = data.point ? data.point.is_real : false;
+                    let meta = document.getElementById('station-meta');
+                    if (meta) {
+                        meta.innerText = isReal 
+                            ? 'STATION CALLSIGN: K7BIT | PA: 1.5kW LDMOS | 🟢 LIVE CAN CONTROLLER TELEMETRY'
+                            : 'STATION CALLSIGN: K7BIT | PA: 1.5kW LDMOS | ⚪ AMPLIFIER STANDBY / DEMO';
+                    }
+                    updateStatsUI();
+                    updateThermalUI();
+                    renderCharts();
+                })
+                .catch(err => {
+                    console.log("Telemetry fetch fallback", err);
+                });
+        }
+
+        function updateStatsUI() {
+            if (!statsData.temp) return;
+            // Temp
+            let t = statsData.temp;
+            let tempElem = document.getElementById('val-temp');
+            tempElem.innerText = `${t.cur.toFixed(1)} °C`;
+            tempElem.style.color = t.cur <= 50 ? 'var(--data-green)' : (t.cur <= 55 ? 'var(--data-yellow)' : 'var(--data-red)');
+            document.getElementById('typ-temp').innerText = `${t.typ.toFixed(1)} °C`;
+            document.getElementById('min-temp').innerText = `${t.min.toFixed(1)} °C`;
+            document.getElementById('max-temp').innerText = `${t.max.toFixed(1)} °C`;
+
+            // Fwd Power
+            let pf = statsData.p_fwd;
+            document.getElementById('val-pfwd').innerText = `${pf.cur.toFixed(0)} W`;
+            document.getElementById('typ-pfwd').innerText = `${pf.typ.toFixed(0)} W`;
+            document.getElementById('min-pfwd').innerText = `${pf.min.toFixed(0)} W`;
+            document.getElementById('max-pfwd').innerText = `${pf.max.toFixed(0)} W`;
+
+            // Refl & SWR
+            let pr = statsData.p_refl;
+            let swr = statsData.swr;
+            document.getElementById('val-refl').innerText = `${pr.cur.toFixed(0)} W (${swr.cur.toFixed(2)}:1)`;
+            document.getElementById('typ-swr').innerText = `${swr.typ.toFixed(2)}:1`;
+            document.getElementById('max-refl').innerText = `${pr.max.toFixed(0)} W`;
+            document.getElementById('max-swr').innerText = `${swr.max.toFixed(2)}:1`;
+
+            // Volts
+            let v = statsData.volt;
+            document.getElementById('val-volt').innerText = `${v.cur.toFixed(1)} V`;
+            document.getElementById('typ-volt').innerText = `${v.typ.toFixed(1)} V`;
+            document.getElementById('min-volt').innerText = `${v.min.toFixed(1)} V`;
+            document.getElementById('max-volt').innerText = `${v.max.toFixed(1)} V`;
+
+            // Amps
+            let a = statsData.curr;
+            document.getElementById('val-curr').innerText = `${a.cur.toFixed(1)} A`;
+            document.getElementById('typ-curr').innerText = `${a.typ.toFixed(1)} A`;
+            document.getElementById('min-curr').innerText = `${a.min.toFixed(1)} A`;
+            document.getElementById('max-curr').innerText = `${a.max.toFixed(1)} A`;
+        }
+
+        function updateThermalUI() {
+            let banner = document.getElementById('thermalBanner');
+            let bannerText = document.getElementById('bannerText');
+            let modal = document.getElementById('thermalTripModal');
+            let temp = (statsData.temp && statsData.temp.cur) ? statsData.temp.cur : 32.0;
+
+            if (thermalState.tripped) {
+                modal.style.display = 'flex';
+                document.getElementById('cooldownTimer').innerText = `${thermalState.remaining_seconds}s`;
+                banner.className = 'thermal-alert-banner banner-alert';
+                bannerText.innerText = thermalState.message;
+            } else {
+                modal.style.display = 'none';
+                if (temp > 55.0) {
+                    banner.className = 'thermal-alert-banner banner-alert';
+                    bannerText.innerText = `ALERT: PA HEATSINK EXCEEDS 55°C (${temp.toFixed(1)}°C) — LINE TURNED RED | APPROACHING 60°C TRIP!`;
+                    document.getElementById('live-temp-line-stat').innerText = 'Line Color: RED (> 55°C)';
+                    document.getElementById('temp-pane-title').style.color = 'var(--data-red)';
+                } else if (temp > 50.0) {
+                    banner.className = 'thermal-alert-banner banner-warn';
+                    bannerText.innerText = `WARNING: PA HEATSINK EXCEEDS 50°C (${temp.toFixed(1)}°C) — LINE TURNED YELLOW | HIGH THERMAL LOAD`;
+                    document.getElementById('live-temp-line-stat').innerText = 'Line Color: YELLOW (> 50°C)';
+                    document.getElementById('temp-pane-title').style.color = 'var(--data-yellow)';
+                } else {
+                    banner.className = 'thermal-alert-banner';
+                    bannerText.innerText = `PA HEATSINK NOMINAL: ${temp.toFixed(1)}°C (<= 50°C) | LINE GREEN | NORMAL DUTY`;
+                    document.getElementById('live-temp-line-stat').innerText = 'Line Color: GREEN (<= 50°C)';
+                    document.getElementById('temp-pane-title').style.color = 'var(--data-green)';
+                }
+            }
+        }
+
+        function testThermalTrip() {
+            fetch('/api/thermal/trip_test', {method: 'POST'})
+                .then(r => r.json())
+                .then(data => {
+                    thermalState = data;
+                    updateThermalUI();
+                });
+        }
+
+        function resetThermalTrip() {
+            fetch('/api/thermal/reset', {method: 'POST'})
+                .then(r => r.json())
+                .then(data => {
+                    thermalState = data;
+                    updateThermalUI();
+                });
+        }
+
+        function drawChart(canvasId, points, minY, maxY, lineType, thresholds) {
+            let c = document.getElementById(canvasId);
+            if (!c) return;
+            c.width = c.parentElement.clientWidth - 40;
+            c.height = 190;
+            let ctx = c.getContext('2d');
+            let w = c.width;
+            let h = c.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            let lm = 45;
+            let rm = 20;
+            let tm = 15;
+            let bm = 25;
+            let pw = w - lm - rm;
+            let ph = h - tm - bm;
+
+            // Blueprint Grid
+            ctx.strokeStyle = '#103b68';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(lm, tm); ctx.lineTo(lm + pw, tm);
+            ctx.moveTo(lm, tm + ph/2); ctx.lineTo(lm + pw, tm + ph/2);
+            ctx.moveTo(lm, tm + ph); ctx.lineTo(lm + pw, tm + ph);
+            ctx.stroke();
+
+            // Threshold lines
+            if (thresholds) {
+                thresholds.forEach(th => {
+                    let ty = tm + ph - ((th.val - minY) / (maxY - minY)) * ph;
+                    ctx.strokeStyle = th.color;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(lm, ty); ctx.lineTo(lm + pw, ty);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = th.color;
+                    ctx.font = '10px Consolas, monospace';
+                    ctx.fillText(`${th.label} (${th.val})`, lm + pw - 130, ty - 4);
+                });
+            }
+
+            // Axes
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(lm, tm);
+            ctx.lineTo(lm, tm + ph);
+            ctx.lineTo(lm + pw, tm + ph);
+            ctx.stroke();
+
+            // Labels
+            ctx.fillStyle = '#93c5fd';
+            ctx.font = '10px Consolas, monospace';
+            ctx.textAlign = 'right';
+            ctx.fillText(maxY, lm - 8, tm + 8);
+            ctx.fillText(minY, lm - 8, tm + ph);
+
+            if (points.length < 2) return;
+
+            let n = points.length;
+            const ptToX = (i) => lm + (i / (n - 1)) * pw;
+            const ptToY = (val) => tm + ph - ((val - minY) / (maxY - minY)) * ph;
+
+            if (lineType === 'temp') {
+                // Multi-colored segmented temperature line: Green <=50C, Yellow >50C, Red >55C
+                for (let i = 0; i < n - 1; i++) {
+                    let v1 = points[i];
+                    let v2 = points[i+1];
+                    let avgV = (v1 + v2) / 2.0;
+                    let segColor = avgV <= 50.0 ? '#22c55e' : (avgV <= 55.0 ? '#facc15' : '#ef4444');
+
+                    ctx.strokeStyle = segColor;
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.moveTo(ptToX(i), ptToY(v1));
+                    ctx.lineTo(ptToX(i+1), ptToY(v2));
+                    ctx.stroke();
+                }
+            } else {
+                ctx.strokeStyle = lineType;
+                ctx.lineWidth = 2.2;
+                ctx.beginPath();
+                points.forEach((val, i) => {
+                    let x = ptToX(i);
+                    let y = ptToY(val);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+            }
+        }
+
+        function renderCharts() {
+            let pts = telemetryData.length > 0 ? telemetryData : [];
+            let tempPts = pts.map(p => p.temperature);
+            let pwrPts = pts.map(p => p.p_forward);
+            let voltPts = pts.map(p => p.voltage);
+
+            // Pad if short
+            while (tempPts.length < 30) tempPts.unshift(32.0);
+            while (pwrPts.length < 30) pwrPts.unshift(0);
+            while (voltPts.length < 30) voltPts.unshift(53.5);
+
+            drawChart('tempChart', tempPts, 20, 70, 'temp', [
+                {val: 42, color: 'rgba(56, 189, 248, 0.7)', label: 'Fan Trigger'},
+                {val: 50, color: 'rgba(250, 204, 21, 0.7)', label: 'Warn Line'},
+                {val: 55, color: 'rgba(239, 68, 68, 0.7)', label: 'Alert Line'},
+                {val: 60, color: '#ef4444', label: 'Safety Trip'}
+            ]);
+
+            drawChart('pwrChart', pwrPts, 0, 2000, '#38bdf8');
+            drawChart('dcChart', voltPts, 50, 56, '#facc15');
+        }
+
+        window.addEventListener('resize', renderCharts);
+
+        // Fetch periodically
+        fetchTelemetry();
+        setInterval(fetchTelemetry, 3000);
+    </script>
+</body>
+</html>

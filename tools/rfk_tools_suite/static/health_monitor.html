@@ -45,6 +45,7 @@
             padding: 16px 20px;
             margin-bottom: 20px;
             background: var(--bp-card-bg);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             position: relative;
         }
         .header::after {
@@ -71,16 +72,15 @@
 
         .nav-tools {
             display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
+            gap: 10px;
         }
         .btn {
             background-color: var(--bp-bg);
             border: 1px solid var(--bp-line);
             color: var(--bp-line);
-            padding: 8px 12px;
+            padding: 8px 14px;
             font-family: inherit;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             text-decoration: none;
@@ -92,14 +92,13 @@
         }
         .btn:hover {
             background-color: var(--bp-border-bright);
-            color: #0c2340;
+            color: #ffffff;
             box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
         }
         .btn-active {
             background-color: #1e40af !important;
-            border-color: var(--data-cyan) !important;
-            color: var(--data-cyan) !important;
-            box-shadow: 0 0 10px rgba(103, 232, 249, 0.4);
+            border-color: #60a5fa !important;
+            color: #ffffff !important;
         }
 
         /* Thermal Alert Banner */
@@ -283,6 +282,23 @@
 </head>
 <body>
 
+    <!-- Technical Header -->
+    <div class="header">
+        <div>
+            <h1>RF-KIT Amplifier Health &amp; Thermal Guard</h1>
+            <div class="meta" id="station-meta">STATION CALLSIGN: K7BIT | PA: 1.5kW LDMOS | 53.5V SWITCH-MODE SUPPLY</div>
+        </div>
+        <div class="nav-tools">
+            <a href="/docs" class="btn">📖 Station Docs</a>
+            <a href="/antenna" class="btn">🗺️ Antenna Mapper</a>
+            <a href="/health" class="btn btn-active">📈 Health Monitor</a>
+            <a href="/screen" class="btn">📺 Remote Screen</a>
+            <a href="/backup" class="btn">💾 SD Backup</a>
+            <a href="/report" class="btn">📋 System Report</a>
+            <a href="/logs" class="btn">📜 Log Viewer</a>
+        </div>
+    </div>
+
     <!-- 60°C Critical Thermal Trip Modal Overlay with 300s Countdown -->
     <div class="trip-overlay" id="thermalTripModal">
         <div class="trip-box">
@@ -303,23 +319,6 @@
             <div style="margin-top: 25px; display: flex; justify-content: center; gap: 15px;">
                 <button class="btn" onclick="resetThermalTrip()">Manual Reset (Admin Override)</button>
             </div>
-        </div>
-    </div>
-
-    <!-- Technical Header -->
-    <div class="header">
-        <div>
-            <h1>RF-KIT Amplifier Health &amp; Thermal Guard</h1>
-            <div class="meta" id="station-meta">STATION CALLSIGN: K7BIT | PA: 1.5kW LDMOS | 53.5V SWITCH-MODE SUPPLY</div>
-        </div>
-        <div class="nav-tools">
-            <a href="/docs" class="btn">📖 Station Docs</a>
-            <a href="/antenna" class="btn">🗺️ Antenna Mapper</a>
-            <a href="/health" class="btn btn-active">📈 Health Monitor</a>
-            <a href="/screen" class="btn">📺 Remote Screen</a>
-            <a href="/backup" class="btn">💾 SD Backup</a>
-            <a href="/report" class="btn">📋 System Report</a>
-            <a href="/logs" class="btn">📜 Log Viewer</a>
         </div>
     </div>
 

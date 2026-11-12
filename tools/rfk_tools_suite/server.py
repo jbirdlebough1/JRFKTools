@@ -406,29 +406,36 @@ class RFKToolsHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=STATIC_DIR, **kwargs)
 
+    def end_headers(self):
+        self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Expires', '0')
+        super().end_headers()
+
     def do_HEAD(self):
         return self.do_GET()
 
     def do_GET(self):
-        if self.path == "/" or self.path == "/docs" or self.path == "/migrator":
+        clean = self.path.split('?', 1)[0].split('#', 1)[0].rstrip('/')
+        if clean == "" or clean == "/docs" or clean == "/docs_viewer.html" or clean == "/migrator":
             self.path = "/docs_viewer.html"
             return super().do_GET()
-        elif self.path == "/antenna":
+        elif clean == "/antenna" or clean == "/antenna_mapper.html":
             self.path = "/antenna_mapper.html"
             return super().do_GET()
-        elif self.path == "/health" or self.path == "/health_manager" or self.path == "/health-manager":
+        elif clean in ["/health", "/health_monitor.html", "/health_manager", "/health_manager.html", "/health-manager"]:
             self.path = "/health_monitor.html"
             return super().do_GET()
-        elif self.path == "/screen":
+        elif clean == "/screen" or clean == "/screen_viewer.html":
             self.path = "/screen_viewer.html"
             return super().do_GET()
-        elif self.path == "/report":
+        elif clean == "/report" or clean == "/system_report.html":
             self.path = "/system_report.html"
             return super().do_GET()
-        elif self.path == "/logs":
+        elif clean == "/logs" or clean == "/log_viewer.html":
             self.path = "/log_viewer.html"
             return super().do_GET()
-        elif self.path == "/backup":
+        elif clean == "/backup" or clean == "/backup_manager.html":
             self.path = "/backup_manager.html"
             return super().do_GET()
         elif self.path.startswith("/docs/"):

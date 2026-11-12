@@ -234,7 +234,7 @@
 
             <div style="margin-top: 20px;">
                 <button class="btn btn-action" id="btnStartClone" style="width: 100%; justify-content: center; padding: 14px; font-size: 14px;" onclick="startBackup()">
-                    ⚡ Execute Immediate Full System Clone &amp; Verify
+                    ⚡ Execute Immediate Full System Backup
                 </button>
             </div>
         </div>
@@ -312,12 +312,12 @@
                             statusElem.innerText = "✅ BACKUP VERIFIED & READY";
                             statusElem.style.color = "var(--data-green)";
                             isCloning = false;
-                            if (btn) { btn.disabled = false; btn.innerText = "⚡ Execute Immediate Full System Clone & Verify"; }
+                            if (btn) { btn.disabled = false; btn.innerText = "⚡ Execute Immediate Full System Backup"; }
                         } else if (d.log.includes("VERIFICATION FAILED:") || d.log.includes("ERROR:")) {
                             statusElem.innerText = "❌ VERIFICATION FAILED";
                             statusElem.style.color = "#ff4444";
                             isCloning = false;
-                            if (btn) { btn.disabled = false; btn.innerText = "⚡ Execute Immediate Full System Clone & Verify"; }
+                            if (btn) { btn.disabled = false; btn.innerText = "⚡ Execute Immediate Full System Backup"; }
                         } else if (d.log.includes("Step 6/6") || d.log.includes("Verifying")) {
                             statusElem.innerText = "🔍 FULL VERIFICATION IN PROGRESS...";
                             statusElem.style.color = "var(--data-cyan)";
@@ -329,10 +329,10 @@
                         } else {
                             statusElem.innerText = "● ENGINE READY";
                             statusElem.style.color = "var(--data-cyan)";
-                            if (btn) { btn.disabled = false; btn.innerText = "⚡ Execute Immediate Full System Clone & Verify"; }
+                            if (btn) { btn.disabled = false; btn.innerText = "⚡ Execute Immediate Full System Backup"; }
                         }
                     } else {
-                        document.getElementById('logBox').innerText = "Backup engine idle. Click 'Execute Immediate Full System Clone & Verify' to begin replication.";
+                        document.getElementById('logBox').innerText = "Backup engine idle. Click 'Execute Immediate Full System Backup' to begin replication.";
                     }
                     if (d.schedule) {
                         document.getElementById('schedDay').value = d.schedule.day || "0";
@@ -378,7 +378,7 @@
                     alert("Error triggering backup: " + err);
                     if (btn) {
                         btn.disabled = false;
-                        btn.innerText = "⚡ Execute Immediate Full System Clone & Verify";
+                        btn.innerText = "⚡ Execute Immediate Full System Backup";
                     }
                 });
         }
