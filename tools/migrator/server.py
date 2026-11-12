@@ -296,6 +296,56 @@ def _set_windows_automount(enable):
         pass
 
 
+def _lock_all_disk_volumes(disk_index):
+    """Find, lock, and dismount ALL Windows volumes (even unlettered Volume{GUID}s) on disk_index; return open handles."""
+    locked_handles = []
+    if os.name != "nt":
+        return locked_handles
+    try:
+        buf = ctypes.create_unicode_buffer(1024)
+        find_h = kernel32.FindFirstVolumeW(buf, 1024)
+        invalid_h = ctypes.c_void_p(-1).value
+        if find_h == invalid_h or find_h == -1:
+            return locked_handles
+        try:
+            while True:
+                vol_name = buf.value.rstrip("\\")
+                hv = kernel32.CreateFileW(
+                    vol_name,
+                    GENERIC_READ | GENERIC_WRITE,
+                    FILE_SHARE_READ | FILE_SHARE_WRITE,
+                    None,
+                    OPEN_EXISTING,
+                    FILE_ATTRIBUTE_NORMAL,
+                    None,
+                )
+                if hv != invalid_h and hv != -1:
+                    belongs = False
+                    out = ctypes.create_string_buffer(256)
+                    ret = wintypes.DWORD(0)
+                    if kernel32.DeviceIoControl(hv, 0x00560000, None, 0, out, 256, ctypes.byref(ret), None):
+                        cnt = struct.unpack_from("<I", out.raw, 0)[0]
+                        for i in range(cnt):
+                            off = 8 + i * 24
+                            if off + 4 <= ret.value and struct.unpack_from("<I", out.raw, off)[0] == int(disk_index):
+                                belongs = True
+                                break
+                    if belongs:
+                        bret = wintypes.DWORD(0)
+                        kernel32.DeviceIoControl(hv, FSCTL_LOCK_VOLUME, None, 0, None, 0, ctypes.byref(bret), None)
+                        kernel32.DeviceIoControl(hv, FSCTL_DISMOUNT_VOLUME, None, 0, None, 0, ctypes.byref(bret), None)
+                        locked_handles.append(hv)
+                    else:
+                        kernel32.CloseHandle(hv)
+                if not kernel32.FindNextVolumeW(find_h, buf, 1024):
+                    break
+        finally:
+            kernel32.FindVolumeClose(find_h)
+    except Exception:
+        pass
+    return locked_handles
+
+
 def _dismount_sd_volumes(verified_disk, remove_letters=True):
     """Lock, dismount, and optionally detach mounted drive letters on verified_disk so Windows 11 never pops 'Format disk'."""
     letters = verified_disk.get("partition_letters") or []
@@ -426,10 +476,11 @@ def flash_raw_image(img_path, disk_index, progress_callback=None, verified_disk=
     device_path = f"\\\\.\\PhysicalDrive{int(disk_index)}"
 
     if not already_cleaned:
-        clean_disk_partitions(disk_index, verified_disk=verified)
+        clean_disk_partitions(disk_index, verified_disk=verified, refresh_properties=True)
     else:
         _dismount_sd_volumes(verified)
 
+    locked_vols = _lock_all_disk_volumes(disk_index)
     append_log(f"[*] Opening raw device {device_path} for verified {'compressed .img.xz stream' if is_xz else 'raw .img'} write (~{total_size / (1024**3):.2f} GB)...")
     flags = FILE_FLAG_WRITE_THROUGH
     h_disk = kernel32.CreateFileW(
@@ -444,16 +495,13 @@ def flash_raw_image(img_path, disk_index, progress_callback=None, verified_disk=
 
     if h_disk == INVALID_HANDLE_VALUE or h_disk == -1:
         err = kernel32.GetLastError()
+        for hv in locked_vols:
+            kernel32.CloseHandle(hv)
         raise RuntimeError(f"Could not open device {device_path}: Windows error {err} (requires Administrator elevation)")
 
     bytes_returned = wintypes.DWORD(0)
-
-    # Allow extended DASD IO to prevent Windows filesystem boundary checks
     kernel32.DeviceIoControl(h_disk, FSCTL_ALLOW_EXTENDED_DASD_IO, None, 0, None, 0, ctypes.byref(bytes_returned), None)
-
-    # Lock and dismount to prevent Windows MountMgr from locking sectors mid-write
-    kernel32.DeviceIoControl(h_disk, FSCTL_LOCK_VOLUME, None, 0, None, 0, ctypes.byref(bytes_returned), None)
-    kernel32.DeviceIoControl(h_disk, FSCTL_DISMOUNT_VOLUME, None, 0, None, 0, ctypes.byref(bytes_returned), None)
+    kernel32.DeviceIoControl(h_disk, IOCTL_DISK_DELETE_DRIVE_LAYOUT, None, 0, None, 0, ctypes.byref(bytes_returned), None)
 
     append_log(f"[*] Flashing 64-bit OS image (~{total_size / (1024**3):.2f} GB) to {device_path}...")
 
@@ -481,6 +529,8 @@ def flash_raw_image(img_path, disk_index, progress_callback=None, verified_disk=
                     data = data + b'\x00' * (4096 - remainder)
                 if expected_head is None:
                     expected_head = data[:4096]
+                    # Defer writing sector 0 (MBR/partition table) until the end so Windows cannot attach fastfat mid-stream
+                    data = (b"\x00" * 4096) + data[4096:]
 
                 ok = kernel32.WriteFile(
                     h_disk,
@@ -505,6 +555,16 @@ def flash_raw_image(img_path, disk_index, progress_callback=None, verified_disk=
                     pct = min(99, int((bytes_written_total / max(total_size, 1)) * 100))
                     progress_callback(pct, bytes_written_total, max(total_size, bytes_written_total), speed)
 
+        # Write deferred MBR + partition table (first 4096 bytes) now that all partitions are on disk
+        if expected_head and len(expected_head) >= 512:
+            pos = ctypes.c_longlong(0)
+            kernel32.SetFilePointerEx(h_disk, ctypes.c_longlong(0), ctypes.byref(pos), 0)
+            mbr_written = wintypes.DWORD(0)
+            m_ok = kernel32.WriteFile(h_disk, expected_head, len(expected_head), ctypes.byref(mbr_written), None)
+            if not m_ok or mbr_written.value != len(expected_head):
+                err = kernel32.GetLastError()
+                raise RuntimeError(f"WriteFile failed committing MBR at offset 0: Windows error {err}")
+
         if progress_callback:
             t_now = time.time()
             speed = (bytes_written_total / (t_now - t0)) / (1024 * 1024) if (t_now - t0) > 0 else 0
@@ -525,8 +585,13 @@ def flash_raw_image(img_path, disk_index, progress_callback=None, verified_disk=
 
         kernel32.DeviceIoControl(h_disk, IOCTL_DISK_UPDATE_PROPERTIES, None, 0, None, 0, ctypes.byref(bytes_returned), None)
     finally:
-        kernel32.DeviceIoControl(h_disk, FSCTL_UNLOCK_VOLUME, None, 0, None, 0, ctypes.byref(bytes_returned), None)
         kernel32.CloseHandle(h_disk)
+        for hv in locked_vols:
+            try:
+                kernel32.DeviceIoControl(hv, FSCTL_UNLOCK_VOLUME, None, 0, None, 0, ctypes.byref(bytes_returned), None)
+            except Exception:
+                pass
+            kernel32.CloseHandle(hv)
 
     append_log(f"[+] Successfully wrote {bytes_written_total / (1024**3):.2f} GB to Disk {disk_index}.")
     time.sleep(1)
