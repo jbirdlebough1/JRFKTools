@@ -276,18 +276,48 @@
 
     <!-- Live Backup Log -->
     <div class="card">
-        <h2>Cloning Pipeline Log (/var/log/rfk_backup.log)</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2>Cloning Pipeline Log (/var/log/rfk_backup.log)</h2>
+            <span id="backupEngineStatus" style="font-size:12px; font-weight:bold; color:var(--data-cyan);">● ENGINE READY</span>
+        </div>
         <div class="log-box" id="logBox">Loading backup log stream...</div>
     </div>
 
     <script>
+        let pollTimer = null;
+        let isCloning = false;
+
         function fetchStatus() {
             fetch('/api/backup/status')
                 .then(r => r.json())
                 .then(d => {
                     if (d.boot_dev) document.getElementById('bootDev').innerText = `Device: ${d.boot_dev} | ${(d.boot_size_bytes/1073741824).toFixed(1)} GB`;
-                    if (d.target_dev) document.getElementById('targetDev').innerText = `Device: ${d.target_dev} | ${d.target_name || 'USB SD'} (${(d.target_size_bytes/1073741824).toFixed(1)} GB)`;
-                    if (d.log) document.getElementById('logBox').innerText = d.log;
+                    if (d.target_dev) {
+                        let name = d.target_name || (d.target_found ? 'USB SD Card' : 'None Detected');
+                        let sz = (d.target_size_bytes/1073741824).toFixed(1);
+                        document.getElementById('targetDev').innerText = d.target_found ? `Device: ${d.target_dev} | ${name} (${sz} GB)` : 'No USB SD Card Inserted';
+                    }
+                    if (d.log !== undefined && d.log !== null && d.log !== "") {
+                        let box = document.getElementById('logBox');
+                        box.innerText = d.log;
+                        box.scrollTop = box.scrollHeight;
+
+                        let statusElem = document.getElementById('backupEngineStatus');
+                        if (d.log.includes("SUCCESS:")) {
+                            statusElem.innerText = "✅ BACKUP COMPLETE (READY)";
+                            statusElem.style.color = "var(--data-green)";
+                            isCloning = false;
+                        } else if (d.log.includes("Starting") || d.log.includes("Step")) {
+                            statusElem.innerText = "🔄 CLONING IN PROGRESS...";
+                            statusElem.style.color = "var(--data-yellow)";
+                            isCloning = true;
+                        } else {
+                            statusElem.innerText = "● ENGINE READY";
+                            statusElem.style.color = "var(--data-cyan)";
+                        }
+                    } else {
+                        document.getElementById('logBox').innerText = "Backup engine idle. Click 'Execute Immediate Full System Clone' to begin replication.";
+                    }
                     if (d.schedule) {
                         document.getElementById('schedDay').value = d.schedule.day || "0";
                         document.getElementById('schedTime').value = d.schedule.time || "03:00";
@@ -298,12 +328,22 @@
         }
 
         function startBackup() {
-            if (!confirm("Start full system replication from /dev/mmcblk0 to USB SD? Ensure target SD contains no vital data.")) return;
+            if (!confirm("Start full system replication from internal SD to USB SD? Ensure target SD contains no vital data.")) return;
+            let box = document.getElementById('logBox');
+            box.innerText = "[*] Dispatching live cloning pipeline to amplifier daemon...\n[*] Awaiting partition allocation and filesystem replication...";
+            document.getElementById('backupEngineStatus').innerText = "🔄 CLONING IN PROGRESS...";
+            document.getElementById('backupEngineStatus').style.color = "var(--data-yellow)";
+
             fetch('/api/backup/start', {method: 'POST'})
                 .then(r => r.json())
                 .then(d => {
-                    alert("Cloning task dispatched in background! Progress logged to /var/log/rfk_backup.log");
-                    fetchStatus();
+                    // Fast polling every 1.5 seconds during active backup
+                    if (pollTimer) clearInterval(pollTimer);
+                    pollTimer = setInterval(fetchStatus, 1500);
+                    setTimeout(fetchStatus, 500);
+                })
+                .catch(err => {
+                    alert("Error triggering backup: " + err);
                 });
         }
 
@@ -326,7 +366,7 @@
         }
 
         fetchStatus();
-        setInterval(fetchStatus, 5000);
+        pollTimer = setInterval(fetchStatus, 3000);
     </script>
 </body>
 </html>

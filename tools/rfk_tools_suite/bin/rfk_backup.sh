@@ -6,16 +6,40 @@
 # ==============================================================================
 
 set -o pipefail
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH"
+
+# Auto-elevate with sudo if not root
+if [ "$EUID" -ne 0 ]; then
+    if which sudo >/dev/null 2>&1; then
+        exec sudo "$0" "$@"
+    else
+        echo "[-] ERROR: rfk_backup.sh requires root privileges."
+        exit 1
+    fi
+fi
 
 LOG_FILE="/var/log/rfk_backup.log"
+touch "$LOG_FILE" 2>/dev/null || LOG_FILE="/home/pi/rfk_tools/rfk_backup.log"
+touch "$LOG_FILE" 2>/dev/null || true
+chmod 666 "$LOG_FILE" 2>/dev/null || true
+
 CONFIG_FILE="/home/pi/rfk_tools/config/backup_schedule.json"
 mkdir -p /home/pi/rfk_tools/config
-mkdir -p /var/log
 
 log() {
     local msg="[$(date '+%Y-%m-%d %H:%M:%S')] $1"
     echo "$msg"
     echo "$msg" >> "$LOG_FILE" 2>/dev/null || true
+}
+
+get_part_dev() {
+    local dev="$1"
+    local num="$2"
+    if [[ "$dev" =~ [0-9]$ ]]; then
+        echo "${dev}p${num}"
+    else
+        echo "${dev}${num}"
+    fi
 }
 
 # 1. Identify Boot Media
@@ -91,6 +115,80 @@ EOF
     exit 0
 fi
 
+execute_smart_clone() {
+    local src="$1"
+    local dst="$2"
+    
+    local part1=$(get_part_dev "$dst" 1)
+    local part2=$(get_part_dev "$dst" 2)
+
+    log "[*] Step 1/5: Unmounting any active volumes on $dst..."
+    unmount_target_partitions "$dst"
+
+    log "[*] Step 2/5: Initializing partition table on $dst..."
+    sfdisk "$dst" <<EOF >/dev/null 2>&1
+label: dos
+unit: sectors
+
+${part1} : start=16384, size=1048576, type=c
+${part2} : start=1064960, type=83
+EOF
+    partprobe "$dst" 2>/dev/null || true
+    sleep 2
+
+    log "[*] Step 3/5: Formatting target filesystems..."
+    log "    Formatting FAT32 boot partition ($part1)..."
+    mkfs.vfat -F 32 -n bootfs "$part1" >> "$LOG_FILE" 2>&1
+    log "    Formatting EXT4 rootfs partition ($part2)..."
+    mkfs.ext4 -F -q -L rootfs "$part2" >> "$LOG_FILE" 2>&1
+
+    log "[*] Step 4/5: Replicating filesystems..."
+    local mnt_boot=$(mktemp -d /tmp/jrfk_b_XXXXXX)
+    local mnt_root=$(mktemp -d /tmp/jrfk_r_XXXXXX)
+    mount "$part1" "$mnt_boot"
+    mount "$part2" "$mnt_root"
+
+    local boot_src=$(findmnt -n -o TARGET /boot/firmware 2>/dev/null || findmnt -n -o TARGET /boot 2>/dev/null || echo "/boot")
+    log "    Copying boot partition from $boot_src..."
+    rsync -axHAX --delete "$boot_src/" "$mnt_boot/" >> "$LOG_FILE" 2>&1
+    log "[+] Bootloader files copied."
+
+    log "    Copying 64-bit root filesystem (copying ~6.8 GB used data)..."
+    rsync -axHAX --delete \
+        --exclude={"/var/log/*","/tmp/*","/run/*","/proc/*","/sys/*","/dev/*","/mnt/*","/media/*","/lost+found"} \
+        / "$mnt_root/" >> "$LOG_FILE" 2>&1
+    log "[+] Root filesystem replicated."
+
+    log "[*] Step 5/5: Updating partition UUIDs and station calibration..."
+    local new_root_uuid=$(blkid -s PARTUUID -o value "$part2")
+    local new_boot_uuid=$(blkid -s PARTUUID -o value "$part1")
+
+    if [ -n "$new_root_uuid" ] && [ -f "$mnt_boot/cmdline.txt" ]; then
+        sed -i "s|root=PARTUUID=[^ ]*|root=PARTUUID=${new_root_uuid}|" "$mnt_boot/cmdline.txt"
+    fi
+
+    if [ -f "$mnt_root/etc/fstab" ]; then
+        if [ -n "$new_root_uuid" ]; then
+            sed -i -E "s|PARTUUID=[^ ]+([ \t]+/[ \t]+)|PARTUUID=${new_root_uuid}\1|" "$mnt_root/etc/fstab"
+        fi
+        if [ -n "$new_boot_uuid" ]; then
+            sed -i -E "s|PARTUUID=[^ ]+([ \t]+/boot[^ \t]*[ \t]+)|PARTUUID=${new_boot_uuid}\1|" "$mnt_root/etc/fstab"
+        fi
+    fi
+
+    rsync -av --update /home/pi/PA-Files/ "$mnt_root/home/pi/PA-Files/" >> "$LOG_FILE" 2>&1 || true
+    rsync -av --update /home/pi/rf-kit-statics/ "$mnt_root/home/pi/rf-kit-statics/" >> "$LOG_FILE" 2>&1 || true
+    rsync -av --update /home/pi/rfk_tools/ "$mnt_root/home/pi/rfk_tools/" >> "$LOG_FILE" 2>&1 || true
+    touch "$mnt_root/home/pi/.jrfk_backup_image"
+
+    sync
+    umount "$mnt_boot" 2>/dev/null || true
+    umount "$mnt_root" 2>/dev/null || true
+    rm -rf "$mnt_boot" "$mnt_root"
+
+    log "[+] SUCCESS: Disaster recovery backup SD ($dst) created cleanly at $(date)."
+}
+
 if [ "$1" == "--auto" ] || [ "$1" == "--cron" ]; then
     log "=========================================================="
     log "RFK_Backup: Automated Scheduled Backup Starting"
@@ -103,43 +201,7 @@ if [ "$1" == "--auto" ] || [ "$1" == "--cron" ]; then
     fi
     
     log "[+] Target Backup Media Found: $TARGET_DEV"
-    
-    # Verify target media capacity is at least equal or close to boot media
-    BOOT_BYTES=$(lsblk -bno SIZE "$BOOT_DEV" | head -n1)
-    TARGET_BYTES=$(lsblk -bno SIZE "$TARGET_DEV" | head -n1)
-    log "[*] Capacity Check: Source=${BOOT_BYTES} B, Target=${TARGET_BYTES} B"
-    
-    # Safely unmount any desktop automounted partitions on target before cloning
-    log "[*] Unmounting any active target partitions on $TARGET_DEV..."
-    unmount_target_partitions "$TARGET_DEV"
-
-    log "[*] Executing live partition clone via piclone with UUID re-generation..."
-    if which piclone >/dev/null 2>&1; then
-        if piclone -f "$BOOT_DEV" "$TARGET_DEV" >> "$LOG_FILE" 2>&1; then
-            log "[+] piclone completed partition replication successfully."
-        else
-            log "[-] piclone failed! Falling back to raw sync stream..."
-            dd if="$BOOT_DEV" of="$TARGET_DEV" bs=4M status=none conv=fsync >> "$LOG_FILE" 2>&1
-        fi
-    else
-        log "[*] Performing raw block stream clone..."
-        dd if="$BOOT_DEV" of="$TARGET_DEV" bs=4M status=none conv=fsync >> "$LOG_FILE" 2>&1
-    fi
-    
-    # Sync calibration and user configuration files
-    log "[*] Synchronizing critical RF-KIT user calibration files..."
-    TEMP_MNT=$(mktemp -d)
-    if mount "${TARGET_DEV}2" "$TEMP_MNT" 2>/dev/null || mount "${TARGET_DEV}p2" "$TEMP_MNT" 2>/dev/null; then
-        rsync -av --update /home/pi/PA-Files/ "$TEMP_MNT/home/pi/PA-Files/" 2>/dev/null || true
-        rsync -av --update /home/pi/rf-kit-statics/ "$TEMP_MNT/home/pi/rf-kit-statics/" 2>/dev/null || true
-        rsync -av --update /home/pi/rfk_tools/ "$TEMP_MNT/home/pi/rfk_tools/" 2>/dev/null || true
-        # Install first-boot restore verification hook
-        touch "$TEMP_MNT/home/pi/.jrfk_backup_image"
-        umount "$TEMP_MNT"
-    fi
-    rm -rf "$TEMP_MNT"
-    
-    log "[+] SUCCESS: Automated weekly backup completed cleanly at $(date)."
+    execute_smart_clone "$BOOT_DEV" "$TARGET_DEV"
     log "=========================================================="
     exit 0
 fi
@@ -173,33 +235,13 @@ read -p "Proceed with full clone and user data sync? (y/N): " CONFIRM
 
 if [[ "$CONFIRM" =~ ^[Yy]$ ]]; then
     echo ""
-    echo "[*] Unmounting any active target partitions on $TARGET_DEV..."
-    unmount_target_partitions "$TARGET_DEV"
-    
-    echo "[*] Initiating clone (this may take several minutes)..."
     log "Interactive backup initiated by operator from $BOOT_DEV to $TARGET_DEV"
-    if which piclone >/dev/null 2>&1; then
-        sudo piclone -f "$BOOT_DEV" "$TARGET_DEV"
-    else
-        sudo dd if="$BOOT_DEV" of="$TARGET_DEV" bs=4M status=progress conv=fsync
-    fi
-    
-    # Sync calibration and user files
-    TEMP_MNT=$(mktemp -d)
-    if sudo mount "${TARGET_DEV}2" "$TEMP_MNT" 2>/dev/null || sudo mount "${TARGET_DEV}p2" "$TEMP_MNT" 2>/dev/null; then
-        sudo rsync -av --update /home/pi/PA-Files/ "$TEMP_MNT/home/pi/PA-Files/" 2>/dev/null || true
-        sudo rsync -av --update /home/pi/rf-kit-statics/ "$TEMP_MNT/home/pi/rf-kit-statics/" 2>/dev/null || true
-        sudo rsync -av --update /home/pi/rfk_tools/ "$TEMP_MNT/home/pi/rfk_tools/" 2>/dev/null || true
-        sudo touch "$TEMP_MNT/home/pi/.jrfk_backup_image"
-        sudo umount "$TEMP_MNT"
-    fi
-    rm -rf "$TEMP_MNT"
-    
+    execute_smart_clone "$BOOT_DEV" "$TARGET_DEV"
     log "Interactive backup completed successfully."
     echo ""
     echo "[+] SUCCESS: Backup SD Card created successfully!"
     echo "    In case of emergency, simply replace the internal SD with this card."
-    echo "    The amplifier will boot, reboot once, and run immediately."
+    echo "    The amplifier will boot and run immediately."
 else
     echo "[-] Operation aborted by user."
 fi

@@ -784,13 +784,20 @@ class RFKToolsHandler(SimpleHTTPRequestHandler):
                 except Exception:
                     pass
 
-            if os.path.exists(LOG_PATH):
-                try:
-                    with open(LOG_PATH, 'r') as f:
-                        lines = f.readlines()
-                        data["log"] = "".join(lines[-25:])
-                except Exception:
-                    pass
+            # Read latest logs from candidates
+            candidate_logs = [LOG_PATH, "/home/pi/rfk_tools/rfk_backup.log", os.path.join(BASE_DIR, "rfk_backup.log")]
+            for c_path in candidate_logs:
+                if os.path.exists(c_path) and os.path.getsize(c_path) > 0:
+                    try:
+                        with open(c_path, 'r', encoding='utf-8', errors='replace') as f:
+                            lines = f.readlines()
+                            if lines:
+                                data["log"] = "".join(lines[-40:])
+                                break
+                    except Exception:
+                        pass
+            if not data.get("log") or data["log"] == "No logs recorded.":
+                data["log"] = "Backup engine idle. Click 'Execute Immediate Full System Clone' to begin replication."
 
             if os.path.exists(BACKUP_CFG_PATH):
                 try:
@@ -866,9 +873,10 @@ class RFKToolsHandler(SimpleHTTPRequestHandler):
             def run_bg():
                 if os.path.exists(BACKUP_SCRIPT):
                     try:
-                        subprocess.run([BACKUP_SCRIPT, "--auto"], timeout=1800)
-                    except Exception:
-                        pass
+                        cmd = ["sudo", BACKUP_SCRIPT, "--auto"] if sys.platform.startswith("linux") else [BACKUP_SCRIPT, "--auto"]
+                        subprocess.run(cmd, timeout=3600)
+                    except Exception as e:
+                        logger.error(f"Backup start error: {e}")
             threading.Thread(target=run_bg, daemon=True).start()
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
