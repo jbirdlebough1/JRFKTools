@@ -277,7 +277,8 @@ def assert_writable_non_gold_sd(disk_index, drive_letter=None, require_letter=Fa
 
 
 def _dismiss_windows_format_dialogs():
-    """Close Windows 11 'You need to format the disk' popups automatically so Linux/RAW SD partitions never show Format screens."""
+    """Close Windows 11 'You need to format the disk', 'Location is not available',
+    and unformatted partition popups automatically so Linux/RAW SD partitions never show popups."""
     if os.name != "nt":
         return 0
     closed = 0
@@ -307,28 +308,50 @@ def _dismiss_windows_format_dialogs():
             if _wcls(hwnd) != "#32770":
                 return True
             title = _wtext(hwnd).lower()
-            if title == "microsoft windows" or title.startswith("format "):
-                texts = []
 
-                def _ccb(chwnd, _clp):
-                    t = _wtext(chwnd)
-                    if t:
-                        texts.append(t.lower())
-                    return True
+            texts = []
 
-                user32.EnumChildWindows(hwnd, child_proc(_ccb), 0)
-                joined = " ".join(texts)
+            def _ccb(chwnd, _clp):
+                t = _wtext(chwnd)
+                if t:
+                    texts.append(t.lower())
+                return True
+
+            user32.EnumChildWindows(hwnd, child_proc(_ccb), 0)
+            joined = " ".join(texts)
+
+            is_match = False
+            if "location is not available" in title or "not available" in title:
+                is_match = True
+            elif title == "microsoft windows" or title.startswith("format "):
                 if "format the disk" in joined or "you need to format" in joined or "format disk" in joined or (
                     title.startswith("format ") and "capacity" in joined and "file system" in joined
                 ):
-                    targets.append(hwnd)
+                    is_match = True
+
+            if not is_match:
+                if any(phrase in joined for phrase in [
+                    "not contain a recognized file system",
+                    "is not accessible",
+                    "you need to format the disk",
+                    "format the disk in drive",
+                    "before you can use it",
+                    "volume does not contain",
+                    "parameter is incorrect"
+                ]):
+                    is_match = True
+
+            if is_match:
+                targets.append(hwnd)
             return True
 
         user32.EnumWindows(enum_proc(_cb), 0)
         for hwnd in targets:
-            # WM_COMMAND IDCANCEL (2) and WM_CLOSE (0x0010) dismiss both 'Microsoft Windows' and 'Format' dialogs cleanly
-            user32.PostMessageW(hwnd, 0x0111, 2, 0)
-            user32.PostMessageW(hwnd, 0x0010, 0, 0)
+            # Post both IDOK (1) and IDCANCEL (2), followed by WM_CLOSE and WM_SYSCOMMAND SC_CLOSE
+            user32.PostMessageW(hwnd, 0x0111, 1, 0)      # IDOK (dismisses 'Location is not available' & info dialogs)
+            user32.PostMessageW(hwnd, 0x0111, 2, 0)      # IDCANCEL (dismisses 'Format disk?' prompt)
+            user32.PostMessageW(hwnd, 0x0010, 0, 0)      # WM_CLOSE
+            user32.PostMessageW(hwnd, 0x0112, 0xF060, 0) # WM_SYSCOMMAND, SC_CLOSE
             closed += 1
     except Exception:
         pass
@@ -431,6 +454,10 @@ def _dismount_sd_volumes(verified_disk, remove_letters=True):
         if remove_letters:
             try:
                 kernel32.DeleteVolumeMountPointW(f"{clean}:\\")
+            except Exception:
+                pass
+            try:
+                subprocess.run(["mountvol.exe", f"{clean}:", "/D"], stdin=subprocess.DEVNULL, capture_output=True, timeout=2)
             except Exception:
                 pass
 
@@ -614,6 +641,7 @@ def flash_raw_image(img_path, disk_index, progress_callback=None, verified_disk=
                     speed = (bytes_written_total / (t_now - t0)) / (1024 * 1024) if (t_now - t0) > 0 else 0
                     pct = min(99, int((bytes_written_total / max(total_size, 1)) * 100))
                     progress_callback(pct, bytes_written_total, max(total_size, bytes_written_total), speed)
+                    _dismiss_windows_format_dialogs()
 
         # Write deferred MBR + partition table (first 4096 bytes) now that all partitions are on disk
         if expected_head and len(expected_head) >= 512:
@@ -2082,19 +2110,21 @@ class ThreadingMigratorServer(socketserver.ThreadingMixIn, socketserver.TCPServe
 
 def run_server():
     append_log(f"JRFK Migrator Server starting on port {PORT}...")
+
+    # Start background suppressor for Windows format and "Location is not available" dialogs
+    def _format_dialog_watcher():
+        while True:
+            _dismiss_windows_format_dialogs()
+            time.sleep(0.15)
+
+    threading.Thread(target=_format_dialog_watcher, daemon=True).start()
+
     if is_admin():
         append_log("[+] Running with elevated Administrator privileges.")
         _set_windows_automount(False)
         atexit.register(_set_windows_automount, True)
         _dismiss_windows_format_dialogs()
         append_log("[+] Windows automount disabled & Format-popup suppressor active during JRFK session.")
-
-        def _format_dialog_watcher():
-            while True:
-                _dismiss_windows_format_dialogs()
-                time.sleep(0.4)
-
-        threading.Thread(target=_format_dialog_watcher, daemon=True).start()
     else:
         append_log("[-] Running with standard user privileges (Elevation available via Web UI).")
     append_log("Ready for SD provisioning.")
