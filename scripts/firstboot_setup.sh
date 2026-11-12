@@ -484,7 +484,16 @@ if [ -f "\$HOME/.jrfk_migration_complete_prompt" ] && [ -f "\$HOME/rfk_postboot_
     rm -f "\$HOME/.jrfk_migration_complete_prompt"
 fi
 
-# Hide desktop taskbar/wallpaper panels if active so ONLY RFK app is visible
+# Temporarily hide desktop panel while RFK GUI runs fullscreen, and restore it if GUI ever exits
+_restore_panel() {
+    if command -v wf-panel-pi >/dev/null 2>&1 && ! pgrep -x wf-panel-pi >/dev/null 2>&1 && [ -n "\${WAYLAND_DISPLAY:-}" ]; then
+        nohup wf-panel-pi >/dev/null 2>&1 </dev/null &
+    elif command -v lxpanel >/dev/null 2>&1 && ! pgrep -x lxpanel >/dev/null 2>&1; then
+        nohup lxpanel --profile LXDE-pi >/dev/null 2>&1 </dev/null &
+    fi
+}
+trap _restore_panel EXIT
+
 pkill -f lxpanel 2>/dev/null || true
 pkill -f wf-panel-pi 2>/dev/null || true
 pkill -f sfwbar 2>/dev/null || true
@@ -497,6 +506,7 @@ done
 
 cd "$TARGET_HOME/rf-kit-statics"
 python3 gui_starter.py &>> rf-kit-gui.log
+_restore_panel
 EOF
 chmod +x "$TARGET_HOME/Desktop/start_gui.sh" "$TARGET_HOME/rf-kit-statics/gui_starter.py" 2>/dev/null || true
 
