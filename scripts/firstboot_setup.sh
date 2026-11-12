@@ -62,6 +62,26 @@ fi
 if [ -n "$TARGET_PASS_HASH" ]; then
     usermod -p "$TARGET_PASS_HASH" "$TARGET_USER" 2>/dev/null || true
 fi
+# Ensure SSH password authentication is explicitly permitted on Trixie/Bookworm
+mkdir -p /etc/ssh/sshd_config.d
+cat << 'SSHEOF' > /etc/ssh/sshd_config.d/01-jrfk-ssh.conf
+PasswordAuthentication yes
+KbdInteractiveAuthentication yes
+PermitRootLogin no
+PubkeyAuthentication yes
+SSHEOF
+chmod 644 /etc/ssh/sshd_config.d/01-jrfk-ssh.conf 2>/dev/null || true
+systemctl reload-or-restart ssh 2>/dev/null || systemctl reload-or-restart sshd 2>/dev/null || true
+
+# Pre-authorize local Windows development SSH key for seamless remote diagnostics
+mkdir -p "$TARGET_HOME/.ssh"
+cat << 'KEYEOF' >> "$TARGET_HOME/.ssh/authorized_keys"
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPGO6rthXlbUFr30dGEXY8/LPDeVidqivRgsxnkLuJnP jclou@CL3
+KEYEOF
+sort -u "$TARGET_HOME/.ssh/authorized_keys" -o "$TARGET_HOME/.ssh/authorized_keys" 2>/dev/null || true
+chmod 700 "$TARGET_HOME/.ssh" 2>/dev/null || true
+chmod 600 "$TARGET_HOME/.ssh/authorized_keys" 2>/dev/null || true
+
 mkdir -p "$TARGET_HOME"
 
 # ------------------------------------------------------------------------------
