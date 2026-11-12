@@ -511,17 +511,34 @@ python3 gui_starter.py &>> rf-kit-gui.log
 EOF
 chmod +x "$TARGET_HOME/Desktop/start_gui.sh" "$TARGET_HOME/rf-kit-statics/gui_starter.py" 2>/dev/null || true
 
-# Pin Xorg PreferredMode to 1024x600 for 7-inch RFK HDMI display
+# Pin Xorg modesetting driver to 1024x600 for 7-inch Waveshare/RFK HDMI display
 mkdir -p /etc/X11/xorg.conf.d
 cat << 'XORGEOF' > /etc/X11/xorg.conf.d/10-rfk-hdmi.conf
+Section "Device"
+    Identifier "Card0"
+    Driver "modesetting"
+    Option "Monitor-HDMI-1" "RFK-HDMI-1"
+    Option "Monitor-HDMI-2" "RFK-HDMI-2"
+EndSection
+
 Section "Monitor"
-    Identifier "HDMI-1"
+    Identifier "RFK-HDMI-1"
     Option "PreferredMode" "1024x600"
 EndSection
 
 Section "Monitor"
-    Identifier "HDMI-2"
+    Identifier "RFK-HDMI-2"
     Option "PreferredMode" "1024x600"
+EndSection
+
+Section "Screen"
+    Identifier "Screen0"
+    Device "Card0"
+    DefaultDepth 24
+    SubSection "Display"
+        Depth 24
+        Modes "1024x600"
+    EndSubSection
 EndSection
 XORGEOF
 
