@@ -15,6 +15,14 @@ import string
 import random
 import lzma
 
+MIGRATOR_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "tools", "migrator")
+if MIGRATOR_DIR not in sys.path:
+    sys.path.insert(0, MIGRATOR_DIR)
+
+import gold_extractor
+import sd_guard
+from sd_guard import SDGuardError
+
 PORT = 8089
 if len(sys.argv) > 1:
     try:
@@ -23,6 +31,8 @@ if len(sys.argv) > 1:
         pass
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+BACKUP_ROOT = os.path.join(BASE_DIR, "backups")
+IMAGES_DIR = os.path.join(BASE_DIR, "images")
 
 # In-memory streaming log buffer for live terminal display in HTM
 LOG_BUFFER = []
@@ -73,56 +83,32 @@ def generate_sha512_crypt(password, salt=None):
     digest = hashlib.sha512((salt + password).encode('utf-8')).hexdigest()
     return f"$6${salt}${digest[:43]}"
 
+def assert_writable_non_gold_sd(disk_index, drive_letter=None, require_letter=False):
+    verified = sd_guard.validate_sd_write_target(
+        disk_index, drive_letter=drive_letter, require_letter=require_letter
+    )
+    gold_extractor.check_not_gold_target(verified, drive_letter=drive_letter)
+    return verified
+
+
 def query_disks():
-    disks = []
-    try:
-        ps_cmd = """
-        $res = @()
-        Get-CimInstance Win32_DiskDrive | ForEach-Object {
-            $d = $_
-            $idx = $d.Index
-            $parts = Get-Partition -DiskNumber $idx -ErrorAction SilentlyContinue
-            $letters = ($parts | Where-Object { $_.DriveLetter } | ForEach-Object { $_.DriveLetter + ':' }) -join ', '
-            $sizeGB = [math]::Round($d.Size / 1GB, 1)
-            $isSD = ($d.InterfaceType -eq 'USB' -and $sizeGB -ge 7 -and $sizeGB -le 260)
-            $res += [PSCustomObject]@{
-                index = $idx
-                id = $d.DeviceID
-                model = $d.Model
-                interface = $d.InterfaceType
-                size_bytes = $d.Size
-                size_gb = "$sizeGB GB"
-                letter = $letters
-                is_sd = $isSD
-            }
-        }
-        $res | ConvertTo-Json -Compress
-        """
-        p = subprocess.run(["powershell", "-NoProfile", "-Command", ps_cmd], capture_output=True, text=True, timeout=15)
-        out = p.stdout.strip()
-        if out:
-            raw_data = json.loads(out)
-            if isinstance(raw_data, dict):
-                raw_data = [raw_data]
-            for item in raw_data:
-                disks.append({
-                    "index": item.get("index"),
-                    "id": item.get("id"),
-                    "model": item.get("model", "Unknown Storage Device"),
-                    "interface": item.get("interface", "Unknown"),
-                    "size_bytes": int(item.get("size_bytes") or 0),
-                    "size_gb": item.get("size_gb", "Unknown"),
-                    "letter": item.get("letter", ""),
-                    "is_sd": bool(item.get("is_sd"))
-                })
-    except Exception as e:
-        append_log(f"Error querying disks: {e}")
-        
+    disks = sd_guard.query_disks(log_fn=append_log)
+    for d in disks:
+        d["is_gold"] = False
+        if d.get("is_sd"):
+            try:
+                gold_extractor.check_not_gold_target(d)
+            except SDGuardError as ge:
+                d["is_gold"] = True
+                d["writable"] = False
+                d["blocked_reason"] = str(ge)
     return disks
 
 def validate_sd_partitions(disk_index, drive_letter):
     """Validates both Partition 1 (FAT32 bootfs) and Partition 2 (Linux ext4 rootfs)."""
-    clean_letter = drive_letter.replace(":", "").strip() if drive_letter else "E"
+    clean_letter = sd_guard.resolve_verified_drive_letter(disk_index, requested_letter=drive_letter)
+    if not clean_letter:
+        raise SDGuardError(f"No mounted removable FAT32 boot partition found on Disk {disk_index}.")
     target_dir = f"{clean_letter}:\\"
     
     validation = {
@@ -157,15 +143,27 @@ def validate_sd_partitions(disk_index, drive_letter):
 
     return validation
 
-def restore_official_boot_files(target_dir):
-    """Ensures all 411 official Raspberry Pi OS bootloader & kernel files are present on target_dir."""
-    seven_zip = find_7zip()
-    boot_fat = r"C:\RFK_Backups\boot_partition.fat"
-    image_xz = r"C:\RFK_Backups\images\raspios_bookworm_arm64.img.xz"
+def resolve_os_image_path():
+    for d in (IMAGES_DIR,):
+        if os.path.isdir(d):
+            for ext in (".img.xz", ".img"):
+                p = os.path.join(d, f"raspios_bookworm_arm64{ext}")
+                if os.path.isfile(p):
+                    return p
+    return None
 
-    if not os.path.exists(boot_fat) and os.path.exists(image_xz):
+
+def restore_official_boot_files(target_dir, disk_index=None, drive_letter=None):
+    """Ensures all 411 official Raspberry Pi OS bootloader & kernel files are present on target_dir."""
+    letter_check = drive_letter or (target_dir[0] if target_dir else None)
+    assert_writable_non_gold_sd(disk_index, drive_letter=letter_check, require_letter=True)
+    seven_zip = find_7zip()
+    os.makedirs(BACKUP_ROOT, exist_ok=True)
+    boot_fat = os.path.join(BACKUP_ROOT, "boot_partition.fat")
+    image_xz = resolve_os_image_path()
+
+    if not os.path.exists(boot_fat) and image_xz and image_xz.lower().endswith(".xz"):
         append_log("[*] Unpacking official 512MB bootloader partition from cached OS image...")
-        os.makedirs(r"C:\RFK_Backups", exist_ok=True)
         with lzma.open(image_xz, "rb") as f_in:
             f_in.seek(8388608)
             data = f_in.read(536870912)
@@ -194,7 +192,9 @@ def check_old_rfk_files(drive_path):
                 old_files.append(item)
     return old_files
 
-def inject_jrfk_bits(target_dir, username, password, hostname, ssid, wifipw):
+def inject_jrfk_bits(target_dir, username, password, hostname, ssid, wifipw, disk_index=None, drive_letter=None):
+    letter_check = drive_letter or (target_dir[0] if target_dir else None)
+    assert_writable_non_gold_sd(disk_index, drive_letter=letter_check, require_letter=True)
     append_log(f"[*] Staging station credentials for user '{username}' and hostname '{hostname}'...")
     
     # 1. userconf.txt
@@ -282,15 +282,12 @@ def run_pipeline(disk_index, drive_letter, username, password, hostname, ssid, w
     append_log("=========================================================================")
 
     try:
-        clean_letter = drive_letter.replace(":", "").strip() if drive_letter else ""
+        verified_disk = assert_writable_non_gold_sd(disk_index, drive_letter=drive_letter or None)
+        clean_letter = sd_guard.resolve_verified_drive_letter(
+            disk_index, requested_letter=drive_letter or None, disks=[verified_disk]
+        )
         if not clean_letter:
-            disks = query_disks()
-            for d in disks:
-                if d["index"] == disk_index and d["letter"]:
-                    clean_letter = d["letter"].split(",")[0].replace(":", "").strip()
-                    break
-        if not clean_letter:
-            clean_letter = "E"
+            raise SDGuardError(f"No mounted removable boot partition found on Disk {disk_index}.")
         target_dir = f"{clean_letter}:\\"
 
         # Step 1: Scan for old RFK amplifier data
@@ -301,11 +298,6 @@ def run_pipeline(disk_index, drive_letter, username, password, hostname, ssid, w
         old_rfk = check_old_rfk_files(target_dir)
         if old_rfk:
             append_log(f"[!] Found existing RFK amplifier data on card: {', '.join(old_rfk)}")
-            backup_archive = r"C:\RFK_Backups\RFK_Golden_Master.tar.gz"
-            os.makedirs(r"C:\RFK_Backups", exist_ok=True)
-            with open(backup_archive, "wb") as f:
-                f.write(b"RFK Golden Master Backup\n")
-            append_log(f"[+] Safely preserved calibrations to {backup_archive}")
         else:
             append_log("[+] Target SD card checked: No previous RFK files found (Clean Card verified).")
 
@@ -317,15 +309,19 @@ def run_pipeline(disk_index, drive_letter, username, password, hostname, ssid, w
         
         if not has_boot:
             append_log("[*] Step 2/5: Restoring official 64-bit firmware and kernel into Partition 1...")
-            restored = restore_official_boot_files(target_dir)
+            restored = restore_official_boot_files(target_dir, disk_index=disk_index, drive_letter=clean_letter)
             if not restored:
-                append_log("[-] Notice: Launching Raspberry Pi Imager GUI...")
+                assert_writable_non_gold_sd(disk_index)
+                append_log("[-] Notice: Launching Raspberry Pi Imager...")
                 imager_exe = find_rpi_imager()
-                image_path = r"C:\RFK_Backups\images\raspios_bookworm_arm64.img.xz"
+                image_path = resolve_os_image_path()
                 target_dev = f"\\\\.\\PHYSICALDRIVE{disk_index}"
-                if imager_exe:
-                    cmd = f"powershell -NoProfile -Command \"Start-Process '{imager_exe}' -ArgumentList '{image_path}', '{target_dev}' -Verb RunAs\""
-                    subprocess.Popen(cmd, shell=True)
+                if imager_exe and image_path:
+                    if is_admin():
+                        subprocess.Popen([imager_exe, image_path, target_dev], shell=False)
+                    else:
+                        cmd = f"powershell -NoProfile -Command \"Start-Process '{imager_exe}' -ArgumentList '{image_path}', '{target_dev}' -Verb RunAs\""
+                        subprocess.Popen(cmd, shell=True)
                     append_log("[ACTION REQUIRED] Click 'NEXT' -> 'WRITE' in Raspberry Pi Imager on your desktop.")
                     for _ in range(300):
                         time.sleep(2)
@@ -338,13 +334,13 @@ def run_pipeline(disk_index, drive_letter, username, password, hostname, ssid, w
         ACTIVE_JOB["step"] = "injecting_payload"
         ACTIVE_JOB["progress"] = 70
         append_log("[*] Step 3/5: Injecting station credentials and JRFK application suite...")
-        inject_jrfk_bits(target_dir, username, password, hostname, ssid, wifipw)
+        inject_jrfk_bits(target_dir, username, password, hostname, ssid, wifipw, disk_index=disk_index, drive_letter=clean_letter)
 
         # Step 4: Verification of both FAT32 and ext4 partitions
         ACTIVE_JOB["step"] = "validating_partitions"
         ACTIVE_JOB["progress"] = 90
         append_log("[*] Step 4/5: Validating both Linux ext4 and FAT32 partitions...")
-        val = validate_sd_partitions(disk_index, drive_letter)
+        val = validate_sd_partitions(disk_index, clean_letter)
         for detail in val["details"]:
             append_log(f"    [OK] {detail}")
 
@@ -395,6 +391,13 @@ class MigratorHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "*")
         self.send_header("Access-Control-Allow-Private-Network", "true")
+
+    def send_json(self, status_code, payload):
+        self.send_response(status_code)
+        self.send_header("Content-Type", "application/json")
+        self.send_cors_headers()
+        self.end_headers()
+        self.wfile.write(json.dumps(payload).encode("utf-8"))
 
     def do_OPTIONS(self):
         self.send_response(200)
@@ -451,17 +454,25 @@ class MigratorHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps(data).encode('utf-8'))
                 return
 
+            elif parsed.path == "/api/gold_manifest":
+                manifest = ACTIVE_JOB.get("gold_manifest") or gold_extractor.load_latest_gold_manifest()
+                if not manifest:
+                    self.send_json(404, {"status": "error", "message": "No GOLD extraction manifest found yet."})
+                    return
+                self.send_json(200, {"status": "ok", "manifest": manifest})
+                return
+
             elif parsed.path == "/api/validate_card":
                 query = urllib.parse.parse_qs(parsed.query)
-                disk_idx = int(query.get("disk_index", [2])[0])
-                drive_letter = query.get("drive_letter", ["E:"])[0]
-                
-                val = validate_sd_partitions(disk_idx, drive_letter)
-                self.send_response(200)
-                self.send_header("Content-Type", "application/json")
-                self.send_cors_headers()
-                self.end_headers()
-                self.wfile.write(json.dumps({"status": "ok", "validation": val}).encode('utf-8'))
+                disk_idx_raw = query.get("disk_index", [None])[0]
+                drive_letter = query.get("drive_letter", [None])[0]
+                try:
+                    sd_guard.validate_sd_write_target(disk_idx_raw, drive_letter=drive_letter)
+                    val = validate_sd_partitions(int(disk_idx_raw), drive_letter)
+                except SDGuardError as ge:
+                    self.send_json(403, {"status": "error", "message": str(ge)})
+                    return
+                self.send_json(200, {"status": "ok", "validation": val})
                 return
 
             elif parsed.path == "/api/check_amp":
@@ -505,15 +516,19 @@ class MigratorHandler(http.server.SimpleHTTPRequestHandler):
 
             if parsed.path == "/api/start_clean_build":
                 if ACTIVE_JOB.get("running"):
-                    self.send_response(400)
-                    self.send_header("Content-Type", "application/json")
-                    self.send_cors_headers()
-                    self.end_headers()
-                    self.wfile.write(json.dumps({"status": "error", "message": "A provisioning job is already running."}).encode('utf-8'))
+                    self.send_json(400, {"status": "error", "message": "A provisioning job is already running."})
                     return
 
-                disk_idx = req_data.get("disk_index", 2)
-                drive_letter = req_data.get("drive_letter", "E:")
+                disk_idx_raw = req_data.get("disk_index")
+                drive_letter = req_data.get("drive_letter")
+                try:
+                    verified = assert_writable_non_gold_sd(disk_idx_raw, drive_letter=drive_letter or None)
+                    disk_idx = verified["index"]
+                except SDGuardError as ge:
+                    append_log(f"[BLOCKED] /api/start_clean_build rejected: {ge}")
+                    self.send_json(403, {"status": "error", "message": str(ge)})
+                    return
+
                 username = req_data.get("username", "pi")
                 password = req_data.get("password", "raspberry")
                 hostname = req_data.get("hostname", "k7bit")
@@ -522,29 +537,30 @@ class MigratorHandler(http.server.SimpleHTTPRequestHandler):
 
                 t = threading.Thread(
                     target=run_pipeline,
-                    args=(disk_idx, drive_letter, username, password, hostname, ssid, wifipw),
+                    args=(disk_idx, drive_letter or "", username, password, hostname, ssid, wifipw),
                     daemon=True
                 )
                 t.start()
 
-                self.send_response(200)
-                self.send_header("Content-Type", "application/json")
-                self.send_cors_headers()
-                self.end_headers()
-                self.wfile.write(json.dumps({"status": "ok", "message": "Pipeline initiated."}).encode('utf-8'))
+                self.send_json(200, {"status": "ok", "message": "Pipeline initiated."})
                 return
 
             elif parsed.path == "/api/inject_bits":
                 if ACTIVE_JOB.get("running"):
-                    self.send_response(400)
-                    self.send_header("Content-Type", "application/json")
-                    self.send_cors_headers()
-                    self.end_headers()
-                    self.wfile.write(json.dumps({"status": "error", "message": "A job is already running."}).encode('utf-8'))
+                    self.send_json(400, {"status": "error", "message": "A job is already running."})
                     return
 
-                disk_idx = req_data.get("disk_index", 2)
-                drive_letter = req_data.get("drive_letter", "E:")
+                disk_idx_raw = req_data.get("disk_index")
+                drive_letter = req_data.get("drive_letter")
+                try:
+                    verified = assert_writable_non_gold_sd(disk_idx_raw, drive_letter=drive_letter, require_letter=True)
+                    disk_idx = verified["index"]
+                    clean_letter = sd_guard.normalize_drive_letter(drive_letter)
+                except SDGuardError as ge:
+                    append_log(f"[BLOCKED] /api/inject_bits rejected: {ge}")
+                    self.send_json(403, {"status": "error", "message": str(ge)})
+                    return
+
                 username = req_data.get("username", "pi")
                 password = req_data.get("password", "raspberry")
                 hostname = req_data.get("hostname", "k7bit")
@@ -554,16 +570,15 @@ class MigratorHandler(http.server.SimpleHTTPRequestHandler):
                 def _inject():
                     global ACTIVE_JOB
                     ACTIVE_JOB = {"running": True, "step": "injecting_payload", "progress": 30, "error": None}
-                    clean_letter = drive_letter.replace(":", "").strip() if drive_letter else "E"
                     target_dir = f"{clean_letter}:\\"
                     try:
                         has_boot = os.path.exists(os.path.join(target_dir, "kernel8.img")) and os.path.exists(os.path.join(target_dir, "start4.elf"))
                         if not has_boot:
-                            restore_official_boot_files(target_dir)
+                            restore_official_boot_files(target_dir, disk_index=disk_idx, drive_letter=clean_letter)
 
-                        inject_jrfk_bits(target_dir, username, password, hostname, ssid, wifipw)
+                        inject_jrfk_bits(target_dir, username, password, hostname, ssid, wifipw, disk_index=disk_idx, drive_letter=clean_letter)
                         
-                        val = validate_sd_partitions(disk_idx, drive_letter)
+                        val = validate_sd_partitions(disk_idx, clean_letter)
                         for d in val["details"]:
                             append_log(f"    [OK] {d}")
 
@@ -581,77 +596,87 @@ class MigratorHandler(http.server.SimpleHTTPRequestHandler):
                         append_log(f"[ERROR] Injection failed: {e}")
 
                 threading.Thread(target=_inject, daemon=True).start()
-                self.send_response(200)
-                self.send_header("Content-Type", "application/json")
-                self.send_cors_headers()
-                self.end_headers()
-                self.wfile.write(json.dumps({"status": "ok", "message": "Injection started."}).encode('utf-8'))
+                self.send_json(200, {"status": "ok", "message": "Injection started."})
                 return
 
             elif parsed.path == "/api/extract_golden_master":
-                drive_letter = req_data.get("drive_letter", "E:")
-                clean_letter = drive_letter.replace(":", "").strip()
-                
-                append_log(f"[*] Reading original 32-bit SD card from Drive {clean_letter}:...")
-                backup_dir = r"C:\RFK_Backups"
-                os.makedirs(backup_dir, exist_ok=True)
-                
+                if ACTIVE_JOB.get("running"):
+                    self.send_json(400, {"status": "error", "message": "A job is already running."})
+                    return
+
+                disk_idx_raw = req_data.get("disk_index")
+                drive_letter = req_data.get("drive_letter")
+                try:
+                    verified = sd_guard.validate_sd_write_target(disk_idx_raw, drive_letter=drive_letter or None)
+                    disk_idx = verified["index"]
+                    clean_letter = sd_guard.resolve_verified_drive_letter(
+                        disk_idx, requested_letter=drive_letter or None, disks=[verified]
+                    ) or ""
+                except SDGuardError as ge:
+                    append_log(f"[BLOCKED] /api/extract_golden_master rejected: {ge}")
+                    self.send_json(403, {"status": "error", "message": str(ge)})
+                    return
+
+                append_log(f"[*] Reading GOLD 32-bit SD card READ-ONLY (Disk {disk_idx}, Drive {clean_letter or 'Unmounted'}:)...")
+
                 def _extract():
+                    global ACTIVE_JOB
+                    ACTIVE_JOB = {"running": True, "step": "extracting", "progress": 15, "error": None, "gold_manifest": None}
                     try:
-                        time.sleep(1)
-                        append_log("[+] Found /home/pi/PA-Files/ directory structure on original SD.")
-                        append_log("[+] Extracted: calibration.json (SWR bridge & power scale constants)")
-                        append_log("[+] Extracted: touch.cal (4-wire resistive touch alignment)")
-                        append_log("[+] Extracted: antenna_matrix.json (4x4 coaxial relay band mappings)")
-                        append_log("[+] Extracted: wpa_supplicant.conf (Station Wi-Fi credentials)")
-                        tar_path = os.path.join(backup_dir, "RFK_Golden_Master.tar.gz")
-                        with open(tar_path, "wb") as f:
-                            f.write(b"RFK Golden Master Backup Archive\n")
-                        append_log(f"[SUCCESS] Golden Master archived cleanly to {tar_path}")
-                        append_log("=========================================================================")
-                        append_log("OPERATOR ACTION: Eject original SD card, label it 'GOLDEN MASTER (DO NOT OVERWRITE)',")
-                        append_log("and insert your new blank 16GB/32GB+ SD card. Tool will complete migration automatically.")
-                        append_log("=========================================================================")
+                        manifest = gold_extractor.extract_gold_sd(
+                            disk_idx, drive_letter=clean_letter or None, log_fn=append_log
+                        )
+                        ACTIVE_JOB["gold_manifest"] = manifest
+                        ACTIVE_JOB["progress"] = 100
+                        ACTIVE_JOB["step"] = "extracted"
+                        ACTIVE_JOB["running"] = False
+                        append_log(f"[SUCCESS] GOLD SD read complete ({manifest.get('total_items', 0)} items validated).")
                     except Exception as e:
-                        append_log(f"[ERROR] Extraction failed: {e}")
+                        ACTIVE_JOB["running"] = False
+                        ACTIVE_JOB["step"] = "error"
+                        ACTIVE_JOB["error"] = str(e)
+                        append_log(f"[ERROR] GOLD extraction failed: {e}")
 
                 threading.Thread(target=_extract, daemon=True).start()
-                self.send_response(200)
-                self.send_header("Content-Type", "application/json")
-                self.send_cors_headers()
-                self.end_headers()
-                self.wfile.write(json.dumps({"status": "ok", "message": "Extraction started."}).encode('utf-8'))
+                self.send_json(200, {"status": "ok", "message": "Read-only GOLD extraction started."})
                 return
 
             elif parsed.path == "/api/launch_imager":
                 imager = find_rpi_imager()
                 if not imager:
-                    self.send_response(400)
-                    self.send_header("Content-Type", "application/json")
-                    self.send_cors_headers()
-                    self.end_headers()
-                    self.wfile.write(json.dumps({"status": "error", "message": "Raspberry Pi Imager is not installed."}).encode('utf-8'))
+                    self.send_json(400, {"status": "error", "message": "Raspberry Pi Imager is not installed."})
                     return
 
-                image_path = r"C:\RFK_Backups\images\raspios_bookworm_arm64.img.xz"
-                disk_idx = req_data.get("disk_index", 2)
+                disk_idx_raw = req_data.get("disk_index")
+                drive_letter = req_data.get("drive_letter")
+                try:
+                    verified = assert_writable_non_gold_sd(disk_idx_raw, drive_letter=drive_letter or None)
+                    disk_idx = verified["index"]
+                except SDGuardError as ge:
+                    append_log(f"[BLOCKED] /api/launch_imager rejected: {ge}")
+                    self.send_json(403, {"status": "error", "message": str(ge)})
+                    return
+
+                image_path = resolve_os_image_path()
+                if not image_path:
+                    self.send_json(400, {"status": "error", "message": f"64-bit RPi OS image not found in {IMAGES_DIR}."})
+                    return
                 target_dev = f"\\\\.\\PHYSICALDRIVE{disk_idx}"
                 
-                append_log(f"[*] Launching Raspberry Pi Imager GUI with pre-selected image and Disk {disk_idx}...")
+                append_log(f"[*] Launching Raspberry Pi Imager GUI with pre-selected image and verified SD Disk {disk_idx}...")
                 try:
-                    cmd = f"powershell -NoProfile -Command \"Start-Process '{imager}' -ArgumentList '{image_path}', '{target_dev}' -Verb RunAs\""
-                    subprocess.Popen(cmd, shell=True)
-                    append_log(f"[+] Raspberry Pi Imager GUI opened on desktop with 64-bit OS & Disk {disk_idx} pre-selected!")
+                    if is_admin():
+                        subprocess.Popen([imager, image_path, target_dev], shell=False)
+                    else:
+                        cmd = f"powershell -NoProfile -Command \"Start-Process '{imager}' -ArgumentList '{image_path}', '{target_dev}' -Verb RunAs\""
+                        subprocess.Popen(cmd, shell=True)
+                    append_log(f"[+] Raspberry Pi Imager GUI opened on desktop with 64-bit OS & SD Disk {disk_idx} pre-selected!")
                     res = {"status": "ok", "message": "Imager launched."}
                 except Exception as e:
                     append_log(f"[ERROR] Could not launch Imager: {e}")
                     res = {"status": "error", "message": str(e)}
 
-                self.send_response(200)
-                self.send_header("Content-Type", "application/json")
-                self.send_cors_headers()
-                self.end_headers()
-                self.wfile.write(json.dumps(res).encode('utf-8'))
+                self.send_json(200, res)
                 return
 
             self.send_response(404)

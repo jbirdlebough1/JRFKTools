@@ -1,11 +1,11 @@
 
-# Disk raw images (saved on disk outside git tracking)
+# Disk raw images & station GOLD backups (saved on disk outside git tracking)
 *.img
 *.img.gz
-
-# Disk raw images (saved on disk outside git tracking)
-*.img
-*.img.gz
+*.img.xz
+*.tar.gz
+images/
+backups/
 
 .pio/
 __pycache__/

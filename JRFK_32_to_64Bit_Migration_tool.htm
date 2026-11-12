@@ -455,13 +455,34 @@ body {
             <option value="">Scanning for connected SD cards...</option>
           </select>
         </div>
-        <div style="display:flex; gap:8px;">
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
           <button class="btn-primary" id="btnExtract" onclick="extractOriginalData()">
             📥 Extract Golden Master Data
           </button>
           <button class="btn-secondary" onclick="scanDisks()">🔄 Rescan Drives</button>
+          <button class="btn-secondary" onclick="ejectOriginalCard()">⏏️ Safely Eject GOLD</button>
         </div>
-        <div class="terminal-box" id="extractLog">Ready. Insert original amplifier SD card and click 'Extract Golden Master Data'.</div>
+        <div class="terminal-box" id="extractLog">Ready. Insert original GOLD SD card and click 'Extract Golden Master Data'.</div>
+        <div id="goldManifestWrap" style="display:none; margin-top:10px; border:1px solid var(--border); border-radius:8px; padding:10px; background:var(--panel-2, rgba(0,0,0,0.03));">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <strong id="goldManifestTitle" style="font-size:13px;">Validated GOLD SD Contents</strong>
+            <span id="goldManifestBadge" class="badge ok">Ready</span>
+          </div>
+          <div id="goldMetaSummary" style="font-size:12px; color:var(--ink-2); margin-bottom:8px;"></div>
+          <div style="max-height:180px; overflow:auto; border:1px solid var(--border); border-radius:6px;">
+            <table style="width:100%; border-collapse:collapse; font-size:11.5px;">
+              <thead>
+                <tr style="text-align:left; border-bottom:1px solid var(--border); background:rgba(0,0,0,0.04);">
+                  <th style="padding:4px 6px;">Part / Cat</th>
+                  <th style="padding:4px 6px;">Path</th>
+                  <th style="padding:4px 6px;">Size</th>
+                  <th style="padding:4px 6px;">Status</th>
+                </tr>
+              </thead>
+              <tbody id="goldManifestBody"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <!-- Stage 2: Target SD Provisioning -->
@@ -473,6 +494,9 @@ body {
         <p style="color:var(--ink-2); margin:0;">
           <strong>Action:</strong> Remove original SD card and store it safely in your station drawer. Insert a brand-new 16GB or 32GB+ SD card (Class 10, UHS-I U3, V30, A2 Application Class).
         </p>
+        <div id="osReleaseBanner" style="font-size:12px; padding:6px 8px; border:1px solid var(--border); border-radius:6px; background:var(--panel-2, rgba(0,0,0,0.03)); color:var(--ink-2);">
+          OS Target: Checking latest official 64-bit Raspberry Pi OS (Pi 4 &amp; Pi 5)...
+        </div>
         <div class="form-group">
           <label class="form-label">Target Write Drive (CAUTION)</label>
           <select class="form-control" id="driveSelectTarget">
@@ -489,13 +513,32 @@ body {
             Inject extracted user calibrations (calibration.json, touch cal, attenuator offsets)
           </label>
         </div>
-        <div style="display:flex; gap:8px; margin-top:6px;">
+        <div style="display:flex; gap:8px; margin-top:6px; flex-wrap:wrap;">
           <button class="btn-primary" id="btnFlash" onclick="buildTargetImage()">
-            ⚡ Build & Flash 64-Bit Appliance Image
+            ⚡ Create 64-Bit RFK Image
           </button>
-          <button class="btn-secondary" onclick="ejectTargetCard()">⏏️ Safely Eject</button>
+          <button class="btn-secondary" id="btnEraseTarget" onclick="eraseTargetCard('flashLog', 'driveSelectTarget')">🧹 Full Erase</button>
+          <button class="btn-secondary" onclick="scanDisks()">🔄 Rescan</button>
+          <button class="btn-secondary" onclick="ejectTargetCard('driveSelectTarget', 'flashLog')">⏏️ Safely Eject</button>
         </div>
         <div class="terminal-box" id="flashLog">Awaiting user trigger...</div>
+        <div id="flashTraceWrap" style="display:none; margin-top:10px; border:1px solid var(--border); border-radius:8px; padding:10px; background:var(--panel-2, rgba(0,0,0,0.03));">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <strong style="font-size:13px;">Migration Trace (32-Bit GOLD -> 64-Bit Pi 4/5)</strong>
+            <span class="badge ok">Verified</span>
+          </div>
+          <table style="width:100%; border-collapse:collapse; font-size:11.5px;">
+            <thead>
+              <tr style="text-align:left; border-bottom:1px solid var(--border); background:rgba(0,0,0,0.04);">
+                <th style="padding:4px 6px;">Component</th>
+                <th style="padding:4px 6px;">Original</th>
+                <th style="padding:4px 6px;">64-Bit Output</th>
+                <th style="padding:4px 6px;">Status</th>
+              </tr>
+            </thead>
+            <tbody id="flashTraceBody"></tbody>
+          </table>
+        </div>
       </div>
 
     </div>
@@ -554,7 +597,7 @@ body {
           <span class="badge">16GB or Larger</span>
         </h3>
         <p style="color:var(--ink-2); margin:0;">
-          Select your new blank SD card. The tool partitions, formats, writes Debian 12 Bookworm 64-bit, and writes Wi-Fi credentials into <code>userconf.txt</code> and <code>wpa_supplicant.conf</code>.
+          Select your new blank SD card. The tool full-erases, flashes the latest official 64-bit Raspberry Pi OS (Pi 4 &amp; Pi 5) via RPi Imager, and stages credentials and RFK payload.
         </p>
         <div class="form-group">
           <label class="form-label">Target Write Drive (CAUTION)</label>
@@ -562,12 +605,13 @@ body {
             <option value="">Insert and select new blank SD card...</option>
           </select>
         </div>
-        <div style="display:flex; gap:8px;">
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
           <button class="btn-success" id="btnFreshBuild" onclick="buildFreshSystem()">
-            🚀 Partition, Format & Build 64-Bit System
+            🚀 Create Clean 64-Bit RFK Image
           </button>
-          <button class="btn-secondary" onclick="scanDisks()">🔄 Rescan Drives</button>
-          <button class="btn-secondary" onclick="ejectTargetCard()">⏏️ Eject</button>
+          <button class="btn-secondary" id="btnEraseFresh" onclick="eraseTargetCard('freshLog', 'driveSelectFresh')">🧹 Full Erase</button>
+          <button class="btn-secondary" onclick="scanDisks()">🔄 Rescan</button>
+          <button class="btn-secondary" onclick="ejectTargetCard('driveSelectFresh', 'freshLog')">⏏️ Safely Eject</button>
         </div>
         <div class="terminal-box" id="freshLog">Ready. Enter credentials and click 'Build 64-Bit System'.</div>
       </div>
@@ -840,164 +884,369 @@ async function scanDisks() {
       const data = await res.json();
       populateDrives(data.disks || []);
     } else {
-      mockScan();
+      populateDrives([], "Backend disk scan failed");
     }
   } catch (e) {
-    mockScan();
+    populateDrives([], "Backend server offline (launch via JRFK_Migrator.bat)");
   }
 }
 
-function mockScan() {
-  const mockDrives = [
-    { id: "PhysicalDrive2", model: "Generic USB SD Card Reader (Original 16GB SD)", size: "15.9 GB" },
-    { id: "PhysicalDrive3", model: "SanDisk Extreme V30 A2 (Target 32GB SD)", size: "31.9 GB" }
-  ];
-  populateDrives(mockDrives);
-}
-
-function populateDrives(drives) {
+function populateDrives(drives, offlineReason) {
   const selOrig = document.getElementById('driveSelectOriginal');
   const selTgt = document.getElementById('driveSelectTarget');
   const selFresh = document.getElementById('driveSelectFresh');
+  const btnExtract = document.getElementById('btnExtract');
+  const btnFlash = document.getElementById('btnFlash');
+  const btnFresh = document.getElementById('btnFreshBuild');
+  const btnEraseTarget = document.getElementById('btnEraseTarget');
+  const btnEraseFresh = document.getElementById('btnEraseFresh');
+  const sdPill = document.getElementById('sdPill');
+
   selOrig.innerHTML = "";
   selTgt.innerHTML = "";
   selFresh.innerHTML = "";
 
-  if (drives.length === 0) {
-    const emptyOpt = "<option value=''>No removable SD cards detected</option>";
-    selOrig.innerHTML = emptyOpt;
-    selTgt.innerHTML = emptyOpt;
-    selFresh.innerHTML = emptyOpt;
-    return;
+  const sdSourceDrives = (drives || []).filter(d => d.is_sd);
+  const sdTargetDrives = (drives || []).filter(d => d.is_sd && d.writable && !d.is_gold);
+
+  if (sdSourceDrives.length === 0) {
+    const msg = offlineReason || "No 16-64 GB SD / SD+USB card detected (SSDs & HDDs blocked)";
+    selOrig.innerHTML = `<option value=''>${msg}</option>`;
+    if (btnExtract) btnExtract.disabled = true;
+  } else {
+    sdSourceDrives.forEach(d => {
+      const goldTag = d.is_gold ? " [GOLD - READ ONLY]" : "";
+      const opt = document.createElement('option');
+      opt.value = `${d.index}|${d.letter || ''}`;
+      opt.textContent = `Disk ${d.index}: ${d.model} [${d.size_gb || d.size}] (${d.letter || 'Unmounted'})${goldTag}`;
+      selOrig.appendChild(opt);
+    });
+    if (btnExtract) btnExtract.disabled = false;
   }
 
-  drives.forEach(d => {
-    const opt1 = document.createElement('option');
-    opt1.value = d.id;
-    opt1.textContent = `${d.model} [${d.size}]`;
-    selOrig.appendChild(opt1);
+  if (sdTargetDrives.length === 0) {
+    const hasGold = sdSourceDrives.some(d => d.is_gold);
+    const msg = hasGold
+      ? "GOLD SD locked (READ-ONLY) — remove GOLD and insert NEW 16-64 GB target SD"
+      : (offlineReason || "No writable 16-64 GB target SD detected (SSDs & HDDs blocked)");
+    const emptyOpt = `<option value=''>${msg}</option>`;
+    selTgt.innerHTML = emptyOpt;
+    selFresh.innerHTML = emptyOpt;
+    if (btnFlash) btnFlash.disabled = true;
+    if (btnFresh) btnFresh.disabled = true;
+    if (btnEraseTarget) btnEraseTarget.disabled = true;
+    if (btnEraseFresh) btnEraseFresh.disabled = true;
+  } else {
+    sdTargetDrives.forEach(d => {
+      const label = `Disk ${d.index}: ${d.model} [${d.size_gb || d.size}] (${d.letter || 'Unmounted'})`;
+      const val = `${d.index}|${d.letter || ''}`;
+      [selTgt, selFresh].forEach(sel => {
+        const opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = label;
+        sel.appendChild(opt);
+      });
+    });
+    if (btnFlash) btnFlash.disabled = false;
+    if (btnFresh) btnFresh.disabled = false;
+    if (btnEraseTarget) btnEraseTarget.disabled = false;
+    if (btnEraseFresh) btnEraseFresh.disabled = false;
+  }
 
-    const opt2 = document.createElement('option');
-    opt2.value = d.id;
-    opt2.textContent = `${d.model} [${d.size}]`;
-    selTgt.appendChild(opt2);
+  if (sdPill) {
+    if (sdTargetDrives.length > 0) {
+      sdPill.textContent = `● Target SD: Ready (${sdTargetDrives.length} writable SD)`;
+      sdPill.classList.remove('amber');
+      sdPill.classList.add('ok');
+    } else if (sdSourceDrives.length > 0) {
+      sdPill.textContent = `● GOLD SD: Read-Only Ready (${sdSourceDrives.length})`;
+      sdPill.classList.remove('amber');
+      sdPill.classList.add('ok');
+    } else {
+      sdPill.textContent = "● Target SD: None (SSDs/Disks Blocked)";
+      sdPill.classList.remove('ok');
+      sdPill.classList.add('amber');
+    }
+  }
+}
 
-    const opt3 = document.createElement('option');
-    opt3.value = d.id;
-    opt3.textContent = `${d.model} [${d.size}]`;
-    selFresh.appendChild(opt3);
+let activeLogTimer = null;
+
+function pollJobLogs(targetBoxId, onDone) {
+  if (activeLogTimer) clearInterval(activeLogTimer);
+  const box = document.getElementById(targetBoxId);
+  let lastCount = 0;
+
+  activeLogTimer = setInterval(async () => {
+    try {
+      const res = await fetch('/api/logs');
+      if (!res.ok) return;
+      const data = await res.json();
+      const logs = data.logs || [];
+      if (logs.length > lastCount) {
+        if (lastCount === 0) box.textContent = "";
+        for (let i = lastCount; i < logs.length; i++) {
+          box.textContent += `[${logs[i].time}] ${logs[i].message}\n`;
+        }
+        lastCount = logs.length;
+        box.scrollTop = box.scrollHeight;
+      }
+      if (data.job && !data.job.running && data.job.step !== 'idle') {
+        clearInterval(activeLogTimer);
+        activeLogTimer = null;
+        if (onDone) onDone(data.job);
+      }
+    } catch (e) {
+      console.warn("Log poll error:", e);
+    }
+  }, 600);
+}
+
+function renderGoldManifest(manifest) {
+  const wrap = document.getElementById('goldManifestWrap');
+  const body = document.getElementById('goldManifestBody');
+  const metaDiv = document.getElementById('goldMetaSummary');
+  const badge = document.getElementById('goldManifestBadge');
+  if (!wrap || !body || !manifest) return;
+
+  wrap.style.display = 'block';
+  const counts = manifest.counts || {};
+  const meta = manifest.metadata || {};
+  const fp = manifest.gold_fingerprint || {};
+  const parts = manifest.partitions || [];
+  const partTxt = parts.map(p => `P${p.index} (${p.filesystem}, ${p.size_mb} MB, ${p.item_count} items)`).join(' | ');
+
+  metaDiv.innerHTML =
+    `<div><strong>Partitions:</strong> ${partTxt}</div>` +
+    `<div><strong>System:</strong> ${meta.os_release || 'Unknown'} | <strong>Host:</strong> ${meta.hostname || 'N/A'} | ` +
+    `<strong>Callsign:</strong> ${meta.callsign || 'N/A'} | <strong>Wi-Fi:</strong> ${meta.wifi_ssid || 'N/A'} | ` +
+    `<strong>GOLD Sig:</strong> 0x${(fp.disk_signature || 0).toString(16)}</div>` +
+    `<div><strong>Validated Counts:</strong> RFK App=${counts.rfk_app || 0}, Tuning/Cal=${counts.tuning_data || 0}, ` +
+    `User/Config=${counts.user_data || 0}, Network=${counts.network || 0}, Boot=${counts.boot || 0}</div>`;
+
+  if (badge) {
+    badge.textContent = manifest.validated_ok ? `✔ Validated (${manifest.total_items} items)` : `⚠ Check Items (${manifest.total_items})`;
+    badge.className = manifest.validated_ok ? 'badge ok' : 'badge';
+  }
+
+  body.innerHTML = "";
+  const items = manifest.items || [];
+  items.slice(0, 200).forEach(it => {
+    const tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid var(--border)';
+    tr.innerHTML =
+      `<td style="padding:3px 6px;">P${it.partition} / ${it.category}</td>` +
+      `<td style="padding:3px 6px; font-family:monospace;">${it.source_path}</td>` +
+      `<td style="padding:3px 6px;">${it.size_bytes} B</td>` +
+      `<td style="padding:3px 6px; color:${it.status === 'VALID' ? 'var(--ok, green)' : 'orange'};">${it.status}</td>`;
+    body.appendChild(tr);
   });
-
-  document.getElementById('sdPill').textContent = `● Target SD: Ready (${drives.length} drives)`;
-  document.getElementById('sdPill').classList.add('ok');
 }
 
 async function extractOriginalData() {
   const btn = document.getElementById('btnExtract');
+  const selVal = document.getElementById('driveSelectOriginal').value;
+  if (!selVal) {
+    logExtract("[BLOCKED] Select a verified 16-64 GB GOLD SD card first.");
+    return;
+  }
+  const [diskIdx, driveLetter] = selVal.split('|');
   btn.disabled = true;
-  logExtract("[*] Mounting ext4 root partition on original SD card in Read-Only mode...");
-  
-  setTimeout(() => {
-    logExtract("[+] Mounted /dev/disk/by-label/rootfs safely.");
-    logExtract("[*] Scanning /home/pi/PA-Files/ for user calibration matrices...");
-  }, 700);
+  document.getElementById('extractLog').textContent = "[*] Starting strictly READ-ONLY GOLD extraction...\n";
 
-  setTimeout(() => {
-    logExtract(" [+] Found calibration.json (Forward/Reflected power offsets)");
-    logExtract(" [+] Found touchscreen_axes.cal (Capacitive touch matrix)");
-    logExtract(" [+] Found /etc/wpa_supplicant/wpa_supplicant.conf (Station Wi-Fi credentials)");
-    logExtract(" [+] Found /home/pi/rf-kit-statics/config.json (Callsign: K7BIT)");
-  }, 1400);
+  try {
+    const res = await fetch('/api/extract_golden_master', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ disk_index: parseInt(diskIdx, 10), drive_letter: driveLetter || '' })
+    });
+    const data = await res.json();
+    if (!res.ok || data.status !== 'ok') {
+      logExtract(`[ERROR] ${data.message || 'Extraction rejected'}`);
+      btn.disabled = false;
+      return;
+    }
 
-  setTimeout(() => {
-    logExtract("[*] Compressing extracted archive: C:\\RFK_Backups\\RFK_Golden_Master_20261031.tar.gz...");
-    logExtract("[SUCCESS] Golden Master Backup verified (SHA256 valid).");
-    logExtract("=================================================================");
-    logExtract("OPERATOR ACTION: Safely remove your original SD card now and");
-    logExtract("store it in your station drawer as an untouched Golden Master!");
-    logExtract("Then insert your new 16GB/32GB target SD card and proceed to Step 2.");
-    logExtract("=================================================================");
+    pollJobLogs('extractLog', async (job) => {
+      btn.disabled = false;
+      if (job.step === 'extracted' && job.gold_manifest) {
+        renderGoldManifest(job.gold_manifest);
+        document.getElementById('statusMessage').textContent =
+          `GOLD read complete (${job.gold_manifest.total_items} items). Remove GOLD SD & insert NEW 16-64 GB SD!`;
+        await scanDisks();
+      } else if (job.error) {
+        document.getElementById('statusMessage').textContent = `GOLD extraction error: ${job.error}`;
+      }
+    });
+  } catch (e) {
+    logExtract(`[ERROR] Request failed: ${e}`);
     btn.disabled = false;
-    document.getElementById('statusMessage').textContent = "Extraction complete! Stored C:\\RFK_Backups\\RFK_Golden_Master.tar.gz";
-  }, 2200);
+  }
+}
+
+function renderMigrationTrace(trace) {
+  const wrap = document.getElementById('flashTraceWrap');
+  const body = document.getElementById('flashTraceBody');
+  if (!wrap || !body || !trace || !trace.rows) return;
+  wrap.style.display = 'block';
+  body.innerHTML = '';
+  trace.rows.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid var(--border)';
+    tr.innerHTML =
+      `<td style="padding:3px 6px;"><strong>${r.item}</strong></td>` +
+      `<td style="padding:3px 6px;">${r.original}</td>` +
+      `<td style="padding:3px 6px;">${r.upgraded}</td>` +
+      `<td style="padding:3px 6px; color:var(--ok, green);">✔ ${r.status}</td>`;
+    body.appendChild(tr);
+  });
+}
+
+async function _startBuildJob({ selectId, logId, btnId, mode, username, password, hostname, ssid, wifipw }) {
+  const btn = document.getElementById(btnId);
+  const selVal = document.getElementById(selectId).value;
+  const logFn = logId === 'freshLog' ? logFresh : logFlash;
+  if (!selVal) {
+    logFn("[BLOCKED] Select a writable 16-64 GB target SD card first (SSDs, HDDs, and GOLD are blocked).");
+    return;
+  }
+  const [diskIdx, driveLetter] = selVal.split('|');
+  const autoUpgrade = document.getElementById('chkAutoUpgrade') ? document.getElementById('chkAutoUpgrade').checked : true;
+  const injectCal = document.getElementById('chkInjectCal') ? document.getElementById('chkInjectCal').checked : true;
+
+  if (btn) btn.disabled = true;
+  document.getElementById(logId).textContent = `[*] Starting 64-bit RFK Image build on Disk ${diskIdx}...\n`;
+
+  try {
+    const res = await fetch('/api/start_clean_build', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        disk_index: parseInt(diskIdx, 10),
+        drive_letter: driveLetter || '',
+        username,
+        password,
+        hostname,
+        ssid,
+        wifipw,
+        mode,
+        auto_upgrade: autoUpgrade,
+        inject_cal: injectCal
+      })
+    });
+    const data = await res.json();
+    if (!res.ok || data.status !== 'ok') {
+      logFn(`[ERROR] ${data.message || 'Build rejected'}`);
+      if (btn) btn.disabled = false;
+      return;
+    }
+
+    pollJobLogs(logId, async (job) => {
+      if (btn) btn.disabled = false;
+      if (job.step === 'complete') {
+        if (job.migration_trace && mode === 'migrate') {
+          renderMigrationTrace(job.migration_trace);
+        }
+        document.getElementById('statusMessage').textContent =
+          "64-bit RFK SD image complete! Safely eject and install in Raspberry Pi 4 or 5.";
+        await scanDisks();
+      } else if (job.error) {
+        document.getElementById('statusMessage').textContent = `Build error: ${job.error}`;
+      }
+    });
+  } catch (e) {
+    logFn(`[ERROR] Request failed: ${e}`);
+    if (btn) btn.disabled = false;
+  }
 }
 
 async function buildTargetImage() {
-  const btn = document.getElementById('btnFlash');
-  btn.disabled = true;
-  logFlash("[*] Validating target media: High-Endurance A2/V30 MicroSD card...");
-
-  setTimeout(() => {
-    logFlash("[+] Target drive verified: 32GB partition boundary valid.");
-    logFlash("[*] Flashing Debian 12 Bookworm 64-Bit (aarch64) base image with Kernel 6.6+...");
-  }, 800);
-
-  setTimeout(() => {
-    logFlash("[+] Base OS flashed. Writing multi-arch shims & native 64-bit Hamlib bridge...");
-    logFlash("[*] Configuring weekly maintenance cron (/etc/cron.d/jrfk_weekly_upgrade)...");
-    logFlash(" [+] Active: 0 4 * * 0 root apt-get update && apt-get upgrade -y");
-  }, 1600);
-
-  setTimeout(() => {
-    logFlash("[*] Injecting user calibrations from Golden Master into /home/pi/PA-Files/...");
-    logFlash(" [+] Injected calibration.json, touch cal, and antenna routing tables.");
-    logFlash(" [+] Injected rfk_tools_suite server (:8088) and backup scripts.");
-    logFlash("[*] Verifying permissions (chown -R pi:pi /home/pi, chmod 755)...");
-  }, 2400);
-
-  setTimeout(() => {
-    logFlash("[SUCCESS] 64-bit Appliance image verified and disk caches cleanly flushed!");
-    logFlash("=================================================================");
-    logFlash("OPERATOR ACTION: Click 'Safely Eject', install card into amplifier,");
-    logFlash("and power on for Boot 1 (Auto-expansion & hardware discovery)!");
-    logFlash("=================================================================");
-    btn.disabled = false;
-    document.getElementById('statusMessage').textContent = "Target 64-bit image ready for amplifier deployment!";
-  }, 3200);
+  await _startBuildJob({
+    selectId: 'driveSelectTarget',
+    logId: 'flashLog',
+    btnId: 'btnFlash',
+    mode: 'migrate',
+    username: 'pi',
+    password: 'pi',
+    hostname: '',
+    ssid: '',
+    wifipw: ''
+  });
 }
 
 async function buildFreshSystem() {
-  const btn = document.getElementById('btnFreshBuild');
-  const user = document.getElementById('freshUsername').value || 'pi';
-  const host = document.getElementById('freshHostname').value || 'k7bit';
-  const ssid = document.getElementById('freshSsid').value || 'Shack-WiFi';
-  
-  btn.disabled = true;
-  logFresh("[*] Initiating Clean Install on target SD card...");
-  logFresh(`[*] Partitioning target drive (MBR: 512MB FAT32 boot, ext4 rootfs)...`);
-
-  setTimeout(() => {
-    logFresh("[+] Drive formatted. Writing Debian 12 Bookworm 64-Bit base image...");
-    logFresh(`[*] Generating user account '${user}' with hashed credentials in /boot/userconf.txt...`);
-  }, 900);
-
-  setTimeout(() => {
-    logFresh(`[*] Configuring Wi-Fi network SSID '${ssid}' in /etc/wpa_supplicant.conf...`);
-    logFresh(`[*] Setting system hostname '${host}' in /etc/hostname...`);
-    logFresh("[+] Enabling SSH daemon (/boot/ssh asserted).");
-  }, 1800);
-
-  setTimeout(() => {
-    logFresh("[*] Injecting JRFK Tools Suite (:8088) and automated Sunday 4:00 AM maintenance cron...");
-    logFresh("[*] Setting filesystem ownership (chown -R pi:pi /home/pi) and permissions (755)...");
-    logFresh("[SUCCESS] Clean 64-bit image successfully built and verified!");
-    logFresh("=================================================================");
-    logFresh(`OPERATOR ACTION: Eject card, install into amplifier, and power on.`);
-    logFresh(`Amplifier will auto-expand and connect directly to '${ssid}' with working Wi-Fi!`);
-    logFresh("=================================================================");
-    btn.disabled = false;
-    document.getElementById('statusMessage').textContent = `Clean 64-bit card ready with Wi-Fi for ${host}!`;
-  }, 2800);
+  await _startBuildJob({
+    selectId: 'driveSelectFresh',
+    logId: 'freshLog',
+    btnId: 'btnFreshBuild',
+    mode: 'fresh',
+    username: document.getElementById('freshUsername').value || 'pi',
+    password: document.getElementById('freshPassword').value || 'raspberry',
+    hostname: document.getElementById('freshHostname').value || 'k7bit',
+    ssid: document.getElementById('freshSsid').value || '',
+    wifipw: document.getElementById('freshSsidPass').value || ''
+  });
 }
 
-function ejectTargetCard() {
-  logFlash("[*] Flushing filesystem cache and safely unmounting target card...");
-  logFresh("[*] Flushing filesystem cache and safely unmounting target card...");
-  setTimeout(() => {
-    logFlash("[+] Target SD card safely unmounted. Safe to remove!");
-    logFresh("[+] Target SD card safely unmounted. Safe to remove!");
-    alert("Target SD Card is safely ejected. You can now insert it into your RF2K amplifier!");
-  }, 600);
+async function eraseTargetCard(logId, selectId) {
+  const selVal = document.getElementById(selectId).value;
+  const logFn = logId === 'freshLog' ? logFresh : logFlash;
+  if (!selVal) {
+    logFn("[BLOCKED] Select a writable 16-64 GB target SD card first.");
+    return;
+  }
+  const [diskIdx, driveLetter] = selVal.split('|');
+  if (!confirm(`Full Erase both partitions on SD Disk ${diskIdx} (${driveLetter || 'Unmounted'})?`)) return;
+  document.getElementById(logId).textContent = `[*] Initiating Full Erase on SD Disk ${diskIdx}...\n`;
+  try {
+    const res = await fetch('/api/erase_sd', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ disk_index: parseInt(diskIdx, 10), drive_letter: driveLetter || '' })
+    });
+    const data = await res.json();
+    if (!res.ok || data.status !== 'ok') {
+      logFn(`[ERROR] ${data.message || 'Erase rejected'}`);
+      return;
+    }
+    pollJobLogs(logId, async () => { await scanDisks(); });
+  } catch (e) {
+    logFn(`[ERROR] Erase request failed: ${e}`);
+  }
+}
+
+async function ejectOriginalCard() {
+  await ejectTargetCard('driveSelectOriginal', 'extractLog');
+}
+
+async function ejectTargetCard(selectId = 'driveSelectTarget', logId = 'flashLog') {
+  if (activeLogTimer) {
+    const logFnBusy = logId === 'extractLog' ? logExtract : (logId === 'freshLog' ? logFresh : logFlash);
+    logFnBusy("[BLOCKED] Wait until the active extraction/build finishes before ejecting.");
+    return;
+  }
+  const selEl = document.getElementById(selectId);
+  const selVal = (selEl && selEl.value) || document.getElementById('driveSelectOriginal').value;
+  const logFn = logId === 'extractLog' ? logExtract : (logId === 'freshLog' ? logFresh : logFlash);
+  if (!selVal) {
+    alert("No SD card selected to eject.");
+    return;
+  }
+  const [diskIdx, driveLetter] = selVal.split('|');
+  logFn(`[*] Safely unmounting Disk ${diskIdx} (${driveLetter || 'Unmounted'})...`);
+  try {
+    const res = await fetch('/api/eject_sd', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ disk_index: parseInt(diskIdx, 10), drive_letter: driveLetter || '' })
+    });
+    const data = await res.json();
+    logFn(data.status === 'ok' ? `[+] ${data.message}` : `[-] ${data.message}`);
+    alert(data.message || "SD Card unmounted.");
+  } catch (e) {
+    logFn(`[ERROR] Eject failed: ${e}`);
+  }
+  await scanDisks();
 }
 
 function testAmpConnection() {
@@ -1026,8 +1275,31 @@ function saveProfilePayload() {
   alert("Station profile configuration saved and queued for next build injection!");
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  scanDisks();
+window.addEventListener('DOMContentLoaded', async () => {
+  await scanDisks();
+  try {
+    const osRes = await fetch('/api/os_release');
+    if (osRes.ok) {
+      const osData = await osRes.json();
+      const banner = document.getElementById('osReleaseBanner');
+      if (banner) {
+        if (osData.online) {
+          banner.innerHTML = `<strong>OS Target (RPi Imager Feed):</strong> ${osData.online.name} &mdash; Release <strong>${osData.online.release_date}</strong> (Pi 4 &amp; Pi 5 64-bit)`;
+        } else if (osData.cached_name) {
+          banner.innerHTML = `<strong>OS Target (Offline Cached):</strong> ${osData.cached_name} (Pi 4 &amp; Pi 5 64-bit)`;
+        } else {
+          banner.textContent = 'OS Target: Raspberry Pi OS 64-bit (Feed offline; no local cache yet)';
+        }
+      }
+    }
+  } catch (e) {}
+  try {
+    const res = await fetch('/api/gold_manifest');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.manifest) renderGoldManifest(data.manifest);
+    }
+  } catch (e) {}
 });
 </script>
 </body>

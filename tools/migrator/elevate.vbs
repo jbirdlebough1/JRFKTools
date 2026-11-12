@@ -7,8 +7,8 @@ baseDir = FSO.GetParentFolderName(toolsDir)
 
 batPath = baseDir & "\JRFK_Migrator.bat"
 If Not FSO.FileExists(batPath) Then
-    batPath = "D:\JRFK\JRFK_Migrator.bat"
-    baseDir = "D:\JRFK"
+    MsgBox "Could not find JRFK_Migrator.bat in: " & baseDir, 16, "JRFK Migrator"
+    WScript.Quit 1
 End If
 
 UAC.ShellExecute batPath, "", baseDir, "runas", 1

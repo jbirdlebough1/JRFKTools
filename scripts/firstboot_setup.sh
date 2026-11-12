@@ -1,19 +1,22 @@
 #!/bin/bash
 # ==============================================================================
 # JRFK Universal 64-bit First-Boot Auto-Migrator
-# Target Hardware: Raspberry Pi 4 Model B (4GB) & Raspberry Pi 5
-# Target OS: Raspberry Pi OS 64-bit (Debian Bookworm aarch64)
+# Target Hardware: Raspberry Pi 4 Model B & Raspberry Pi 5 (Single-SD Parity)
+# Target OS: Raspberry Pi OS 64-bit (Debian Bookworm/Trixie aarch64)
 # Author: John Birdlebough (K7BIT/AE)
 # Contributor: John Stafford
 # ==============================================================================
 
 set +e
-LOGFILE="/var/log/jrfk_firstboot.log"
-exec > >(tee -a "$LOGFILE") 2>&1
+CLOUDINIT_MODE=0
+for _arg in "$@"; do
+    [ "$_arg" = "--cloudinit" ] && CLOUDINIT_MODE=1
+done
 
-# ------------------------------------------------------------------------------
-# Progress Display Helper: Writes high-contrast visual status to HDMI screen
-# ------------------------------------------------------------------------------
+LOGFILE="/var/log/jrfk_firstboot.log"
+# Log directly to file without async process substitution so cloud-init never hangs waiting on tee pipe FDs
+exec >>"$LOGFILE" 2>&1
+
 show_step() {
     local num="$1"
     local title="$2"
@@ -22,38 +25,19 @@ show_step() {
     echo ">>> [RF-KIT MIGRATION STEP $num] $title"
     echo "=========================================================="
     echo ""
-
-    # Send message to Plymouth splash if active
     if command -v plymouth >/dev/null 2>&1; then
         plymouth display-message --text="[RF-KIT STEP $num] $title" 2>/dev/null || true
     fi
-
-    # Output directly to active virtual terminal /dev/tty1 and /dev/console
-    echo -e "\n\033[1;32m>>> [RF-KIT MIGRATION STEP $num] $title\033[0m\n" > /dev/tty1 2>/dev/null || true
-    echo -e "\n>>> [RF-KIT MIGRATION STEP $num] $title\n" > /dev/console 2>/dev/null || true
 }
 
-# ------------------------------------------------------------------------------
-# 0. Initialize Display Console
-# ------------------------------------------------------------------------------
-if command -v plymouth >/dev/null 2>&1; then
-    plymouth quit 2>/dev/null || true
+if [ "$CLOUDINIT_MODE" != "1" ]; then
+    if command -v plymouth >/dev/null 2>&1; then
+        plymouth quit 2>/dev/null || true
+    fi
+    chvt 1 2>/dev/null || true
+    clear > /dev/tty1 2>/dev/null || true
 fi
-chvt 1 2>/dev/null || true
-clear > /dev/tty1 2>/dev/null || true
 
-cat << 'BANNER' > /dev/tty1 2>/dev/null || true
-
- ================================================================
-           RF-KIT 64-BIT AUTOMATED APPLIANCE MIGRATION           
-               K7BIT / RF2K+ & RF2K-S Amplifier System           
- ================================================================
-
-BANNER
-
-# ------------------------------------------------------------------------------
-# Locate Boot Partition and Payload Directory
-# ------------------------------------------------------------------------------
 BOOT_DIR="/boot/firmware"
 [ ! -d "$BOOT_DIR" ] && BOOT_DIR="/boot"
 
@@ -61,91 +45,82 @@ PAYLOAD_DIR="$BOOT_DIR/jrfk_payload"
 [ ! -d "$PAYLOAD_DIR" ] && PAYLOAD_DIR="/boot/jrfk_payload"
 [ ! -d "$PAYLOAD_DIR" ] && PAYLOAD_DIR="/opt/jrfk"
 
+# Optional station metadata passed from migrator
+TARGET_USER="pi"
+TARGET_HOST=""
+AUTO_UPGRADE="1"
+if [ -f "$PAYLOAD_DIR/jrfk_meta.env" ]; then
+    # shellcheck disable=SC1090
+    source "$PAYLOAD_DIR/jrfk_meta.env"
+fi
+
+TARGET_HOME="/home/$TARGET_USER"
+if ! id "$TARGET_USER" >/dev/null 2>&1; then
+    useradd -m -s /bin/bash -G sudo,dialout,tty,video,audio,netdev "$TARGET_USER" 2>/dev/null || true
+fi
+mkdir -p "$TARGET_HOME"
+
 # ------------------------------------------------------------------------------
-# Step 1: Filesystem & Environment Preparation
+# Step 1/7: Filesystem & Environment Preparation
 # ------------------------------------------------------------------------------
-show_step "1/6" "Preparing 64-bit environment and expanding storage..."
-if command -v raspi-config >/dev/null 2>&1; then
+show_step "1/7" "Preparing 64-bit root filesystem..."
+if [ "$CLOUDINIT_MODE" != "1" ] && command -v raspi-config >/dev/null 2>&1; then
     raspi-config nonint do_expand_rootfs 2>/dev/null || true
 fi
 
 # ------------------------------------------------------------------------------
-# Step 2: Unpack RF-KIT Application Suite
+# Step 2/7: Deploy RF-KIT App, User Data & Tuning Data (from GOLD or Bundle)
 # ------------------------------------------------------------------------------
-show_step "2/6" "Deploying RF-KIT v2.00 & v1.98 Application Suite..."
-cd /home/pi
+show_step "2/7" "Deploying RF-KIT app, user data & antenna/tuning data..."
+mkdir -p "$TARGET_HOME/rf-kit-statics" "$TARGET_HOME/PA-Files" "$TARGET_HOME/Desktop" "$TARGET_HOME/.config/autostart"
+
 if [ -f "$PAYLOAD_DIR/rfk_bundle.tar.gz" ]; then
-    tar -xzf "$PAYLOAD_DIR/rfk_bundle.tar.gz" -C /
-elif [ -f /opt/jrfk/rfk_bundle.tar.gz ]; then
-    tar -xzf /opt/jrfk/rfk_bundle.tar.gz -C /
+    tar -xzf "$PAYLOAD_DIR/rfk_bundle.tar.gz" -C / 2>/dev/null || true
 fi
 
-# ------------------------------------------------------------------------------
-# Step 3: Restore Operator Calibrations, Settings & Documentation
-# ------------------------------------------------------------------------------
-show_step "3/6" "Restoring Operator Calibrations & K7BIT Cookbook..."
-mkdir -p /home/pi/rf-kit-statics /home/pi/Desktop /home/pi/.config/autostart
+if [ -d "$PAYLOAD_DIR/gold_rootfs" ]; then
+    echo "[*] Restoring validated GOLD rootfs payload..."
+    if [ -d "$PAYLOAD_DIR/gold_rootfs/home/pi" ]; then
+        cp -a "$PAYLOAD_DIR/gold_rootfs/home/pi/." "$TARGET_HOME/" 2>/dev/null || true
+    fi
+    if [ -f "$PAYLOAD_DIR/gold_rootfs/etc/wpa_supplicant/wpa_supplicant.conf" ]; then
+        mkdir -p /etc/wpa_supplicant
+        cp -f "$PAYLOAD_DIR/gold_rootfs/etc/wpa_supplicant/wpa_supplicant.conf" /etc/wpa_supplicant/wpa_supplicant.conf
+        chmod 600 /etc/wpa_supplicant/wpa_supplicant.conf
+    fi
+    if [ -f "$PAYLOAD_DIR/gold_rootfs/etc/hostname" ] && [ -z "$TARGET_HOST" ]; then
+        TARGET_HOST=$(tr -d ' \t\r\n' < "$PAYLOAD_DIR/gold_rootfs/etc/hostname")
+    fi
+fi
 
 SETTINGS_DIR="$PAYLOAD_DIR/user_settings_backup"
-[ ! -d "$SETTINGS_DIR" ] && SETTINGS_DIR="/opt/jrfk/user_settings_backup"
-
 if [ -d "$SETTINGS_DIR" ]; then
-    cp -a "$SETTINGS_DIR"/* /home/pi/rf-kit-statics/ 2>/dev/null || true
-    cp -a "$SETTINGS_DIR"/.* /home/pi/rf-kit-statics/ 2>/dev/null || true
-    # Place K7BIT Cookbook on Desktop
-    cp -a "$SETTINGS_DIR"/*Cookbook* /home/pi/Desktop/ 2>/dev/null || true
+    cp -a "$SETTINGS_DIR"/. "$TARGET_HOME/rf-kit-statics/" 2>/dev/null || true
+    cp -a "$SETTINGS_DIR"/*Cookbook* "$TARGET_HOME/Desktop/" 2>/dev/null || true
 fi
 
-# Create Desktop Shortcut for K7BIT Cookbook
-cat << 'EOF' > /home/pi/Desktop/K7BIT_B26_Cookbook.desktop
-[Desktop Entry]
-Name=K7BIT B26 Cookbook Manual
-Comment=Open K7BIT End-to-End Builders and Operators Guide
-Type=Application
-Exec=xdg-open /home/pi/Desktop/K7BIT_B26_Cookbook.html
-Icon=help-browser
-Terminal=false
-Categories=Documentation;HamRadio;
-EOF
-chmod +x /home/pi/Desktop/K7BIT_B26_Cookbook.desktop 2>/dev/null || true
+# Keep PA-Files and rf-kit-statics aligned so both v1.98 and v2.00 find calibrations
+for f in calibration.json config.json gui_path.json gui_starter.py touch.cal touchscreen_axes.cal antenna_matrix.json band_matrix.cfg; do
+    if [ -f "$TARGET_HOME/PA-Files/$f" ] && [ ! -f "$TARGET_HOME/rf-kit-statics/$f" ]; then
+        cp -a "$TARGET_HOME/PA-Files/$f" "$TARGET_HOME/rf-kit-statics/$f" 2>/dev/null || true
+    elif [ -f "$TARGET_HOME/rf-kit-statics/$f" ] && [ ! -f "$TARGET_HOME/PA-Files/$f" ]; then
+        cp -a "$TARGET_HOME/rf-kit-statics/$f" "$TARGET_HOME/PA-Files/$f" 2>/dev/null || true
+    fi
+done
 
 # ------------------------------------------------------------------------------
-# Step 4: Hardware Interfaces (USB Serial MCU, CAN bus, Bluetooth disable)
+# Step 3/7: Apply 64-Bit Python / Pillow & Hamlib Compatibility Shims
 # ------------------------------------------------------------------------------
-show_step "4/6" "Configuring Hardware Interfaces (USB MCU & SocketCAN)..."
+show_step "3/7" "Applying 64-bit Pillow ANTIALIAS & Hamlib compatibility fixes..."
+if [ -f "$PAYLOAD_DIR/patch_antialias.py" ]; then
+    python3 "$PAYLOAD_DIR/patch_antialias.py" "$TARGET_HOME"/rf-kit* 2>/dev/null || true
+fi
 
-# Free UART / prevent port contention
-systemctl disable --now hciuart.service 2>/dev/null || true
-systemctl disable --now bluealsa.service 2>/dev/null || true
-systemctl disable --now bluetooth.service 2>/dev/null || true
-
-# Universal udev rules for Pi 4 & Pi 5 Controller MCU
-cat << 'EOF' > /etc/udev/rules.d/99-rfk-controller.rules
-# Universal RF-KIT Microcontroller Link for both Pi 4 and Pi 5
-KERNEL=="ttyACM*|ttyUSB*", SUBSYSTEM=="tty", MODE="0666", GROUP="dialout", SYMLINK+="rfk_controller"
-KERNEL=="ttyACM*|ttyUSB*", SUBSYSTEM=="tty", MODE="0666", GROUP="dialout", SYMLINK+="serial/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usb-0:1.3:1.0-port0"
-EOF
-udevadm control --reload-rules 2>/dev/null || true
-udevadm trigger 2>/dev/null || true
-
-# SocketCAN can0 interface
-cat << 'EOF' > /etc/network/interfaces.d/can0
-auto can0
-iface can0 can static
-    bitrate 250000
-    up ifconfig can0 txqueuelen 1000
-EOF
-
-# Ensure user pi is in hardware groups
-usermod -aG dialout,tty,video,audio pi 2>/dev/null || true
-
-# Setup 64-bit Hamlib Bridge for Python 3.11 if module is available
-for GUI_DIR in /home/pi/rf-kit-gui_v200 /home/pi/rf-kit-gui_v198; do
+for GUI_DIR in "$TARGET_HOME"/rf-kit-gui*; do
     if [ -d "$GUI_DIR" ]; then
         mkdir -p "$GUI_DIR/hamlib/v4_6_5_bindings_backport/lib/python3_7/site_packages"
-        python3 -c "import Hamlib; import os; p=os.path.dirname(Hamlib.__file__); print(p)" > /tmp/hamlib_path 2>/dev/null || true
-        if [ -s /tmp/hamlib_path ]; then
-            HL_PATH=$(cat /tmp/hamlib_path)
+        HL_PATH=$(python3 -c "import Hamlib, os; print(os.path.dirname(Hamlib.__file__))" 2>/dev/null || true)
+        if [ -n "$HL_PATH" ] && [ -d "$HL_PATH" ]; then
             ln -sf "$HL_PATH/Hamlib.py" "$GUI_DIR/hamlib/v4_6_5_bindings_backport/lib/python3_7/site_packages/Hamlib.py" 2>/dev/null || true
             ln -sf "$HL_PATH/_Hamlib.so" "$GUI_DIR/hamlib/v4_6_5_bindings_backport/lib/python3_7/site_packages/_Hamlib.so" 2>/dev/null || true
         fi
@@ -153,77 +128,451 @@ for GUI_DIR in /home/pi/rf-kit-gui_v200 /home/pi/rf-kit-gui_v198; do
 done
 
 # ------------------------------------------------------------------------------
-# Step 5: Configure Fullscreen X11 Touchscreen & Autostart
+# Step 4/7: Configure Wi-Fi (NetworkManager + wpa_supplicant) & Hostname
 # ------------------------------------------------------------------------------
-show_step "5/6" "Configuring Fullscreen Touchscreen & X11 Autostart..."
+show_step "4/7" "Configuring station hostname & Wi-Fi..."
+[ -z "$TARGET_HOST" ] && TARGET_HOST="k7bit"
+hostnamectl set-hostname "$TARGET_HOST" 2>/dev/null || echo "$TARGET_HOST" > /etc/hostname
+if grep -q "^127\.0\.1\.1" /etc/hosts 2>/dev/null; then
+    sed -i "s/^127\.0\.1\.1.*/127.0.1.1\t$TARGET_HOST rfk/" /etc/hosts 2>/dev/null || true
+else
+    echo -e "127.0.1.1\t$TARGET_HOST rfk" >> /etc/hosts
+fi
 
-# Switch Bookworm desktop backend to X11 (Openbox) for rock-solid Tkinter touchscreen operation
+WPA_SRC=""
+[ -f "$BOOT_DIR/wpa_supplicant.conf" ] && WPA_SRC="$BOOT_DIR/wpa_supplicant.conf"
+[ -z "$WPA_SRC" ] && [ -f /etc/wpa_supplicant/wpa_supplicant.conf ] && WPA_SRC="/etc/wpa_supplicant/wpa_supplicant.conf"
+if [ -n "$WPA_SRC" ]; then
+    mkdir -p /etc/wpa_supplicant
+    [ "$WPA_SRC" != "/etc/wpa_supplicant/wpa_supplicant.conf" ] && cp -f "$WPA_SRC" /etc/wpa_supplicant/wpa_supplicant.conf
+    chmod 600 /etc/wpa_supplicant/wpa_supplicant.conf 2>/dev/null || true
+
+    WIFI_SSID=$(python3 -c "import re,sys; t=open(sys.argv[1],errors='ignore').read(); m=re.search(r'ssid\s*=\s*\"([^\"]+)\"',t); print(m.group(1) if m else '')" "$WPA_SRC" 2>/dev/null || true)
+    WIFI_PSK=$(python3 -c "import re,sys; t=open(sys.argv[1],errors='ignore').read(); m=re.search(r'psk\s*=\s*\"([^\"]+)\"',t); print(m.group(1) if m else '')" "$WPA_SRC" 2>/dev/null || true)
+    if [ -n "$WIFI_SSID" ] && command -v nmcli >/dev/null 2>&1; then
+        nmcli con delete "$WIFI_SSID" 2>/dev/null || true
+        if [ -n "$WIFI_PSK" ]; then
+            nmcli con add type wifi ifname wlan0 con-name "$WIFI_SSID" ssid "$WIFI_SSID" wifi-sec.key-mgmt wpa-psk wifi-sec.psk "$WIFI_PSK" connection.autoconnect yes 2>/dev/null || true
+        else
+            nmcli con add type wifi ifname wlan0 con-name "$WIFI_SSID" ssid "$WIFI_SSID" connection.autoconnect yes 2>/dev/null || true
+        fi
+    fi
+fi
+
+# ------------------------------------------------------------------------------
+# Step 5/7: Pi 4 & Pi 5 Hardware Parity + RFK Tools Suite (:8088)
+# ------------------------------------------------------------------------------
+show_step "5/7" "Configuring Pi 4 & Pi 5 hardware links, SocketCAN & Tools Suite..."
+systemctl disable --now hciuart.service bluealsa.service bluetooth.service 2>/dev/null || true
+
+cat << 'EOF' > /etc/udev/rules.d/99-rfk-controller.rules
+# Universal RF-KIT Microcontroller Link for both Raspberry Pi 4 and Raspberry Pi 5
+KERNEL=="ttyACM*|ttyUSB*", SUBSYSTEM=="tty", MODE="0666", GROUP="dialout", SYMLINK+="rfk_controller"
+KERNEL=="ttyACM*|ttyUSB*", SUBSYSTEM=="tty", MODE="0666", GROUP="dialout", SYMLINK+="serial/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usb-0:1.3:1.0-port0"
+EOF
+udevadm control --reload-rules 2>/dev/null || true
+udevadm trigger 2>/dev/null || true
+
+mkdir -p /etc/network/interfaces.d
+cat << 'EOF' > /etc/network/interfaces.d/can0
+auto can0
+iface can0 can static
+    bitrate 250000
+    up ifconfig can0 txqueuelen 1000
+EOF
+
+usermod -aG dialout,tty,video,audio "$TARGET_USER" 2>/dev/null || true
+
+if [ -d "$PAYLOAD_DIR/rfk_tools_suite" ]; then
+    mkdir -p "$TARGET_HOME/rfk_tools"
+    cp -a "$PAYLOAD_DIR/rfk_tools_suite/." "$TARGET_HOME/rfk_tools/" 2>/dev/null || true
+    chmod +x "$TARGET_HOME/rfk_tools/bin/"*.sh 2>/dev/null || true
+    cp -f "$TARGET_HOME/rfk_tools/bin/"*.desktop "$TARGET_HOME/Desktop/" 2>/dev/null || true
+    if [ -f "$TARGET_HOME/rfk_tools/bin/jrfk_weekly_backup.cron" ]; then
+        cp -f "$TARGET_HOME/rfk_tools/bin/jrfk_weekly_backup.cron" /etc/cron.d/jrfk_weekly_backup
+        chmod 644 /etc/cron.d/jrfk_weekly_backup
+    fi
+    if [ "$AUTO_UPGRADE" = "1" ] && [ -f "$TARGET_HOME/rfk_tools/bin/jrfk_weekly_upgrade.cron" ]; then
+        cp -f "$TARGET_HOME/rfk_tools/bin/jrfk_weekly_upgrade.cron" /etc/cron.d/jrfk_weekly_upgrade
+        chmod 644 /etc/cron.d/jrfk_weekly_upgrade
+    fi
+    cat << EOF > /etc/systemd/system/rfk-tools-suite.service
+[Unit]
+Description=JRFK Amplifier Diagnostic & Backup Web Suite (:8088)
+After=network.target
+
+[Service]
+Type=simple
+User=$TARGET_USER
+WorkingDirectory=$TARGET_HOME/rfk_tools
+ExecStart=/usr/bin/python3 $TARGET_HOME/rfk_tools/server.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    systemctl daemon-reload 2>/dev/null || true
+    systemctl enable rfk-tools-suite.service 2>/dev/null || true
+fi
+
+# ------------------------------------------------------------------------------
+# Step 6/7: Direct-to-RFK Boot (Install All RFK Deps + X11 Openbox + Wayland labwc Parity)
+# ------------------------------------------------------------------------------
+show_step "6/7" "Installing RFK Python & UI dependencies and configuring Direct-to-RFK fullscreen boot..."
+export DEBIAN_FRONTEND=noninteractive
+NEED_PKGS=""
+python3 -c "import can" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-can can-utils"
+python3 -c "from PIL import ImageTk" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-pil.imagetk"
+python3 -c "import tkinter" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-tk"
+python3 -c "import serial" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-serial"
+python3 -c "import paramiko" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-paramiko"
+python3 -c "import Hamlib" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-hamlib"
+command -v openbox >/dev/null 2>&1 || NEED_PKGS="$NEED_PKGS openbox"
+command -v pip3 >/dev/null 2>&1 || NEED_PKGS="$NEED_PKGS python3-pip"
+
+# Stage offline pure-Python dependencies (simple_rpc, pysftp) from jrfk_payload if present
+if [ -d "$PAYLOAD_DIR/py_deps" ]; then
+    echo "[*] Staging pure-Python RFK modules (simple_rpc, pysftp)..."
+    mkdir -p /usr/local/lib/python3/dist-packages
+    cp -a "$PAYLOAD_DIR/py_deps/." /usr/local/lib/python3/dist-packages/ 2>/dev/null || true
+    for PY_SITE in /usr/lib/python3/dist-packages /usr/local/lib/python3.*/dist-packages; do
+        [ -d "$PY_SITE" ] && cp -a "$PAYLOAD_DIR/py_deps/." "$PY_SITE/" 2>/dev/null || true
+    done
+    for GUI_DIR in "$TARGET_HOME"/rf-kit-gui*; do
+        [ -d "$GUI_DIR" ] && cp -a "$PAYLOAD_DIR/py_deps/." "$GUI_DIR/" 2>/dev/null || true
+    done
+fi
+
+if [ -n "$NEED_PKGS" ]; then
+    echo "[*] Checking network reachability for runtime packages:$NEED_PKGS"
+    if timeout 4 getent hosts deb.debian.org >/dev/null 2>&1 || timeout 4 ping -c1 -W2 1.1.1.1 >/dev/null 2>&1; then
+        echo "[*] Installing required 64-bit runtime packages:$NEED_PKGS"
+        timeout 90 apt-get update -qq -o Acquire::http::Timeout=8 -o Acquire::Retries=1 2>/dev/null && \
+            timeout 180 apt-get install -y --no-install-recommends -qq -o Acquire::http::Timeout=8 $NEED_PKGS 2>/dev/null || true
+    else
+        echo "[!] Offline on first boot; skipping apt-get (will rely on preinstalled/staged libs)."
+    fi
+fi
+
+# Ensure simple-rpc and pysftp are importable system-wide if missing
+if ! python3 -c "import simple_rpc, pysftp" 2>/dev/null; then
+    if command -v pip3 >/dev/null 2>&1 && (timeout 4 getent hosts pypi.org >/dev/null 2>&1 || timeout 4 ping -c1 -W2 1.1.1.1 >/dev/null 2>&1); then
+        timeout 90 pip3 install --break-system-packages --no-input simple-rpc pysftp 2>/dev/null || true
+    fi
+fi
+
+# Re-link 64-bit Hamlib bindings after python3-hamlib install
+HL_PATH=$(python3 -c "import Hamlib, os; print(os.path.dirname(Hamlib.__file__))" 2>/dev/null || true)
+if [ -n "$HL_PATH" ] && [ -d "$HL_PATH" ]; then
+    for GUI_DIR in "$TARGET_HOME"/rf-kit-gui*; do
+        if [ -d "$GUI_DIR" ]; then
+            mkdir -p "$GUI_DIR/hamlib/v4_6_5_bindings_backport/lib/python3_7/site_packages"
+            ln -sf "$HL_PATH/Hamlib.py" "$GUI_DIR/hamlib/v4_6_5_bindings_backport/lib/python3_7/site_packages/Hamlib.py" 2>/dev/null || true
+            ln -sf "$HL_PATH/_Hamlib.so" "$GUI_DIR/hamlib/v4_6_5_bindings_backport/lib/python3_7/site_packages/_Hamlib.so" 2>/dev/null || true
+            for SUB_SP in "$GUI_DIR"/hamlib/*/lib/*/site*packages; do
+                if [ -d "$SUB_SP" ]; then
+                    ln -sf "$HL_PATH/Hamlib.py" "$SUB_SP/Hamlib.py" 2>/dev/null || true
+                    ln -sf "$HL_PATH/_Hamlib.so" "$SUB_SP/_Hamlib.so" 2>/dev/null || true
+                fi
+            done
+        fi
+    done
+fi
+
+echo "[*] Verifying 64-bit RFK Python imports..."
+python3 - << 'PYCHK' || true
+for mod in ("tkinter", "PIL.ImageTk", "can", "serial", "paramiko", "simple_rpc", "pysftp", "Hamlib"):
+    try:
+        __import__(mod)
+        print(f"    [OK] import {mod}")
+    except Exception as e:
+        print(f"    [WARN] import {mod} failed: {e}")
+PYCHK
+
+export USER="$TARGET_USER"
 if command -v raspi-config >/dev/null 2>&1; then
     raspi-config nonint do_wayland W1 2>/dev/null || true
     raspi-config nonint do_boot_behaviour B4 2>/dev/null || true
 fi
 
-# Ensure Desktop launcher start_gui.sh exists
-if [ ! -f /home/pi/Desktop/start_gui.sh ]; then
-    cat << 'EOF' > /home/pi/Desktop/start_gui.sh
+# Remove first-boot setup wizards so desktop goes straight to JRFK
+rm -f /etc/xdg/autostart/piwiz.desktop /etc/xdg/autostart/pprompt.desktop /etc/xdg/autostart/*wiz*.desktop 2>/dev/null || true
+mkdir -p "$TARGET_HOME/.config"
+touch "$TARGET_HOME/.config/piwiz_done" 2>/dev/null || true
+if [ -f /etc/lightdm/lightdm.conf ]; then
+    sed -i "s|^#*autologin-user=.*|autologin-user=$TARGET_USER|" /etc/lightdm/lightdm.conf 2>/dev/null || true
+fi
+
+cat << EOF > "$TARGET_HOME/rfk_postboot_prompt.py"
+#!/usr/bin/env python3
+import os
+import platform
+import subprocess
+import sys
+
+FLAG_FILE = os.path.expanduser("~/.jrfk_migration_complete_prompt")
+
+def read_os_name():
+    try:
+        with open("/etc/os-release", "r", encoding="utf-8", errors="ignore") as f:
+            for line in f:
+                if line.startswith("PRETTY_NAME="):
+                    return line.split("=", 1)[1].strip().strip('"')
+    except Exception:
+        pass
+    return "Raspberry Pi OS 64-bit"
+
+def trigger_reboot():
+    try:
+        if os.path.exists(FLAG_FILE):
+            os.remove(FLAG_FILE)
+    except Exception:
+        pass
+    for cmd in (["sudo", "/sbin/reboot"], ["sudo", "systemctl", "reboot"], ["/sbin/reboot"]):
+        try:
+            subprocess.Popen(cmd)
+            return
+        except Exception:
+            pass
+
+try:
+    import tkinter as tk
+except ImportError:
+    msg = (
+        f"32-64Bit RFK migration complete\n\n"
+        f"OS: {read_os_name()} ({platform.machine()})\n"
+        f"RF-KIT GUI, station settings & calibration data are installed."
+    )
+    subprocess.run(
+        ["zenity", "--info", "--title=32-64Bit RFK Migration Complete", "--text=" + msg, "--ok-label=Reboot"],
+        check=False,
+    )
+    trigger_reboot()
+    sys.exit(0)
+
+def do_reboot():
+    trigger_reboot()
+    root.after(1500, root.destroy)
+
+root = tk.Tk()
+root.title("32-64Bit RFK Migration Complete")
+root.configure(bg="#0b1120")
+sw = max(800, root.winfo_screenwidth())
+sh = max(480, root.winfo_screenheight())
+root.geometry(f"{sw}x{sh}+0+0")
+root.attributes("-fullscreen", True)
+root.attributes("-topmost", True)
+root.bind("<Map>", lambda _e: root.attributes("-fullscreen", True))
+
+frame = tk.Frame(root, bg="#111827", bd=2, relief="ridge", padx=48, pady=40)
+frame.place(relx=0.5, rely=0.5, anchor="center")
+
+tk.Label(
+    frame,
+    text="32-64Bit RFK migration complete",
+    font=("DejaVu Sans", 26, "bold"),
+    fg="#34d399",
+    bg="#111827",
+).pack(pady=(0, 14))
+
+tk.Label(
+    frame,
+    text=f"OS: {read_os_name()} ({platform.machine()})\n"
+         f"RF-KIT GUI, station settings & calibration data are installed.\n"
+         f"Press Reboot to start the RF-KIT amplifier display.",
+    font=("DejaVu Sans", 14),
+    fg="#e5e7eb",
+    bg="#111827",
+    justify="center",
+).pack(pady=(0, 28))
+
+tk.Button(
+    frame,
+    text="Reboot",
+    command=do_reboot,
+    font=("DejaVu Sans", 20, "bold"),
+    fg="#ffffff",
+    bg="#16a34a",
+    activebackground="#15803d",
+    activeforeground="#ffffff",
+    padx=48,
+    pady=16,
+    relief="flat",
+    cursor="hand2",
+).pack()
+
+root.mainloop()
+EOF
+chmod +x "$TARGET_HOME/rfk_postboot_prompt.py" 2>/dev/null || true
+touch "$TARGET_HOME/.jrfk_migration_complete_prompt"
+
+echo "$TARGET_USER ALL=(ALL) NOPASSWD: /sbin/reboot, /bin/systemctl" > /etc/sudoers.d/090_jrfk_reboot
+chmod 0440 /etc/sudoers.d/090_jrfk_reboot 2>/dev/null || true
+
+cat << EOF > "$TARGET_HOME/Desktop/start_gui.sh"
 #!/bin/bash
-cd /home/pi/rf-kit-statics
+exec 9>/tmp/jrfk_gui.lock
+flock -n 9 || exit 0
+
+export DISPLAY="\${DISPLAY:-:0}"
+for _w in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+    xset q >/dev/null 2>&1 && break
+    sleep 0.4
+done
+
+xset s off 2>/dev/null || true
+xset -dpms 2>/dev/null || true
+xset s noblank 2>/dev/null || true
+
+# First graphical boot after firstboot setup: show completion popup with Reboot button
+if [ -f "\$HOME/.jrfk_migration_complete_prompt" ] && [ -f "\$HOME/rfk_postboot_prompt.py" ]; then
+    python3 "\$HOME/rfk_postboot_prompt.py"
+    rm -f "\$HOME/.jrfk_migration_complete_prompt"
+fi
+
+# Hide desktop taskbar/wallpaper panels if active so ONLY RFK app is visible
+pkill -f lxpanel 2>/dev/null || true
+pkill -f wf-panel-pi 2>/dev/null || true
+pkill -f sfwbar 2>/dev/null || true
+
+# Brief wait for USB controller symlink on Pi 4 / Pi 5
+for _i in 1 2 3 4 5 6; do
+    [ -e /dev/rfk_controller ] && break
+    sleep 0.5
+done
+
+cd "$TARGET_HOME/rf-kit-statics"
 python3 gui_starter.py &>> rf-kit-gui.log
 EOF
-fi
-chmod +x /home/pi/Desktop/start_gui.sh 2>/dev/null || true
-chmod +x /home/pi/rf-kit-statics/gui_starter.py 2>/dev/null || true
+chmod +x "$TARGET_HOME/Desktop/start_gui.sh" "$TARGET_HOME/rf-kit-statics/gui_starter.py" 2>/dev/null || true
 
-# User autostart
-cat << 'EOF' > /home/pi/.config/autostart/rf-kit-gui.desktop
+# Openbox rule (X11: Trixie rpd-rc.xml + Bookworm lxde-pi-rc.xml + rc.xml) keeps RFK fullscreen/on-top
+mkdir -p "$TARGET_HOME/.config/openbox"
+for _src_xml in /etc/xdg/openbox/lxde-pi-rc.xml /etc/xdg/openbox/rpd-rc.xml /etc/xdg/openbox/rc.xml; do
+    _base=$(basename "$_src_xml")
+    if [ -f "$_src_xml" ] && [ ! -f "$TARGET_HOME/.config/openbox/$_base" ]; then
+        cp -f "$_src_xml" "$TARGET_HOME/.config/openbox/$_base" 2>/dev/null || true
+    fi
+done
+python3 - << PYEOF
+import os
+home = "$TARGET_HOME"
+targets = [
+    os.path.join(home, ".config/openbox/lxde-pi-rc.xml"),
+    os.path.join(home, ".config/openbox/rpd-rc.xml"),
+    os.path.join(home, ".config/openbox/rc.xml"),
+]
+rule = """  <application class="Tk">
+    <decor>no</decor>
+    <maximized>yes</maximized>
+    <fullscreen>yes</fullscreen>
+    <layer>above</layer>
+    <focus>yes</focus>
+  </application>
+  <application class="tk">
+    <decor>no</decor>
+    <maximized>yes</maximized>
+    <fullscreen>yes</fullscreen>
+    <layer>above</layer>
+    <focus>yes</focus>
+  </application>
+"""
+for rc_path in targets:
+    if os.path.isfile(rc_path):
+        with open(rc_path, "r", encoding="utf-8", errors="ignore") as f:
+            txt = f.read()
+        if '<application class="Tk">' not in txt:
+            if "</applications>" in txt:
+                txt = txt.replace("</applications>", rule + "</applications>", 1)
+            elif "</openbox_config>" in txt:
+                txt = txt.replace("</openbox_config>", f"<applications>\n{rule}</applications>\n</openbox_config>", 1)
+            with open(rc_path, "w", encoding="utf-8") as f:
+                f.write(txt)
+    else:
+        with open(rc_path, "w", encoding="utf-8") as f:
+            f.write(f'<?xml version="1.0" encoding="UTF-8"?>\n<openbox_config xmlns="http://openbox.org/3.4/rc">\n<applications>\n{rule}</applications>\n</openbox_config>\n')
+PYEOF
+
+# Wayland labwc fallback (Trixie desktop) autostart + fullscreen window rules
+mkdir -p "$TARGET_HOME/.config/labwc"
+cat << EOF > "$TARGET_HOME/.config/labwc/autostart"
+$TARGET_HOME/Desktop/start_gui.sh &
+EOF
+chmod +x "$TARGET_HOME/.config/labwc/autostart" 2>/dev/null || true
+
+python3 - << PYEOF
+import os
+lrc_path = "$TARGET_HOME/.config/labwc/rc.xml"
+lrule = """  <windowRule identifier="Tk" serverDecoration="no">
+    <action name="Maximize" />
+    <action name="ToggleFullscreen" />
+  </windowRule>
+  <windowRule identifier="tk" serverDecoration="no">
+    <action name="Maximize" />
+    <action name="ToggleFullscreen" />
+  </windowRule>
+"""
+if os.path.isfile(lrc_path):
+    with open(lrc_path, "r", encoding="utf-8", errors="ignore") as f:
+        txt = f.read()
+    if 'identifier="Tk"' not in txt:
+        if "</windowRules>" in txt:
+            txt = txt.replace("</windowRules>", lrule + "</windowRules>", 1)
+        elif "</labwc_config>" in txt:
+            txt = txt.replace("</labwc_config>", f"<windowRules>\n{lrule}</windowRules>\n</labwc_config>", 1)
+        with open(lrc_path, "w", encoding="utf-8") as f:
+            f.write(txt)
+else:
+    with open(lrc_path, "w", encoding="utf-8") as f:
+        f.write(f'<?xml version="1.0" encoding="UTF-8"?>\n<labwc_config>\n<windowRules>\n{lrule}</windowRules>\n</labwc_config>\n')
+PYEOF
+
+# Standard XDG autostart + LXDE-pi autostart
+cat << EOF > "$TARGET_HOME/.config/autostart/rf-kit-gui.desktop"
 [Desktop Entry]
 Name=rf-kit-gui
-Comment=Starts RF-KIT Touchscreen Interface
+Comment=Starts RF-KIT Fullscreen Interface
 Type=Application
-Exec=/home/pi/Desktop/start_gui.sh
+Exec=$TARGET_HOME/Desktop/start_gui.sh
 Terminal=false
 X-GNOME-Autostart-enabled=true
 EOF
-chmod +x /home/pi/.config/autostart/rf-kit-gui.desktop 2>/dev/null || true
+chmod +x "$TARGET_HOME/.config/autostart/rf-kit-gui.desktop" 2>/dev/null || true
+mkdir -p /etc/xdg/autostart "$TARGET_HOME/.config/lxsession/LXDE-pi"
+cp -f "$TARGET_HOME/.config/autostart/rf-kit-gui.desktop" /etc/xdg/autostart/rf-kit-gui.desktop 2>/dev/null || true
+echo "@$TARGET_HOME/Desktop/start_gui.sh" > "$TARGET_HOME/.config/lxsession/LXDE-pi/autostart"
 
-# System-wide autostart to guarantee startup regardless of session type
-mkdir -p /etc/xdg/autostart
-cp -f /home/pi/.config/autostart/rf-kit-gui.desktop /etc/xdg/autostart/rf-kit-gui.desktop 2>/dev/null || true
+chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME" 2>/dev/null || true
 
-# Set station hostname
-hostnamectl set-hostname K7BIT 2>/dev/null || true
-sed -i 's/127.0.1.1.*/127.0.1.1\tK7BIT rfk/' /etc/hosts 2>/dev/null || true
+# ------------------------------------------------------------------------------
+# Step 7/7: Clean Hooks, Lock Cloud-Init, & Reboot to Completion Dialog
+# ------------------------------------------------------------------------------
+show_step "7/7" "Finalizing boot config, locking firstboot & rebooting to completion dialog..."
+mkdir -p /etc/cloud && touch /etc/cloud/cloud-init.disabled 2>/dev/null || true
 
-# Ensure proper ownership of user home directory
-chown -R pi:pi /home/pi
-
-# Configure boot partition settings (Display & Overlays)
 if [ -f "$BOOT_DIR/config.txt" ]; then
     grep -q "dtoverlay=vc4-kms-v3d" "$BOOT_DIR/config.txt" || echo "dtoverlay=vc4-kms-v3d" >> "$BOOT_DIR/config.txt"
     grep -q "dtoverlay=disable-bt" "$BOOT_DIR/config.txt" || echo "dtoverlay=disable-bt" >> "$BOOT_DIR/config.txt"
+    grep -q "enable_uart=1" "$BOOT_DIR/config.txt" || echo "enable_uart=1" >> "$BOOT_DIR/config.txt"
 fi
-
-# ------------------------------------------------------------------------------
-# Step 6: Finalize Migration & Reboot directly into RF-KIT GUI
-# ------------------------------------------------------------------------------
-show_step "6/6" "Finalizing Migration & Launching RF-KIT Touchscreen GUI..."
-
-# Clean up cmdline.txt hook so firstboot does not run on subsequent boots
 if [ -f "$BOOT_DIR/cmdline.txt" ]; then
     sed -i 's| *systemd\.run=[^ ]*||g' "$BOOT_DIR/cmdline.txt" 2>/dev/null || true
 fi
 
-# Non-blocking background package verification (does NOT delay boot)
-(
-    export DEBIAN_FRONTEND=noninteractive
-    if ! python3 -c "import can" 2>/dev/null; then
-        apt-get update -qq 2>/dev/null && apt-get install -y -qq python3-can can-utils 2>/dev/null || true
-    fi
-) &
-
 echo "=========================================================="
-echo "Migration Complete! System is rebooting directly into RF-KIT GUI..."
+echo "Firstboot Setup Complete! Booting desktop to show Reboot confirmation dialog..."
 echo "=========================================================="
 sync
+if [ "$CLOUDINIT_MODE" = "1" ]; then
+    # Schedule detached reboot so cloud-final.service exits cleanly without systemd shutdown deadlock
+    if command -v systemd-run >/dev/null 2>&1; then
+        systemd-run --no-block --unit=jrfk-firstboot-reboot --on-active=4 /sbin/reboot 2>/dev/null || \
+            (sleep 4 && /sbin/reboot -f) >/dev/null 2>&1 </dev/null &
+    else
+        (sleep 4 && /sbin/reboot -f) >/dev/null 2>&1 </dev/null &
+    fi
+    exit 0
+fi
 sleep 2
 reboot
