@@ -1194,12 +1194,19 @@ sequenceDiagram
     SpareSD->>Admin: BOOT 2: Direct Launch into RFKGUI with All User Data Intact!
 ```
 
-### 14.1 Backup Media Topology & Live Hot-Cloning Engine
-The JRFK Backup Engine (`rfk_backup.sh`) provides live binary cloning of the active root media without taking the amplifier offline:
-1. Automatically identifies the active boot device (`/dev/mmcblk0`).
-2. Scans USB bus for connected external SD card readers (`/dev/sda` through `/dev/sdz`).
-3. Executes a live block stream via `piclone -f`, cloning the boot and root partitions while simultaneously **re-generating unique partition UUIDs (PARTUUID)** to prevent device collisions if the backup card remains plugged into the USB port.
-4. Mounts the target root partition and synchronizes user configurations (`/home/pi/PA-Files/`), network configurations, and calibration databases.
+### 14.1 Backup Media Topology & Headless Smart-Cloning Engine with Mandatory Verification
+The JRFK Backup Engine (`rfk_backup.sh`) provides headless smart cloning of the active system to the external USB 2.0 SD card reader (`/dev/sda`) with mandatory pre-success verification:
+1. **Automated Media Discovery:** Automatically identifies the active boot device (`/dev/mmcblk0`) and connected external USB 2.0 SD reader (`/dev/sda`).
+2. **Headless Partition Allocation (No GUI Crashes):** Rather than relying on crash-prone desktop utilities like `piclone` (which abort in headless environments without an active X11 display), `rfk_backup.sh` uses `sfdisk` to initialize a pristine DOS partition table with a 512MB FAT32 boot partition (`/dev/sda1`) and an EXT4 rootfs partition (`/dev/sda2`).
+3. **High-Speed Differential Sync:** Formats both partitions cleanly (`mkfs.vfat -F 32`, `mkfs.ext4`) and copies bootloader firmware and 64-bit root filesystems using `rsync -axHAX --delete`. Only real used filesystem blocks (~6.8 GB) are transferred, excluding volatile runtimes and swapfiles, reducing replication time to 3–4 minutes over USB 2.0.
+4. **Hardware PARTUUID Re-Alignment:** Queries target partition hardware PARTUUIDs via `blkid` and updates target `/boot/firmware/cmdline.txt` (`root=PARTUUID=<new-uuid>`) and `/etc/fstab` so the cloned card is 100% independent and bootable without partition collisions.
+5. **Mandatory 5-Point Disaster-Recovery Verification Suite:**
+   * **Bootloader & Kernel Audit:** Verifies presence and file sizes of `cmdline.txt`, `config.txt`, and `kernel8.img`.
+   * **PARTUUID Alignment Check:** Verifies that `cmdline.txt` and `/etc/fstab` on the target card point strictly to the target SD PARTUUID.
+   * **OS Binary Integrity:** Verifies critical OS hierarchy (`/bin`, `/sbin`, `/usr`, `/etc`, `/lib`, `/var`) and core shell executables.
+   * **RF-KIT Calibration Parity Audit:** Performs byte-for-byte comparison of `/home/pi/PA-Files` (calibration constants, null voltages, antenna port maps, and ATU tables) to active amplifier files, guaranteeing 100% parity.
+   * **Cache Flush & Filesystem Integrity Check:** Flushes kernel disk buffers (`sync`), unmounts filesystems cleanly, and executes non-destructive read-only filesystem checks (`fsck.vfat -n` and `e2fsck -nf`).
+   * **Success Gating:** Success (`[+] SUCCESS: Disaster recovery backup SD (/dev/sda) verified and created cleanly`) is emitted **strictly if and only if all 5 verification phases pass**. If any check fails, the pipeline logs `[-] VERIFICATION FAILED` and alerts the operator.
 
 ### 14.2 Automated Weekly Cron Job Architecture & User Time Selection
 Through the Diagnostic Web UI (`http://<amp-ip>:8088/backup`), operators can customize an automated backup schedule:

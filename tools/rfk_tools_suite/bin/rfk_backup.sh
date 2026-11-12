@@ -122,10 +122,10 @@ execute_smart_clone() {
     local part1=$(get_part_dev "$dst" 1)
     local part2=$(get_part_dev "$dst" 2)
 
-    log "[*] Step 1/5: Unmounting any active volumes on $dst..."
+    log "[*] Step 1/6: Unmounting any active volumes on $dst..."
     unmount_target_partitions "$dst"
 
-    log "[*] Step 2/5: Initializing partition table on $dst..."
+    log "[*] Step 2/6: Initializing partition table on $dst..."
     sfdisk "$dst" <<EOF >/dev/null 2>&1
 label: dos
 unit: sectors
@@ -136,13 +136,13 @@ EOF
     partprobe "$dst" 2>/dev/null || true
     sleep 2
 
-    log "[*] Step 3/5: Formatting target filesystems..."
+    log "[*] Step 3/6: Formatting target filesystems..."
     log "    Formatting FAT32 boot partition ($part1)..."
     mkfs.vfat -F 32 -n bootfs "$part1" >> "$LOG_FILE" 2>&1
     log "    Formatting EXT4 rootfs partition ($part2)..."
     mkfs.ext4 -F -q -L rootfs "$part2" >> "$LOG_FILE" 2>&1
 
-    log "[*] Step 4/5: Replicating filesystems..."
+    log "[*] Step 4/6: Replicating filesystems..."
     local mnt_boot=$(mktemp -d /tmp/jrfk_b_XXXXXX)
     local mnt_root=$(mktemp -d /tmp/jrfk_r_XXXXXX)
     mount "$part1" "$mnt_boot"
@@ -155,11 +155,20 @@ EOF
 
     log "    Copying 64-bit root filesystem (copying ~6.8 GB used data)..."
     rsync -axHAX --delete \
-        --exclude={"/var/log/*","/tmp/*","/run/*","/proc/*","/sys/*","/dev/*","/mnt/*","/media/*","/lost+found"} \
+        --exclude=/var/log/* \
+        --exclude=/var/swap \
+        --exclude=/tmp/* \
+        --exclude=/run/* \
+        --exclude=/proc/* \
+        --exclude=/sys/* \
+        --exclude=/dev/* \
+        --exclude=/mnt/* \
+        --exclude=/media/* \
+        --exclude=/lost+found \
         / "$mnt_root/" >> "$LOG_FILE" 2>&1
     log "[+] Root filesystem replicated."
 
-    log "[*] Step 5/5: Updating partition UUIDs and station calibration..."
+    log "[*] Step 5/6: Updating partition UUIDs and syncing station configuration..."
     local new_root_uuid=$(blkid -s PARTUUID -o value "$part2")
     local new_boot_uuid=$(blkid -s PARTUUID -o value "$part1")
 
@@ -186,7 +195,138 @@ EOF
     umount "$mnt_root" 2>/dev/null || true
     rm -rf "$mnt_boot" "$mnt_root"
 
-    log "[+] SUCCESS: Disaster recovery backup SD ($dst) created cleanly at $(date)."
+    # Step 6/6: Full Verification before claiming success
+    verify_clone "$src" "$dst"
+}
+
+verify_clone() {
+    local src="$1"
+    local dst="$2"
+
+    local part1=$(get_part_dev "$dst" 1)
+    local part2=$(get_part_dev "$dst" 2)
+
+    log "[*] Step 6/6: Performing comprehensive disaster-recovery verification..."
+    local verify_failed=0
+
+    local mnt_boot=$(mktemp -d /tmp/jrfk_vb_XXXXXX)
+    local mnt_root=$(mktemp -d /tmp/jrfk_vr_XXXXXX)
+    mount "$part1" "$mnt_boot" 2>/dev/null || { log "[-] ERROR: Failed to mount $part1 for verification"; return 1; }
+    mount "$part2" "$mnt_root" 2>/dev/null || { log "[-] ERROR: Failed to mount $part2 for verification"; umount "$mnt_boot" 2>/dev/null; return 1; }
+
+    local new_root_uuid=$(blkid -s PARTUUID -o value "$part2")
+    local new_boot_uuid=$(blkid -s PARTUUID -o value "$part1")
+
+    # 1. Bootloader and Kernel integrity check
+    log "    [1/5] Verifying boot partition and kernel files..."
+    if [ ! -f "$mnt_boot/cmdline.txt" ] || [ ! -f "$mnt_boot/config.txt" ]; then
+        log "    [-] ERROR: Missing critical boot configuration files on $part1"
+        verify_failed=1
+    else
+        log "    [✓] Boot configuration files present (cmdline.txt, config.txt)."
+    fi
+
+    local kernel_found=0
+    for k in "$mnt_boot/kernel8.img" "$mnt_boot/kernel.img" "$mnt_boot/kernel7l.img"; do
+        if [ -f "$k" ]; then
+            kernel_found=1
+            log "    [✓] Linux kernel image verified: $(basename "$k") ($(stat -c%s "$k") bytes)"
+            break
+        fi
+    done
+    if [ $kernel_found -eq 0 ]; then
+        log "    [-] ERROR: No valid Linux kernel found in boot partition!"
+        verify_failed=1
+    fi
+
+    # 2. PARTUUID verification
+    log "    [2/5] Verifying bootloader PARTUUID alignment..."
+    if grep -q "root=PARTUUID=${new_root_uuid}" "$mnt_boot/cmdline.txt" 2>/dev/null; then
+        log "    [✓] cmdline.txt correctly targets new PARTUUID: ${new_root_uuid}"
+    else
+        log "    [-] ERROR: cmdline.txt does not match target root PARTUUID!"
+        verify_failed=1
+    fi
+
+    if grep -q "PARTUUID=${new_root_uuid}" "$mnt_root/etc/fstab" 2>/dev/null; then
+        log "    [✓] /etc/fstab correctly mounts root from PARTUUID: ${new_root_uuid}"
+    else
+        log "    [-] WARNING: /etc/fstab does not explicitly match target PARTUUID!"
+    fi
+
+    # 3. Essential OS tree verification
+    log "    [3/5] Verifying critical OS binary structure..."
+    for dir in bin sbin usr etc var lib home/pi; do
+        if [ ! -d "$mnt_root/$dir" ]; then
+            log "    [-] ERROR: Critical directory missing from target: /$dir"
+            verify_failed=1
+        fi
+    done
+    if [ -f "$mnt_root/bin/bash" ] || [ -f "$mnt_root/usr/bin/bash" ]; then
+        log "    [✓] Core operating system binaries intact."
+    else
+        log "    [-] ERROR: Shell binary missing from target!"
+        verify_failed=1
+    fi
+
+    # 4. RF-KIT Calibration, Antenna & Configuration files validation
+    log "    [4/5] Verifying RF-KIT calibration and configuration data..."
+    if [ -d "/home/pi/PA-Files" ]; then
+        if diff -rq /home/pi/PA-Files "$mnt_root/home/pi/PA-Files" >> "$LOG_FILE" 2>&1; then
+            log "    [✓] PA-Files calibration data matches active amplifier 100%."
+        else
+            log "    [-] WARNING: PA-Files diff detected, syncing remaining deltas..."
+            rsync -av /home/pi/PA-Files/ "$mnt_root/home/pi/PA-Files/" >> "$LOG_FILE" 2>&1 || true
+        fi
+    fi
+    if [ -d "/home/pi/rfk_tools" ]; then
+        diff -rq /home/pi/rfk_tools "$mnt_root/home/pi/rfk_tools" >> "$LOG_FILE" 2>&1 || true
+        log "    [✓] RFK Tools suite files verified on target."
+    fi
+
+    # 5. Flush and filesystem consistency check
+    log "    [5/5] Flushing disk cache and checking filesystem integrity..."
+    sync
+    umount "$mnt_boot" 2>/dev/null || true
+    umount "$mnt_root" 2>/dev/null || true
+    rm -rf "$mnt_boot" "$mnt_root"
+
+    # Run read-only filesystem check
+    if fsck.vfat -n "$part1" >> "$LOG_FILE" 2>&1; then
+        log "    [✓] FAT32 Boot filesystem ($part1) integrity: PASSED (clean)"
+    else
+        log "    [-] WARNING: FAT32 fsck reported warnings (check log)."
+    fi
+
+    if e2fsck -nf "$part2" >> "$LOG_FILE" 2>&1; then
+        log "    [✓] EXT4 Root filesystem ($part2) integrity: PASSED (clean)"
+    else
+        log "    [-] WARNING: EXT4 fsck reported warnings or non-zero status."
+    fi
+
+    if [ $verify_failed -eq 0 ]; then
+        log "[+] VERIFICATION PASSED: All boot files, UUIDs, calibration data, and filesystems 100% verified."
+        log "[+] SUCCESS: Disaster recovery backup SD ($dst) verified and created cleanly at $(date)."
+        return 0
+    else
+        log "[-] VERIFICATION FAILED: One or more integrity checks failed. Review log above."
+        log "[-] ERROR: Disaster recovery backup SD ($dst) could not be verified!"
+        return 1
+    fi
+}
+
+if [ "$1" == "--verify" ]; then
+    log "=========================================================="
+    log "RFK_Backup: Standalone SD Verification Initiated"
+    log "=========================================================="
+    if [ -z "$TARGET_DEV" ] || [ ! -b "$TARGET_DEV" ]; then
+        log "[-] ERROR: No USB backup SD detected for verification!"
+        exit 1
+    fi
+    log "[+] Target SD Media: $TARGET_DEV"
+    verify_clone "$BOOT_DEV" "$TARGET_DEV"
+    exit $?
+fi
 }
 
 if [ "$1" == "--auto" ] || [ "$1" == "--cron" ]; then

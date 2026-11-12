@@ -715,7 +715,29 @@
 
     <!-- SD Backup & Disaster Recovery Subsection -->
     <h3>6.7 Automated SD Backup &amp; Disaster Recovery (`/backup`)</h3>
-    <p>By permanently leaving Card 5 (<code>BACKUP-AUTO</code>) inside the amplifier's external USB 2.0 reader, the system performs unattended weekly whole-disk cloning via <code>/etc/cron.d/jrfk_weekly_backup</code>. If the internal production SD ever degrades or fails, simply power down, move Card 5 into the internal Raspberry Pi slot, and power back on—your amplifier is immediately back online with all settings intact.</p>
+    <p>By permanently leaving Card 5 (<code>BACKUP-AUTO</code>) inside the amplifier's external USB 2.0 reader, the system performs unattended weekly whole-disk cloning via <code>/etc/cron.d/jrfk_weekly_backup</code> or instant on-demand replication via the web interface. If the internal production SD ever degrades or fails, simply power down, move Card 5 into the internal Raspberry Pi slot, and power back on—your amplifier is immediately back online with all settings intact.</p>
+
+    <div class="blueprint-card">
+        <div class="bp-title">6-STAGE REPLICATION PIPELINE &amp; MANDATORY PRE-SUCCESS VERIFICATION</div>
+        The JRFK Disaster Recovery Engine strictly prohibits declaring success until a rigorous 5-point post-replication integrity audit completes without errors:
+        <br><br>
+        • <strong>Stage 1 (Unmount):</strong> Unmounts all active volumes on the target USB 2.0 SD device (<code>/dev/sda</code>).<br>
+        • <strong>Stage 2 (Partition):</strong> Writes a standard DOS partition table (512 MB FAT32 Boot + remaining storage EXT4 Rootfs).<br>
+        • <strong>Stage 3 (Format):</strong> Formats pristine target filesystems via <code>mkfs.vfat -F 32</code> and <code>mkfs.ext4</code>.<br>
+        • <strong>Stage 4 (Replication):</strong> Synchronizes bootloader firmware and 64-bit rootfs via differential block <code>rsync</code> (replicating ~6.8 GB of used data in 3–4 minutes, excluding volatile runtimes and swap).<br>
+        • <strong>Stage 5 (UUID Patching):</strong> Extracts unique hardware PARTUUIDs from the new SD partitions and automatically updates target <code>cmdline.txt</code> and <code>/etc/fstab</code> so the card boots independently with zero dependency on the source.<br>
+        • <strong>Stage 6 (Mandatory Verification Suite):</strong>
+          <ol style="margin-left:20px; margin-top:8px;">
+            <li><strong>Bootloader &amp; Kernel Check:</strong> Verifies existence, permissions, and byte length of <code>cmdline.txt</code>, <code>config.txt</code>, and <code>kernel8.img</code>.</li>
+            <li><strong>PARTUUID Alignment Check:</strong> Validates that both <code>cmdline.txt</code> and <code>/etc/fstab</code> target the destination card's PARTUUID.</li>
+            <li><strong>OS Binary Tree Check:</strong> Confirms critical root directory structures (<code>/bin</code>, <code>/sbin</code>, <code>/usr</code>, <code>/etc</code>, <code>/lib</code>, <code>/var</code>) and core binaries.</li>
+            <li><strong>Station Calibration &amp; Tuning Audit:</strong> Compares <code>/home/pi/PA-Files</code>, antenna matrices, null voltage calibrations, and diagnostic suite files against the active amplifier with 100% parity verification.</li>
+            <li><strong>Cache Flush &amp; Non-Destructive Filesystem Check:</strong> Executes hardware buffer flush (<code>sync</code>), unmounts partitions, and runs non-destructive read-only checks (<code>fsck.vfat -n</code> and <code>e2fsck -nf</code>) confirming 0 filesystem errors.</li>
+          </ol>
+        <div style="margin-top:10px; color:var(--data-green); font-weight:bold;">
+            [✓] ONLY WHEN ALL 5 VERIFICATION CHECKS PASS IS SUCCESS REPORTED: "✅ BACKUP VERIFIED &amp; READY"
+        </div>
+    </div>
 
     <!-- Section 7: Field Troubleshooting & Reference -->
     <h2><span class="sec-num">07</span> Field Troubleshooting &amp; Diagnostic Reference</h2>

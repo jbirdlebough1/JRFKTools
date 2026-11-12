@@ -232,9 +232,12 @@
                 <span class="badge badge-green" id="targetBadge">DETECTED</span>
             </div>
 
-            <div style="margin-top: 20px;">
-                <button class="btn btn-action" style="width:100%; justify-content:center; padding:12px;" onclick="startBackup()">
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button class="btn btn-action" style="flex: 1; justify-content: center; padding: 12px;" onclick="startBackup()">
                     ⚡ Execute Immediate Full System Clone
+                </button>
+                <button class="btn" style="justify-content: center; padding: 12px; border-color: var(--data-cyan); color: var(--data-cyan);" onclick="verifyBackup()">
+                    🔍 Verify Backup SD
                 </button>
             </div>
         </div>
@@ -303,10 +306,18 @@
                         box.scrollTop = box.scrollHeight;
 
                         let statusElem = document.getElementById('backupEngineStatus');
-                        if (d.log.includes("SUCCESS:")) {
-                            statusElem.innerText = "✅ BACKUP COMPLETE (READY)";
+                        if (d.log.includes("VERIFICATION PASSED:") || (d.log.includes("SUCCESS:") && !d.log.includes("Step"))) {
+                            statusElem.innerText = "✅ BACKUP VERIFIED & READY";
                             statusElem.style.color = "var(--data-green)";
                             isCloning = false;
+                        } else if (d.log.includes("VERIFICATION FAILED:") || d.log.includes("ERROR:")) {
+                            statusElem.innerText = "❌ VERIFICATION FAILED";
+                            statusElem.style.color = "#ff4444";
+                            isCloning = false;
+                        } else if (d.log.includes("Step 6/6") || d.log.includes("Verifying")) {
+                            statusElem.innerText = "🔍 FULL VERIFICATION IN PROGRESS...";
+                            statusElem.style.color = "var(--data-cyan)";
+                            isCloning = true;
                         } else if (d.log.includes("Starting") || d.log.includes("Step")) {
                             statusElem.innerText = "🔄 CLONING IN PROGRESS...";
                             statusElem.style.color = "var(--data-yellow)";
@@ -344,6 +355,24 @@
                 })
                 .catch(err => {
                     alert("Error triggering backup: " + err);
+                });
+        }
+
+        function verifyBackup() {
+            let box = document.getElementById('logBox');
+            box.innerText = "[*] Dispatching comprehensive verification suite to amplifier daemon...\n[*] Inspecting bootloader, kernel, UUID alignment, and calibration matrices...";
+            document.getElementById('backupEngineStatus').innerText = "🔍 FULL VERIFICATION IN PROGRESS...";
+            document.getElementById('backupEngineStatus').style.color = "var(--data-cyan)";
+
+            fetch('/api/backup/verify', {method: 'POST'})
+                .then(r => r.json())
+                .then(d => {
+                    if (pollTimer) clearInterval(pollTimer);
+                    pollTimer = setInterval(fetchStatus, 1500);
+                    setTimeout(fetchStatus, 500);
+                })
+                .catch(err => {
+                    alert("Error triggering verification: " + err);
                 });
         }
 

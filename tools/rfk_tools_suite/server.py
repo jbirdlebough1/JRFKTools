@@ -884,6 +884,21 @@ class RFKToolsHandler(SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps({"status": "started"}).encode('utf-8'))
             return
 
+        elif self.path == "/api/backup/verify":
+            def run_bg_verify():
+                if os.path.exists(BACKUP_SCRIPT):
+                    try:
+                        cmd = ["sudo", BACKUP_SCRIPT, "--verify"] if sys.platform.startswith("linux") else [BACKUP_SCRIPT, "--verify"]
+                        subprocess.run(cmd, timeout=600)
+                    except Exception as e:
+                        logger.error(f"Backup verify error: {e}")
+            threading.Thread(target=run_bg_verify, daemon=True).start()
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "verification_started"}).encode('utf-8'))
+            return
+
         self.send_response(404)
         self.end_headers()
 
