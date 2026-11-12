@@ -31,6 +31,8 @@ class JrfkEndToEndUnitTests(unittest.TestCase):
         self.assertNotIn("pkill -f lxpanel", txt)
         self.assertNotIn("pkill -f wf-panel-pi", txt)
         self.assertIn('rm -f "$TARGET_HOME/.config/lxsession/LXDE-pi/autostart"', txt)
+        self.assertIn('PreferredMode" "1024x600', txt)
+        self.assertIn("xrandr --output", txt)
         self.assertIn(".jrfk_migration_complete_prompt", txt)
         self.assertIn('text="Reboot"', txt)
         self.assertIn('<application class="Tk">', txt)

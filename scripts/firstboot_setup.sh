@@ -278,6 +278,7 @@ compute_need_pkgs() {
     python3 -c "import websocket" 2>/dev/null || pkgs="$pkgs python3-websocket"
     python3 -c "import yaml" 2>/dev/null || pkgs="$pkgs python3-yaml"
     python3 -c "import cgi" 2>/dev/null || pkgs="$pkgs python3-legacy-cgi"
+    fc-list 2>/dev/null | grep -qi "Lato" || pkgs="$pkgs fonts-lato"
     command -v openbox >/dev/null 2>&1 || pkgs="$pkgs openbox"
     command -v pip3 >/dev/null 2>&1 || pkgs="$pkgs python3-pip"
     echo "$pkgs"
@@ -487,6 +488,11 @@ xset s off 2>/dev/null || true
 xset -dpms 2>/dev/null || true
 xset s noblank 2>/dev/null || true
 
+# Lock Waveshare / 7-inch display to native 1024x600 so Xorg does not pick 1152x864/1080p
+for _out in HDMI-1 HDMI-2 HDMI-A-1 HDMI-A-2; do
+    xrandr --output "\$_out" --mode 1024x600 2>/dev/null || true
+done
+
 # First graphical boot after firstboot setup: show completion popup with Reboot button
 if [ -f "\$HOME/.jrfk_migration_complete_prompt" ] && [ -f "\$HOME/rfk_postboot_prompt.py" ]; then
     python3 "\$HOME/rfk_postboot_prompt.py"
@@ -504,6 +510,20 @@ cd "$TARGET_HOME/rf-kit-statics"
 python3 gui_starter.py &>> rf-kit-gui.log
 EOF
 chmod +x "$TARGET_HOME/Desktop/start_gui.sh" "$TARGET_HOME/rf-kit-statics/gui_starter.py" 2>/dev/null || true
+
+# Pin Xorg PreferredMode to 1024x600 for 7-inch RFK HDMI display
+mkdir -p /etc/X11/xorg.conf.d
+cat << 'XORGEOF' > /etc/X11/xorg.conf.d/10-rfk-hdmi.conf
+Section "Monitor"
+    Identifier "HDMI-1"
+    Option "PreferredMode" "1024x600"
+EndSection
+
+Section "Monitor"
+    Identifier "HDMI-2"
+    Option "PreferredMode" "1024x600"
+EndSection
+XORGEOF
 
 # Openbox rule (X11: Trixie rpd-rc.xml + Bookworm lxde-pi-rc.xml + rc.xml) keeps RFK fullscreen/on-top
 mkdir -p "$TARGET_HOME/.config/openbox"
