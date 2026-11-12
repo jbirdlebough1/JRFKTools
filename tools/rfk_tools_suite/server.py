@@ -428,6 +428,9 @@ class RFKToolsHandler(SimpleHTTPRequestHandler):
         elif self.path == "/backup":
             self.path = "/backup_manager.html"
             return super().do_GET()
+        elif self.path == "/migrator":
+            self.path = "/migrator.html"
+            return super().do_GET()
 
         # Telemetry API with stats
         elif self.path.startswith("/api/telemetry"):

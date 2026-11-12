@@ -1541,8 +1541,20 @@ class MigratorHandler(http.server.SimpleHTTPRequestHandler):
         path = urllib.parse.unquote(path.split('?', 1)[0].split('#', 1)[0])
         clean_path = path.lstrip('/')
         
-        if clean_path == "" or clean_path == "jrfk_migrator.htm" or clean_path == "JRFK_32_to_64Bit_Migration_tool.htm":
+        if clean_path == "" or clean_path == "migrator" or clean_path == "jrfk_migrator.htm" or clean_path == "JRFK_32_to_64Bit_Migration_tool.htm":
             return os.path.join(BASE_DIR, "JRFK_32_to_64Bit_Migration_tool.htm")
+        elif clean_path == "antenna" or clean_path == "antenna_mapper.html":
+            return os.path.join(BASE_DIR, "tools", "rfk_tools_suite", "static", "antenna_mapper.html")
+        elif clean_path == "health" or clean_path == "health_monitor.html":
+            return os.path.join(BASE_DIR, "tools", "rfk_tools_suite", "static", "health_monitor.html")
+        elif clean_path == "screen" or clean_path == "screen_viewer.html":
+            return os.path.join(BASE_DIR, "tools", "rfk_tools_suite", "static", "screen_viewer.html")
+        elif clean_path == "backup" or clean_path == "backup_manager.html":
+            return os.path.join(BASE_DIR, "tools", "rfk_tools_suite", "static", "backup_manager.html")
+        elif clean_path == "report" or clean_path == "system_report.html":
+            return os.path.join(BASE_DIR, "tools", "rfk_tools_suite", "static", "system_report.html")
+        elif clean_path == "logs" or clean_path == "log_viewer.html":
+            return os.path.join(BASE_DIR, "tools", "rfk_tools_suite", "static", "log_viewer.html")
         elif clean_path.startswith("docs/"):
             return os.path.join(BASE_DIR, clean_path)
         elif clean_path.startswith("tools/"):

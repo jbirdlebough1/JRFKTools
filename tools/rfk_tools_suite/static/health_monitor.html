@@ -307,14 +307,13 @@
             <div class="meta" id="station-meta">STATION CALLSIGN: K7BIT | PA: 1.5kW LDMOS | 53.5V SWITCH-MODE SUPPLY</div>
         </div>
         <div class="nav-tools">
+            <a href="/migrator" class="btn">🛠️ 64-Bit Migrator</a>
             <a href="/antenna" class="btn">🗺️ Antenna Mapper</a>
             <a href="/health" class="btn btn-active">📈 Health Monitor</a>
             <a href="/screen" class="btn">📺 Remote Screen</a>
             <a href="/backup" class="btn">💾 SD Backup</a>
             <a href="/report" class="btn">📋 System Report</a>
             <a href="/logs" class="btn">📜 Log Viewer</a>
-            <button class="btn" onclick="testThermalTrip()">🧪 Test 60°C Trip</button>
-            <button class="btn" onclick="window.print()">🖨️ Print Log</button>
         </div>
     </div>
 
@@ -327,8 +326,10 @@
     <!-- 10MB Circular Telemetry Logging Info Bar -->
     <div class="log-info-box">
         <span>📁 CIRCULAR TELEMETRY LOG: <strong>/home/pi/rfk_tools/telemetry_rolling.log</strong> (Max 10 MB Rotating)</span>
-        <span>SAMPLING: 5.0 SECONDS | FORMAT: TIMESTAMP, TYP/AVG, MIN, MAX</span>
-        <a href="/api/telemetry/log" target="_blank" style="color:var(--data-cyan); font-weight:bold; text-decoration:none;">[View Raw Log]</a>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn" style="padding:4px 8px; font-size:11px; border-color:var(--data-yellow); color:var(--data-yellow);" onclick="testThermalTrip()">🧪 Test 60°C Trip</button>
+            <a href="/api/telemetry/log" target="_blank" style="color:var(--data-cyan); font-weight:bold; text-decoration:none;">[View Raw Log]</a>
+        </div>
     </div>
 
     <!-- Telemetry Statistics Summary Grid (Typ, Min, Max) -->

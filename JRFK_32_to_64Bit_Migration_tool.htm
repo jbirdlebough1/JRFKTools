@@ -9,125 +9,141 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <style>
 :root {
-  --paper: #eef1f4;
-  --panel: #ffffff;
-  --panel-2: #f7f8fa;
-  --ink: #18202a;
-  --ink-2: #485361;
-  --ink-3: #7c8794;
-  --line: #d8dde3;
-  --line-2: #e7eaee;
-  --block: #1b232d;
-  --block-2: #2a3542;
-  --block-ink: #e9eef4;
-  --accent: #1f4fa8;
-  --accent-2: #2d63c8;
-  --accent-soft: #e4ecfa;
-  --amber: #e8a317;
-  --danger: #b8352a;
-  --ok: #2f8a4c;
-  --on-accent: #ffffff;
-  --shadow: rgba(20,30,45,.12);
-  --focus: #2d63c8;
-  --f-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --f-mono: "IBM Plex Mono", ui-monospace, monospace;
-  --f-label: "Barlow Condensed", "Arial Narrow", sans-serif;
-  --r: 6px;
-  color-scheme: light;
-}
-:root[data-ui="dark"] {
-  --paper: #12161b;
-  --panel: #1a2027;
-  --panel-2: #212830;
-  --ink: #e6ebf1;
-  --ink-2: #b4bec9;
-  --ink-3: #8a96a3;
-  --line: #333c47;
-  --line-2: #2a323b;
-  --block: #0c1014;
-  --block-2: #232b34;
-  --block-ink: #e6ebf1;
-  --accent: #6d9cf2;
-  --accent-2: #86aef6;
-  --accent-soft: #1f2d46;
-  --danger: #ff8a7a;
-  --ok: #5fc27f;
-  --on-accent: #0c1014;
-  --shadow: rgba(0,0,0,.45);
-  --focus: #86aef6;
+  --bp-bg: #1a5695;          /* Classic medium blueprint cyanotype blue */
+  --bp-grid: rgba(255, 255, 255, 0.18);
+  --bp-line: #ffffff;
+  --bp-line-dim: #dbeafe;
+  --bp-card-bg: rgba(26, 86, 149, 0.92);
+  --bp-border: #93c5fd;
+  --bp-border-bright: #ffffff;
+  --data-green: #22c55e;
+  --data-yellow: #facc15;
+  --data-red: #ef4444;
+  --data-cyan: #67e8f9;
+
+  --paper: #1a5695;
+  --panel: rgba(15, 53, 98, 0.95);
+  --panel-2: rgba(26, 86, 149, 0.85);
+  --ink: #ffffff;
+  --ink-2: #dbeafe;
+  --ink-3: #93c5fd;
+  --line: #93c5fd;
+  --line-2: rgba(255, 255, 255, 0.25);
+  --block: #0d2847;
+  --block-2: #143b66;
+  --block-ink: #ffffff;
+  --accent: #38bdf8;
+  --accent-2: #67e8f9;
+  --accent-soft: rgba(56, 189, 248, 0.25);
+  --amber: #facc15;
+  --danger: #ef4444;
+  --ok: #22c55e;
+  --on-accent: #0f172a;
+  --shadow: rgba(0,0,0,.35);
+  --focus: #67e8f9;
+  --border: #93c5fd;
+  --f-ui: 'Consolas', 'Monaco', 'Courier New', -apple-system, sans-serif;
+  --f-mono: 'Consolas', 'Monaco', monospace;
+  --f-label: 'Consolas', 'Monaco', -apple-system, sans-serif;
+  --r: 2px;
   color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; padding: 0; }
 body {
-  background: var(--paper);
-  color: var(--ink);
-  font: 13.5px/1.4 var(--f-ui);
-  display: grid;
-  grid-template-rows: auto auto 1fr auto;
-  overflow: hidden;
+  background-color: var(--bp-bg);
+  background-image: 
+      linear-gradient(var(--bp-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px);
+  background-size: 20px 20px;
+  color: var(--bp-line);
+  font: 13px/1.4 var(--f-ui);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 16px;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ---------------- Top Bar (CLE Style) */
-.topbar {
+/* ---------------- Blueprint Technical Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 2px solid var(--bp-line);
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  background: var(--bp-card-bg);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  position: relative;
+}
+.header::after {
+  content: "DWG NO. RFK-MIG-001 | REV 2.4 | AARCH64 GOLD REPLICATION";
+  position: absolute;
+  bottom: 3px;
+  right: 15px;
+  font-size: 10px;
+  color: var(--bp-line-dim);
+  letter-spacing: 1px;
+}
+.header h1 {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: #ffffff;
+}
+.header .meta {
+  font-size: 13px;
+  color: var(--bp-line-dim);
+  margin-top: 4px;
+}
+
+.nav-tools {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.btn {
+  background-color: var(--bp-bg);
+  border: 1px solid var(--bp-line);
+  color: var(--bp-line);
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  text-transform: uppercase;
+}
+.btn:hover {
+  background-color: var(--bp-border-bright);
+  color: #0c2340;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+.btn-active {
+  background-color: #1e40af !important;
+  border-color: var(--data-cyan) !important;
+  color: var(--data-cyan) !important;
+  box-shadow: 0 0 10px rgba(103, 232, 249, 0.4);
+}
+
+.topbar-sub {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 0 16px;
-  height: 48px;
-  background: var(--block);
-  color: var(--block-ink);
-  border-bottom: 1px solid var(--block-2);
+  padding: 8px 14px;
+  background: var(--bp-card-bg);
+  border: 1px solid var(--bp-border);
+  margin-bottom: 14px;
 }
-.brand-group {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.brand-title {
-  font: 700 19px/1 var(--f-label);
-  letter-spacing: .05em;
-  text-transform: uppercase;
-  color: #ffffff;
-}
-.badge-version {
-  font: 600 11px/1.2 var(--f-mono);
-  background: var(--accent);
-  color: #fff;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-.topbar-meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--block-2);
-  color: var(--block-ink);
-  padding: 4px 10px;
-  border-radius: 12px;
-  font: 500 11.5px/1 var(--f-mono);
-  border: 1px solid var(--line);
-}
-.pill.ok { border-color: var(--ok); color: var(--ok); }
-.pill.amber { border-color: var(--amber); color: var(--amber); }
-.theme-btn {
-  background: transparent;
-  border: 1px solid var(--block-2);
-  color: var(--block-ink);
-  border-radius: var(--r);
-  padding: 4px 8px;
-  cursor: pointer;
-  font-size: 12px;
-}
-.theme-btn:hover { background: var(--block-2); }
 
 /* ---------------- Ribbon / Mode Switcher */
 .ribbon {
@@ -181,31 +197,33 @@ body {
   gap: 16px;
 }
 .card {
-  background: var(--panel);
-  border: 1px solid var(--line);
+  background: var(--bp-card-bg);
+  border: 1px solid var(--bp-border);
   border-radius: var(--r);
   padding: 18px;
-  box-shadow: 0 1px 3px var(--shadow);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 .card-title {
   font: 700 15px/1.2 var(--f-ui);
-  color: var(--ink);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--line-2);
   padding-bottom: 8px;
   margin: 0;
+  text-transform: uppercase;
 }
 .card-title span.badge {
   font: 600 11px/1 var(--f-mono);
   padding: 2px 6px;
   border-radius: 4px;
-  background: var(--panel-2);
-  border: 1px solid var(--line);
+  background: var(--block);
+  border: 1px solid var(--bp-border);
+  color: var(--data-cyan);
 }
 .step-number {
   display: inline-flex;
@@ -215,7 +233,7 @@ body {
   height: 24px;
   border-radius: 50%;
   background: var(--accent);
-  color: #fff;
+  color: #07172b;
   font: 700 12px/1 var(--f-mono);
   margin-right: 8px;
 }
@@ -224,10 +242,10 @@ body {
 .build-mode-selector {
   display: flex;
   gap: 12px;
-  background: var(--panel-2);
+  background: var(--bp-card-bg);
   padding: 10px 14px;
   border-radius: var(--r);
-  border: 1px solid var(--line);
+  border: 1px solid var(--bp-border);
 }
 .radio-tile {
   flex: 1;
@@ -235,7 +253,7 @@ body {
   align-items: flex-start;
   gap: 10px;
   padding: 10px 14px;
-  background: var(--panel);
+  background: rgba(15, 53, 98, 0.7);
   border: 2px solid var(--line);
   border-radius: var(--r);
   cursor: pointer;
@@ -243,64 +261,67 @@ body {
 }
 .radio-tile:hover { border-color: var(--accent-2); }
 .radio-tile.selected {
-  border-color: var(--accent);
-  background: var(--accent-soft);
+  border-color: var(--data-cyan);
+  background: rgba(30, 64, 175, 0.6);
 }
 .radio-tile input[type="radio"] { margin-top: 3px; cursor: pointer; }
-.radio-tile-title { font: 700 13px/1.2 var(--f-ui); color: var(--ink); }
+.radio-tile-title { font: 700 13px/1.2 var(--f-ui); color: #ffffff; }
 .radio-tile-desc { font: 400 11.5px/1.3 var(--f-ui); color: var(--ink-2); margin-top: 2px; }
 
 /* ---------------- Buttons & Inputs */
 .btn-primary {
   background: var(--accent);
-  color: #fff;
+  color: #07172b;
   border: 1px solid var(--accent);
   padding: 8px 16px;
   border-radius: var(--r);
-  font: 600 13px/1 var(--f-ui);
+  font: 700 13px/1 var(--f-ui);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: background .15s;
+  transition: all .15s;
+  text-transform: uppercase;
 }
-.btn-primary:hover { background: var(--accent-2); }
+.btn-primary:hover { background: var(--accent-2); box-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-secondary {
-  background: var(--panel-2);
-  color: var(--ink);
-  border: 1px solid var(--line);
+  background: var(--block);
+  color: #ffffff;
+  border: 1px solid var(--bp-line);
   padding: 8px 14px;
   border-radius: var(--r);
-  font: 500 12.5px/1 var(--f-ui);
+  font: 600 12.5px/1 var(--f-ui);
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  text-transform: uppercase;
 }
-.btn-secondary:hover { background: var(--line-2); }
+.btn-secondary:hover { background: var(--bp-border-bright); color: #0c2340; }
 .btn-success {
   background: var(--ok);
-  color: #fff;
+  color: #ffffff;
   border: 1px solid var(--ok);
   padding: 8px 16px;
   border-radius: var(--r);
-  font: 600 13px/1 var(--f-ui);
+  font: 700 13px/1 var(--f-ui);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  text-transform: uppercase;
 }
-.btn-success:hover { background: #26733f; }
+.btn-success:hover { background: #16a34a; box-shadow: 0 0 10px rgba(34, 197, 94, 0.5); }
 
 .terminal-box {
-  background: var(--block);
-  color: #5fc27f;
-  font: 11.5px/1.4 var(--f-mono);
+  background: #050d1a !important;
+  color: var(--data-green) !important;
+  font: 11.5px/1.4 var(--f-mono) !important;
   padding: 12px;
   border-radius: var(--r);
-  border: 1px solid var(--block-2);
+  border: 1px solid var(--bp-border);
   height: 150px;
   overflow-y: auto;
   white-space: pre-wrap;
@@ -313,21 +334,23 @@ body {
   gap: 4px;
 }
 .form-label {
-  font: 600 11.5px/1 var(--f-ui);
+  font: 700 11.5px/1 var(--f-ui);
   color: var(--ink-2);
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 .form-control {
-  background: var(--panel-2);
-  border: 1px solid var(--line);
+  background: #07172b !important;
+  border: 1px solid var(--bp-line) !important;
   border-radius: var(--r);
-  padding: 7px 10px;
-  color: var(--ink);
+  padding: 8px 10px;
+  color: #ffffff !important;
   font: 12.5px/1 var(--f-mono);
 }
 .form-control:focus {
-  border-color: var(--focus);
+  border-color: var(--focus) !important;
   outline: none;
+  box-shadow: 0 0 8px rgba(103, 232, 249, 0.4);
 }
 
 /* ---------------- Remote Operation Bar */
@@ -383,34 +406,36 @@ body {
 </head>
 <body>
 
-<!-- Top Bar -->
-<header class="topbar">
-  <div class="brand-group">
-    <div class="brand-title">JRFK MIGRATOR & STATION WORKBENCH</div>
-    <span class="badge-version">v01.00.01-alpha</span>
+<!-- Blueprint Technical Header with Top Row Navigation -->
+<div class="header">
+  <div>
+    <h1>RF-KIT 64-Bit Appliance Builder &amp; Migration Console</h1>
+    <div class="meta">STATION CALLSIGN: K7BIT | ARCHITECTURE: 64-BIT AARCH64 GOLD REPLICATION ENGINE</div>
   </div>
-  <div class="topbar-meta">
-    <div class="pill ok" id="hostPill">● Windows 11 Host Ready</div>
-    <div class="pill" id="sdPill">○ Target SD: None Detected</div>
-    <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">🌓 Theme</button>
+  <div class="nav-tools">
+    <a href="/migrator" class="btn btn-active">🛠️ 64-Bit Migrator</a>
+    <a href="/antenna" class="btn">🗺️ Antenna Mapper</a>
+    <a href="/health" class="btn">📈 Health Monitor</a>
+    <a href="/screen" class="btn">📺 Remote Screen</a>
+    <a href="/backup" class="btn">💾 SD Backup</a>
+    <a href="/report" class="btn">📋 System Report</a>
+    <a href="/logs" class="btn">📜 Log Viewer</a>
   </div>
-</header>
+</div>
 
-<!-- Navigation Ribbon -->
-<nav class="ribbon">
-  <button class="mode-btn active" id="btnTabWizard" onclick="switchTab('wizard')">
-    💽 SD Appliance Builder
-  </button>
-  <button class="mode-btn" id="btnTabDocs" onclick="switchTab('docs')">
-    📖 Master Manual & K7BIT Cookbook
-  </button>
-  <button class="mode-btn" id="btnTabUtils" onclick="switchTab('utils')">
-    🌐 Remote Web Utilities
-  </button>
-  <button class="mode-btn" id="btnTabProfile" onclick="switchTab('profile')">
-    ⚙️ Station Profile & Calibrations
-  </button>
-</nav>
+<!-- Sub-Header Ribbon with Station Status Pills & Builder Tabs -->
+<div class="topbar-sub">
+  <div style="display:flex; gap:10px; align-items:center;">
+    <span class="pill ok" id="hostPill" style="background:#0c2340; border-color:var(--data-green); color:var(--data-green); font-weight:bold;">● Windows Host Ready</span>
+    <span class="pill" id="sdPill" style="background:#0c2340; border-color:var(--data-cyan); color:var(--data-cyan); font-weight:bold;">○ Target SD: None Detected</span>
+  </div>
+  <nav class="ribbon" style="margin:0; padding:0; background:transparent; border:none; display:flex; gap:8px;">
+    <button class="mode-btn active" id="btnTabWizard" onclick="switchTab('wizard')">💽 SD Appliance Builder</button>
+    <button class="mode-btn" id="btnTabDocs" onclick="switchTab('docs')">📖 Master Manual</button>
+    <button class="mode-btn" id="btnTabUtils" onclick="switchTab('utils')">🌐 Web Utilities</button>
+    <button class="mode-btn" id="btnTabProfile" onclick="switchTab('profile')">⚙️ Station Profile</button>
+  </nav>
+</div>
 
 <!-- Main View Container -->
 <main class="main-view">
