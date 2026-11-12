@@ -146,7 +146,7 @@ class JrfkEndToEndUnitTests(unittest.TestCase):
             finally:
                 server.IMAGES_DIR = orig_images_dir
 
-    def test_run_pipeline_uses_flash_raw_image_and_restores_automount(self):
+    def test_run_pipeline_uses_flash_raw_image_and_suppresses_format_popups(self):
         with tempfile.TemporaryDirectory() as tmp:
             boot_dir = os.path.join(tmp, "Z_boot")
             os.makedirs(boot_dir, exist_ok=True)
@@ -166,11 +166,16 @@ class JrfkEndToEndUnitTests(unittest.TestCase):
                  mock.patch.object(server, "inject_jrfk_bits"), \
                  mock.patch.object(server, "validate_sd_partitions", return_value={"boot_partition_ok": True, "linux_partition_ok": True, "details": ["ok"]}), \
                  mock.patch.object(server, "safely_eject_drive"), \
+                 mock.patch.object(server, "_dismiss_windows_format_dialogs") as mock_dismiss, \
                  mock.patch.object(server, "_set_windows_automount") as mock_automount:
                 server.run_pipeline(2, "Z", "pi", "raspberry", "k7bit", "", "", mode="fresh")
             mock_flash.assert_called_once()
-            self.assertEqual(mock_automount.call_args_list[0].args, (False,))
-            self.assertEqual(mock_automount.call_args_list[-1].args, (True,))
+            mock_automount.assert_called_with(False)
+            self.assertGreaterEqual(mock_dismiss.call_count, 2)
+        with open(os.path.join(BASE_DIR, "JRFK_32_to_64Bit_Migration_tool.htm"), "r", encoding="utf-8") as f:
+            htm = f.read()
+        self.assertNotIn("btnEraseTarget", htm)
+        self.assertNotIn("btnEraseFresh", htm)
 
 
 if __name__ == "__main__":

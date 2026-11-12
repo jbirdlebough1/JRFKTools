@@ -276,6 +276,65 @@ def assert_writable_non_gold_sd(disk_index, drive_letter=None, require_letter=Fa
     return verified
 
 
+def _dismiss_windows_format_dialogs():
+    """Close Windows 11 'You need to format the disk' popups automatically so Linux/RAW SD partitions never show Format screens."""
+    if os.name != "nt":
+        return 0
+    closed = 0
+    try:
+        user32 = ctypes.windll.user32
+        enum_proc = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+        child_proc = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+
+        def _wtext(hwnd):
+            n = user32.GetWindowTextLengthW(hwnd)
+            if n <= 0:
+                return ""
+            b = ctypes.create_unicode_buffer(n + 1)
+            user32.GetWindowTextW(hwnd, b, n + 1)
+            return b.value
+
+        def _wcls(hwnd):
+            b = ctypes.create_unicode_buffer(128)
+            user32.GetClassNameW(hwnd, b, 128)
+            return b.value
+
+        targets = []
+
+        def _cb(hwnd, _lp):
+            if not user32.IsWindowVisible(hwnd):
+                return True
+            if _wcls(hwnd) != "#32770":
+                return True
+            title = _wtext(hwnd).lower()
+            if title == "microsoft windows" or title.startswith("format "):
+                texts = []
+
+                def _ccb(chwnd, _clp):
+                    t = _wtext(chwnd)
+                    if t:
+                        texts.append(t.lower())
+                    return True
+
+                user32.EnumChildWindows(hwnd, child_proc(_ccb), 0)
+                joined = " ".join(texts)
+                if "format the disk" in joined or "you need to format" in joined or "format disk" in joined or (
+                    title.startswith("format ") and "capacity" in joined and "file system" in joined
+                ):
+                    targets.append(hwnd)
+            return True
+
+        user32.EnumWindows(enum_proc(_cb), 0)
+        for hwnd in targets:
+            # WM_COMMAND IDCANCEL (2) and WM_CLOSE (0x0010) dismiss both 'Microsoft Windows' and 'Format' dialogs cleanly
+            user32.PostMessageW(hwnd, 0x0111, 2, 0)
+            user32.PostMessageW(hwnd, 0x0010, 0, 0)
+            closed += 1
+    except Exception:
+        pass
+    return closed
+
+
 def _set_windows_automount(enable):
     """Toggle Windows MountMgr automount (/N disables new auto-letters to stop W11 'Format disk' popups; /E restores)."""
     global _AUTOMOUNT_DISABLED
@@ -476,9 +535,10 @@ def flash_raw_image(img_path, disk_index, progress_callback=None, verified_disk=
     device_path = f"\\\\.\\PhysicalDrive{int(disk_index)}"
 
     if not already_cleaned:
-        clean_disk_partitions(disk_index, verified_disk=verified, refresh_properties=True)
+        clean_disk_partitions(disk_index, verified_disk=verified, refresh_properties=False)
     else:
         _dismount_sd_volumes(verified)
+    _dismiss_windows_format_dialogs()
 
     locked_vols = _lock_all_disk_volumes(disk_index)
     append_log(f"[*] Opening raw device {device_path} for verified {'compressed .img.xz stream' if is_xz else 'raw .img'} write (~{total_size / (1024**3):.2f} GB)...")
@@ -1291,10 +1351,10 @@ def run_pipeline(
         else:
             append_log("[*] Step 1/5: Target SD unmounted; proceeding to full erase and flash.")
 
-        # Step 2: Resolve latest official 64-bit Pi 4/5 OS + Full erase + RPi Imager CLI flash
+        # Step 2: Full erase + Resolve latest official 64-bit Pi 4/5 OS + Direct Win32 flash
         ACTIVE_JOB["step"] = "resolving_os"
         ACTIVE_JOB["progress"] = 16
-        append_log("[*] Step 2/5: Resolving latest official 64-bit Raspberry Pi OS (Pi 4 & Pi 5) and erasing target SD...")
+        append_log("[*] Step 2/5: Full-erasing target SD (both partitions) and flashing latest 64-bit Raspberry Pi OS (Pi 4 & Pi 5)...")
 
         def _on_dl_prog(pct, dl_bytes, tot_bytes):
             ACTIVE_JOB["step"] = "downloading_os"
@@ -1307,6 +1367,7 @@ def run_pipeline(
         ACTIVE_JOB["step"] = "flashing_os"
         ACTIVE_JOB["progress"] = 30
         _set_windows_automount(False)
+        _dismiss_windows_format_dialogs()
         try:
             def _on_raw_prog(pct, done_bytes, tot_bytes, speed_mb):
                 ACTIVE_JOB["progress"] = 30 + int(pct * 0.35)
@@ -1359,7 +1420,7 @@ def run_pipeline(
             except Exception as ej_err:
                 append_log(f"[-] Post-build unmount note: {ej_err}")
         finally:
-            _set_windows_automount(True)
+            _dismiss_windows_format_dialogs()
 
         # Step 5: Migration Trace & Operator Deployment Instructions
         ACTIVE_JOB["step"] = "complete"
@@ -1938,7 +1999,17 @@ def run_server():
     append_log(f"JRFK Migrator Server starting on port {PORT}...")
     if is_admin():
         append_log("[+] Running with elevated Administrator privileges.")
-        _set_windows_automount(True)
+        _set_windows_automount(False)
+        atexit.register(_set_windows_automount, True)
+        _dismiss_windows_format_dialogs()
+        append_log("[+] Windows automount disabled & Format-popup suppressor active during JRFK session.")
+
+        def _format_dialog_watcher():
+            while True:
+                _dismiss_windows_format_dialogs()
+                time.sleep(0.4)
+
+        threading.Thread(target=_format_dialog_watcher, daemon=True).start()
     else:
         append_log("[-] Running with standard user privileges (Elevation available via Web UI).")
     append_log("Ready for SD provisioning.")

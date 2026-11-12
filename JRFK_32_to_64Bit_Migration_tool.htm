@@ -517,7 +517,6 @@ body {
           <button class="btn-primary" id="btnFlash" onclick="buildTargetImage()">
             ⚡ Create 64-Bit RFK Image
           </button>
-          <button class="btn-secondary" id="btnEraseTarget" onclick="eraseTargetCard('flashLog', 'driveSelectTarget')">🧹 Full Erase</button>
           <button class="btn-secondary" onclick="scanDisks()">🔄 Rescan</button>
           <button class="btn-secondary" onclick="ejectTargetCard('driveSelectTarget', 'flashLog')">⏏️ Safely Eject</button>
         </div>
@@ -609,7 +608,6 @@ body {
           <button class="btn-success" id="btnFreshBuild" onclick="buildFreshSystem()">
             🚀 Create Clean 64-Bit RFK Image
           </button>
-          <button class="btn-secondary" id="btnEraseFresh" onclick="eraseTargetCard('freshLog', 'driveSelectFresh')">🧹 Full Erase</button>
           <button class="btn-secondary" onclick="scanDisks()">🔄 Rescan</button>
           <button class="btn-secondary" onclick="ejectTargetCard('driveSelectFresh', 'freshLog')">⏏️ Safely Eject</button>
         </div>
@@ -908,8 +906,6 @@ function populateDrives(drives, offlineReason) {
   const btnExtract = document.getElementById('btnExtract');
   const btnFlash = document.getElementById('btnFlash');
   const btnFresh = document.getElementById('btnFreshBuild');
-  const btnEraseTarget = document.getElementById('btnEraseTarget');
-  const btnEraseFresh = document.getElementById('btnEraseFresh');
   const sdPill = document.getElementById('sdPill');
 
   selOrig.innerHTML = "";
@@ -944,8 +940,6 @@ function populateDrives(drives, offlineReason) {
     selFresh.innerHTML = emptyOpt;
     if (btnFlash) btnFlash.disabled = true;
     if (btnFresh) btnFresh.disabled = true;
-    if (btnEraseTarget) btnEraseTarget.disabled = true;
-    if (btnEraseFresh) btnEraseFresh.disabled = true;
   } else {
     sdTargetDrives.forEach(d => {
       const label = `Disk ${d.index}: ${d.model} [${d.size_gb || d.size}] (${d.letter || 'Unmounted'})`;
@@ -959,8 +953,6 @@ function populateDrives(drives, offlineReason) {
     });
     if (btnFlash) btnFlash.disabled = false;
     if (btnFresh) btnFresh.disabled = false;
-    if (btnEraseTarget) btnEraseTarget.disabled = false;
-    if (btnEraseFresh) btnEraseFresh.disabled = false;
   }
 
   if (sdPill) {
@@ -1196,33 +1188,6 @@ async function buildFreshSystem() {
     ssid: document.getElementById('freshSsid').value || '',
     wifipw: document.getElementById('freshSsidPass').value || ''
   });
-}
-
-async function eraseTargetCard(logId, selectId) {
-  const selVal = document.getElementById(selectId).value;
-  const logFn = logId === 'freshLog' ? logFresh : logFlash;
-  if (!selVal) {
-    logFn("[BLOCKED] Select a writable 16-64 GB target SD card first.");
-    return;
-  }
-  const [diskIdx, driveLetter] = selVal.split('|');
-  if (!confirm(`Full Erase both partitions on SD Disk ${diskIdx} (${driveLetter || 'Unmounted'})?`)) return;
-  document.getElementById(logId).textContent = `[*] Initiating Full Erase on SD Disk ${diskIdx}...\n`;
-  try {
-    const res = await fetch('/api/erase_sd', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ disk_index: parseInt(diskIdx, 10), drive_letter: driveLetter || '' })
-    });
-    const data = await res.json();
-    if (!res.ok || data.status !== 'ok') {
-      logFn(`[ERROR] ${data.message || 'Erase rejected'}`);
-      return;
-    }
-    pollJobLogs(logId, async () => { await scanDisks(); });
-  } catch (e) {
-    logFn(`[ERROR] Erase request failed: ${e}`);
-  }
 }
 
 async function ejectOriginalCard() {
