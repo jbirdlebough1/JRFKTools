@@ -304,7 +304,7 @@
     <div class="header">
         <div>
             <h1>RF-KIT Amplifier Health &amp; Thermal Guard</h1>
-            <div class="meta">STATION CALLSIGN: K7BIT | PA: 1.5kW LDMOS | 53.5V SWITCH-MODE SUPPLY</div>
+            <div class="meta" id="station-meta">STATION CALLSIGN: K7BIT | PA: 1.5kW LDMOS | 53.5V SWITCH-MODE SUPPLY</div>
         </div>
         <div class="nav-tools">
             <a href="/antenna" class="btn">🗺️ Antenna Mapper</a>
@@ -336,55 +336,55 @@
         <!-- Temperature -->
         <div class="telemetry-card">
             <div class="card-label">PA Heatsink Temperature</div>
-            <div class="cur-val" id="val-temp" style="color:var(--data-green);">34.5 °C</div>
+            <div class="cur-val" id="val-temp" style="color:var(--data-green);">--.- °C</div>
             <div class="stat-subrow">
-                <span>TYP: <strong id="typ-temp">32.8 °C</strong></span>
-                <span>MIN: <strong id="min-temp">24.1 °C</strong></span>
-                <span>MAX: <strong id="max-temp">48.2 °C</strong></span>
+                <span>TYP: <strong id="typ-temp">--.- °C</strong></span>
+                <span>MIN: <strong id="min-temp">--.- °C</strong></span>
+                <span>MAX: <strong id="max-temp">--.- °C</strong></span>
             </div>
         </div>
 
         <!-- Forward Power -->
         <div class="telemetry-card">
             <div class="card-label">RF Forward Power (Peak)</div>
-            <div class="cur-val" id="val-pfwd" style="color:var(--data-cyan);">1,450 W</div>
+            <div class="cur-val" id="val-pfwd" style="color:var(--data-cyan);">0 W</div>
             <div class="stat-subrow">
-                <span>TYP: <strong id="typ-pfwd">1,120 W</strong></span>
+                <span>TYP: <strong id="typ-pfwd">0 W</strong></span>
                 <span>MIN: <strong id="min-pfwd">0 W</strong></span>
-                <span>MAX: <strong id="max-pfwd">1,530 W</strong></span>
+                <span>MAX: <strong id="max-pfwd">0 W</strong></span>
             </div>
         </div>
 
         <!-- Reflected Power & SWR -->
         <div class="telemetry-card">
             <div class="card-label">Reflected Power &amp; SWR</div>
-            <div class="cur-val" id="val-refl" style="color:var(--data-green);">14 W (1.18:1)</div>
+            <div class="cur-val" id="val-refl" style="color:var(--data-green);">0 W (1.00:1)</div>
             <div class="stat-subrow">
-                <span>TYP SWR: <strong id="typ-swr">1.15:1</strong></span>
-                <span>MAX REFL: <strong id="max-refl">28 W</strong></span>
-                <span>MAX SWR: <strong id="max-swr">1.32:1</strong></span>
+                <span>TYP SWR: <strong id="typ-swr">1.00:1</strong></span>
+                <span>MAX REFL: <strong id="max-refl">0 W</strong></span>
+                <span>MAX SWR: <strong id="max-swr">1.00:1</strong></span>
             </div>
         </div>
 
         <!-- DC Rail Voltage -->
         <div class="telemetry-card">
             <div class="card-label">53.5V DC Rail Voltage</div>
-            <div class="cur-val" id="val-volt" style="color:#ffffff;">53.4 V</div>
+            <div class="cur-val" id="val-volt" style="color:#ffffff;">53.5 V</div>
             <div class="stat-subrow">
                 <span>TYP: <strong id="typ-volt">53.5 V</strong></span>
-                <span>MIN: <strong id="min-volt">52.9 V</strong></span>
-                <span>MAX: <strong id="max-volt">53.8 V</strong></span>
+                <span>MIN: <strong id="min-volt">53.5 V</strong></span>
+                <span>MAX: <strong id="max-volt">53.5 V</strong></span>
             </div>
         </div>
 
         <!-- DC Drain Current -->
         <div class="telemetry-card">
             <div class="card-label">DC Drain Current</div>
-            <div class="cur-val" id="val-curr" style="color:var(--data-yellow);">28.4 A</div>
+            <div class="cur-val" id="val-curr" style="color:var(--data-yellow);">0.0 A</div>
             <div class="stat-subrow">
-                <span>TYP: <strong id="typ-curr">16.5 A</strong></span>
-                <span>MIN: <strong id="min-curr">0.5 A</strong></span>
-                <span>MAX: <strong id="max-curr">32.1 A</strong></span>
+                <span>TYP: <strong id="typ-curr">0.0 A</strong></span>
+                <span>MIN: <strong id="min-curr">0.0 A</strong></span>
+                <span>MAX: <strong id="max-curr">0.0 A</strong></span>
             </div>
         </div>
     </div>
@@ -431,6 +431,13 @@
                     telemetryData = data.points || [];
                     statsData = data.stats || {};
                     thermalState = data.thermal || {};
+                    let isReal = data.point ? data.point.is_real : false;
+                    let meta = document.getElementById('station-meta');
+                    if (meta) {
+                        meta.innerText = isReal 
+                            ? 'STATION CALLSIGN: K7BIT | PA: 1.5kW LDMOS | 🟢 LIVE CAN CONTROLLER TELEMETRY'
+                            : 'STATION CALLSIGN: K7BIT | PA: 1.5kW LDMOS | ⚪ AMPLIFIER STANDBY / DEMO';
+                    }
                     updateStatsUI();
                     updateThermalUI();
                     renderCharts();

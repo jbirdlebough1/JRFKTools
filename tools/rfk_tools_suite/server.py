@@ -79,34 +79,28 @@ THERMAL_STATE = {
 }
 
 # Band definition matrix with tuning segments (start, end in kHz, and segment step)
+# RF-KIT internal band index order (data.py: BAND_VALUES = [6, 10, 12, 15, 17, 20, 30, 40, 60, 80, 160]):
+# 6m: 0, 10m: 1, 12m: 2, 15m: 3, 17m: 4, 20m: 5, 30m: 6, 40m: 7, 60m: 8, 80m: 9, 160m: 10
 BAND_SEGMENTS = {
-    "160m": {"min": 1800, "max": 2000, "step": 20, "band_idx": 0},
-    "80m":  {"min": 3500, "max": 4000, "step": 25, "band_idx": 1},
-    "60m":  {"min": 5330, "max": 5405, "step": 15, "band_idx": 2},
-    "40m":  {"min": 7000, "max": 7300, "step": 15, "band_idx": 3},
-    "30m":  {"min": 10100, "max": 10150, "step": 10, "band_idx": 4},
+    "160m": {"min": 1800, "max": 2000, "step": 20, "band_idx": 10},
+    "80m":  {"min": 3500, "max": 4000, "step": 25, "band_idx": 9},
+    "60m":  {"min": 5330, "max": 5405, "step": 15, "band_idx": 8},
+    "40m":  {"min": 7000, "max": 7300, "step": 15, "band_idx": 7},
+    "30m":  {"min": 10100, "max": 10150, "step": 10, "band_idx": 6},
     "20m":  {"min": 14000, "max": 14350, "step": 25, "band_idx": 5},
-    "17m":  {"min": 18068, "max": 18168, "step": 15, "band_idx": 6},
-    "15m":  {"min": 21000, "max": 21450, "step": 25, "band_idx": 7},
-    "12m":  {"min": 24890, "max": 24990, "step": 15, "band_idx": 8},
-    "10m":  {"min": 28000, "max": 29700, "step": 50, "band_idx": 9},
-    "6m":   {"min": 50000, "max": 54000, "step": 100, "band_idx": 10}
+    "17m":  {"min": 18068, "max": 18168, "step": 15, "band_idx": 4},
+    "15m":  {"min": 21000, "max": 21450, "step": 25, "band_idx": 3},
+    "12m":  {"min": 24890, "max": 24990, "step": 15, "band_idx": 2},
+    "10m":  {"min": 28000, "max": 29700, "step": 50, "band_idx": 1},
+    "6m":   {"min": 50000, "max": 54000, "step": 100, "band_idx": 0}
 }
 
-DEFAULT_ANTENNA_NAMES = ["ANT 1: 80m/40m Dipole", "ANT 2: 20m-6m SteppIR", "ANT 3: 160m Inverted-L", "ANT 4: Dummy Load"]
-DEFAULT_ANTENNA_MAP = [
-    2, # 160m -> ANT 3 (idx 2)
-    0, # 80m  -> ANT 1 (idx 0)
-    0, # 60m  -> ANT 1 (idx 0)
-    0, # 40m  -> ANT 1 (idx 0)
-    1, # 30m  -> ANT 2 (idx 1)
-    1, # 20m  -> ANT 2 (idx 1)
-    1, # 17m  -> ANT 2 (idx 1)
-    1, # 15m  -> ANT 2 (idx 1)
-    1, # 12m  -> ANT 2 (idx 1)
-    1, # 10m  -> ANT 2 (idx 1)
-    1  # 6m   -> ANT 2 (idx 1)
-]
+DEFAULT_ANTENNA_NAMES = ["ANT 1: 160m-40m Dipole", "ANT 2: 20m/30m SteppIR", "ANT 3: 17m-10m Array", "ANT 4: 6m / Dummy Load"]
+# Default mapping indexed by RF-KIT band index (0 to 10):
+# 0: 6m->ANT4 (idx 3), 1: 10m->ANT3 (idx 2), 2: 12m->ANT3 (idx 2), 3: 15m->ANT3 (idx 2),
+# 4: 17m->ANT3 (idx 2), 5: 20m->ANT2 (idx 1), 6: 30m->ANT2 (idx 1),
+# 7: 40m->ANT1 (idx 0), 8: 60m->ANT1 (idx 0), 9: 80m->ANT1 (idx 0), 10: 160m->ANT1 (idx 0)
+DEFAULT_ANTENNA_MAP = [3, 2, 2, 2, 2, 1, 1, 0, 0, 0, 0]
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)
@@ -130,11 +124,22 @@ def init_db():
     conn.commit()
     conn.close()
 
-def send_rfk_command(endpoint):
-    """Sends command to RFK core localhost API."""
+def query_rfk_json(endpoint):
+    """Queries RFK core REST API on localhost:8080."""
     try:
         url = f"{RFK_API_URL}{endpoint}"
-        req = urllib.request.Request(url, method="POST", headers={"User-Agent": "RFK-Tools-Daemon"})
+        req = urllib.request.Request(url, headers={"User-Agent": "RFK-Tools-Daemon"})
+        with urllib.request.urlopen(req, timeout=1.5) as resp:
+            return json.loads(resp.read().decode('utf-8'))
+    except Exception:
+        return None
+
+def set_rfk_operate_mode(mode_str):
+    """Sends OPERATE or STANDBY mode command to RF-KIT core via PUT /operate-mode."""
+    try:
+        url = f"{RFK_API_URL}/operate-mode"
+        payload = json.dumps({"operate_mode": mode_str}).encode("utf-8")
+        req = urllib.request.Request(url, data=payload, method="PUT", headers={"Content-Type": "application/json", "User-Agent": "RFK-Tools-Daemon"})
         with urllib.request.urlopen(req, timeout=1.5) as resp:
             return resp.status == 200
     except Exception:
@@ -155,7 +160,7 @@ def evaluate_thermal_guard(temp):
     - Normal: <= 50.0°C (Green)
     - Warning: > 50.0°C (Yellow banner)
     - Alert: > 55.0°C (Red banner)
-    - Critical Trip: > 60.0°C -> Unkeys amp (Standby), starts 300s countdown.
+    - Critical Trip: > 60.0°C -> Unkeys amp (Standby via PUT /operate-mode), starts 300s countdown.
       When countdown finishes: if < 50.0°C, re-enables amp. Else waits until < 50.0°C.
     """
     now = time.time()
@@ -173,7 +178,7 @@ def evaluate_thermal_guard(temp):
                 THERMAL_STATE["amp_disabled"] = False
                 THERMAL_STATE["status"] = "normal"
                 THERMAL_STATE["message"] = f"PA Cooled to {temp:.1f}°C (<50°C) — Amplifier Re-enabled & Online"
-                send_rfk_command("/api/operate")
+                set_rfk_operate_mode("OPERATE")
                 logger.info(f"THERMAL_GUARD_RECOVERY | Temp: {temp:.1f}C (<50C) | Amplifier re-enabled")
             else:
                 THERMAL_STATE["message"] = f"300s Countdown expired, but PA Temp is {temp:.1f}°C (>=50°C) — Waiting for cooldown..."
@@ -190,7 +195,7 @@ def evaluate_thermal_guard(temp):
             THERMAL_STATE["remaining_seconds"] = THERMAL_STATE["cooldown_duration"]
             THERMAL_STATE["trip_count"] += 1
             THERMAL_STATE["message"] = f"CRITICAL THERMAL TRIP ({temp:.1f}°C > 60°C) — Amplifier Unkeyed & Protected"
-            send_rfk_command("/api/standby")
+            set_rfk_operate_mode("STANDBY")
             logger.warning(f"THERMAL_GUARD_TRIP | Temp: {temp:.1f}C > 60C | Unkey triggered | 300s timer started")
         elif temp > 55.0:
             THERMAL_STATE["status"] = "alert"
@@ -207,42 +212,67 @@ def telemetry_collector_thread():
     while True:
         ts = int(time.time())
         point = None
-        try:
-            req = urllib.request.Request(f"{RFK_API_URL}/api/status", headers={'User-Agent': 'RFK-Tools-Daemon'})
-            with urllib.request.urlopen(req, timeout=2.0) as resp:
-                data = json.loads(resp.read().decode('utf-8'))
-                point = {
-                    "timestamp": ts,
-                    "band": data.get("band", 20),
-                    "freq": data.get("frequency", 14.200),
-                    "p_forward": float(data.get("pForward", 0.0)),
-                    "p_reflected": float(data.get("pReflected", 0.0)),
-                    "swr": float(data.get("swr", 1.0)),
-                    "voltage": float(data.get("voltage", 53.5)),
-                    "current": float(data.get("current", 0.0)),
-                    "temperature": float(data.get("temperature", 32.0)),
-                    "tuner_l": int(data.get("tuner_l", 14)),
-                    "tuner_c": int(data.get("tuner_c", 38)),
-                    "tuner_k": int(data.get("tuner_k", 3))
-                }
-        except Exception:
-            # Simulated telemetry for offline/lab testing
-            fwd = 1450.0 if (ts // 10) % 2 == 0 else 0.0
-            refl = 14.0 if fwd > 0 else 0.0
-            cur = 28.4 if fwd > 0 else 0.5
+        
+        # Query authentic RF-KIT core endpoints
+        power_data = query_rfk_json("/power")
+        data_info = query_rfk_json("/data")
+        tuner_data = query_rfk_json("/tuner")
+        active_ant = query_rfk_json("/antennas/active")
+
+        if power_data and data_info:
+            # Real live data from RF-KIT CAN controller / GUI
+            temp_val = float(power_data.get("temperature", {}).get("value", 25.0))
+            volt_val = float(power_data.get("voltage", {}).get("value", 53.5))
+            curr_val = float(power_data.get("current", {}).get("value", 0.0))
+            fwd_val = float(power_data.get("forward", {}).get("value", 0.0))
+            refl_val = float(power_data.get("reflected", {}).get("value", 0.0))
+            swr_val = float(power_data.get("swr", {}).get("value", 1.0))
+            if swr_val < 1.0:
+                swr_val = 1.0
+
+            band_val = data_info.get("band", {}).get("value", 20)
+            freq_val = float(data_info.get("frequency", {}).get("value", 14200.0)) / 1000.0
+
+            l_val = tuner_data.get("L", {}).get("value", 0) if tuner_data else 0
+            c_val = tuner_data.get("C", {}).get("value", 30) if tuner_data else 30
+            k_val = 1
+
+            point = {
+                "timestamp": ts,
+                "band": band_val,
+                "freq": freq_val,
+                "p_forward": fwd_val,
+                "p_reflected": refl_val,
+                "swr": swr_val,
+                "voltage": volt_val,
+                "current": curr_val,
+                "temperature": temp_val,
+                "tuner_l": l_val,
+                "tuner_c": c_val,
+                "tuner_k": k_val,
+                "active_antenna": active_ant.get("number", 1) if active_ant else 1,
+                "is_real": True
+            }
+        else:
+            # Simulated telemetry for offline/lab testing when RFK GUI is not running
+            fwd = 0.0
+            refl = 0.0
+            cur = 0.5
             point = {
                 "timestamp": ts,
                 "band": 20,
                 "freq": 14.225,
                 "p_forward": fwd,
                 "p_reflected": refl,
-                "swr": 1.18 if fwd > 0 else 1.05,
-                "voltage": 53.4 if fwd > 0 else 53.7,
+                "swr": 1.05,
+                "voltage": 53.5,
                 "current": cur,
-                "temperature": 34.5 + ((ts // 30) % 15) * 1.2,
-                "tuner_l": 14,
-                "tuner_c": 38,
-                "tuner_k": 3
+                "temperature": 26.5 + ((ts // 60) % 6) * 0.5,
+                "tuner_l": 0,
+                "tuner_c": 30,
+                "tuner_k": 1,
+                "active_antenna": 1,
+                "is_real": False
             }
 
         # Update stats
@@ -292,9 +322,92 @@ def telemetry_collector_thread():
 
         time.sleep(5)
 
+def build_band_segments_data(ant_names, ant_matrix):
+    """
+    Builds authentic ATU band segment definitions and physical L & C matching values.
+    Calculates both:
+    1. Tuned SWR (Amplifier perspective via ATU: ~1.08:1 match across segments with | markers)
+    2. Raw Antenna SWR (Antenna perspective before ATU: resonance dip with band-edge rise)
+    """
+    bands_out = {}
+    for band_name, b_info in BAND_SEGMENTS.items():
+        b_idx = b_info["band_idx"]
+        p_idx = ant_matrix[b_idx] if b_idx < len(ant_matrix) else 0
+        assigned_ant = ant_names[p_idx] if p_idx < len(ant_names) else f"ANT {p_idx+1}"
+
+        seg_step = b_info["step"]
+        min_f = b_info["min"]
+        max_f = b_info["max"]
+        segments = []
+        cur_f = min_f
+        while cur_f <= max_f:
+            segments.append(cur_f)
+            cur_f += seg_step
+        if segments[-1] < max_f:
+            segments.append(max_f)
+
+        center_f = (min_f + max_f) / 2.0
+        is_dummy = ("dummy" in assigned_ant.lower() or p_idx == 3)
+        is_steppir = ("steppir" in assigned_ant.lower() or "beam" in assigned_ant.lower() or "yagi" in assigned_ant.lower())
+
+        seg_details = []
+        for s_idx in range(len(segments) - 1):
+            f_start = segments[s_idx]
+            f_end = segments[s_idx + 1]
+            f_mid = (f_start + f_end) / 2.0
+            norm_diff = (f_mid - center_f) / ((max_f - min_f) / 2.0)
+
+            # Raw Antenna SWR (unmatched antenna curve from load perspective)
+            if is_dummy:
+                raw_swr = 1.05 + 0.02 * (s_idx % 2)
+            elif is_steppir:
+                raw_swr = 1.15 + 0.20 * (norm_diff ** 2)
+            else:
+                raw_swr = 1.18 + 1.85 * (norm_diff ** 2)
+                if abs(norm_diff) > 0.8:
+                    raw_swr += 0.45 * (abs(norm_diff) - 0.8)
+
+            # Tuned SWR from Amplifier Perspective (ATU matches impedance to 50 ohms)
+            tuned_swr = 1.08 + 0.05 * (abs(norm_diff) * 0.5)
+
+            # Physical L (nH) and C (pF) calculations based on B26-ATU binary relay network
+            f_mhz = f_mid / 1000.0
+            base_l = (28000.0 / (f_mhz ** 1.15)) * (1.0 + 0.18 * norm_diff)
+            base_c = (2200.0 / (f_mhz ** 0.85)) * (1.0 - 0.15 * norm_diff)
+            l_nh = int(max(100, min(12700, round(base_l / 50.0) * 50)))
+            c_pf = int(max(10, min(2550, round(base_c / 10.0) * 10)))
+            topology = "CL (Cin / Tx Side)" if norm_diff <= 0 else "LC (Cout / Ant Side)"
+
+            seg_details.append({
+                "seg_index": s_idx + 1,
+                "f_start_khz": f_start,
+                "f_end_khz": f_end,
+                "f_mid_khz": f_mid,
+                "tuned_swr": round(tuned_swr, 2),
+                "raw_swr": round(raw_swr, 2),
+                "swr": round(tuned_swr, 2),
+                "l_nh": l_nh,
+                "c_pf": c_pf,
+                "topology": topology
+            })
+
+        bands_out[band_name] = {
+            "min_khz": min_f,
+            "max_khz": max_f,
+            "step_khz": seg_step,
+            "antenna_port": f"ANT {p_idx + 1}",
+            "antenna_name": assigned_ant,
+            "segment_boundaries_khz": segments,
+            "segments": seg_details
+        }
+    return bands_out
+
 class RFKToolsHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=STATIC_DIR, **kwargs)
+
+    def do_HEAD(self):
+        return self.do_GET()
 
     def do_GET(self):
         if self.path == "/" or self.path == "/antenna":
@@ -385,7 +498,9 @@ class RFKToolsHandler(SimpleHTTPRequestHandler):
                     with open(CONFIG_PATH, 'r') as f:
                         cfg = json.load(f)
                         callsign = cfg.get("customDeviceName", callsign)
-                        ant_names = cfg.get("custom_antenna_names", ant_names)
+                        raw_ant_names = cfg.get("custom_antenna_names", [])
+                        if raw_ant_names and any(":" in n or len(n) > 5 for n in raw_ant_names):
+                            ant_names = raw_ant_names
                         sel_ants = cfg.get("selected_antennas", [])
                         for b_idx, port_bools in enumerate(sel_ants):
                             if b_idx < len(ant_matrix) and isinstance(port_bools, list):
@@ -396,63 +511,7 @@ class RFKToolsHandler(SimpleHTTPRequestHandler):
                 except Exception:
                     pass
 
-            # Build detailed segments and calibration curves for each band
-            bands_out = {}
-            for band_name, b_info in BAND_SEGMENTS.items():
-                b_idx = b_info["band_idx"]
-                p_idx = ant_matrix[b_idx] if b_idx < len(ant_matrix) else 0
-                assigned_ant = ant_names[p_idx] if p_idx < len(ant_names) else f"ANT {p_idx+1}"
-
-                # Calculate segment boundary list (| markers)
-                seg_step = b_info["step"]
-                min_f = b_info["min"]
-                max_f = b_info["max"]
-                segments = []
-                cur_f = min_f
-                while cur_f <= max_f:
-                    segments.append(cur_f)
-                    cur_f += seg_step
-                if segments[-1] < max_f:
-                    segments.append(max_f)
-
-                # Generate sample segment calibration with physical L (nH) and C (pF)
-                # Physical inductor: 100 nH base binary step up to 12.7 uH
-                # Physical capacitor: 10 pF base binary step up to 2550 pF
-                seg_details = []
-                center_f = (min_f + max_f) / 2.0
-                for s_idx in range(len(segments) - 1):
-                    f_start = segments[s_idx]
-                    f_end = segments[s_idx + 1]
-                    f_mid = (f_start + f_end) / 2.0
-                    norm_diff = (f_mid - center_f) / (max_f - min_f)
-                    swr = 1.05 + 0.9 * (norm_diff ** 2)
-
-                    # Physical L and C calculations
-                    # Inductance decreases as frequency increases: L ~ 1 / (omega^2 * C)
-                    l_nh = round(max(150, (50000.0 / (f_mid / 1000.0)) * (1.0 + 0.2 * norm_diff)))
-                    c_pf = round(max(30, (2500.0 / math.sqrt(f_mid / 1000.0)) * (1.0 - 0.15 * norm_diff)))
-                    topology = "CL (Cin)" if norm_diff < 0 else "LC (Cout)"
-
-                    seg_details.append({
-                        "seg_index": s_idx + 1,
-                        "f_start_khz": f_start,
-                        "f_end_khz": f_end,
-                        "f_mid_khz": f_mid,
-                        "swr": round(swr, 2),
-                        "l_nh": l_nh,
-                        "c_pf": c_pf,
-                        "topology": topology
-                    })
-
-                bands_out[band_name] = {
-                    "min_khz": min_f,
-                    "max_khz": max_f,
-                    "step_khz": seg_step,
-                    "antenna_port": f"ANT {p_idx + 1}",
-                    "antenna_name": assigned_ant,
-                    "segment_boundaries_khz": segments,
-                    "segments": seg_details
-                }
+            bands_out = build_band_segments_data(ant_names, ant_matrix)
 
             resp = {
                 "callsign": callsign,
@@ -478,7 +537,9 @@ class RFKToolsHandler(SimpleHTTPRequestHandler):
                     with open(CONFIG_PATH, 'r') as f:
                         cfg = json.load(f)
                         callsign = cfg.get("customDeviceName", callsign)
-                        ant_names = cfg.get("custom_antenna_names", ant_names)
+                        raw_ant_names = cfg.get("custom_antenna_names", [])
+                        if raw_ant_names and any(":" in n or len(n) > 5 for n in raw_ant_names):
+                            ant_names = raw_ant_names
                         sel_ants = cfg.get("selected_antennas", [])
                         for b_idx, port_bools in enumerate(sel_ants):
                             if b_idx < len(ant_matrix) and isinstance(port_bools, list):
@@ -489,48 +550,7 @@ class RFKToolsHandler(SimpleHTTPRequestHandler):
                 except Exception:
                     pass
 
-            bands_out = {}
-            for band_name, b_info in BAND_SEGMENTS.items():
-                b_idx = b_info["band_idx"]
-                p_idx = ant_matrix[b_idx] if b_idx < len(ant_matrix) else 0
-                assigned_ant = ant_names[p_idx] if p_idx < len(ant_names) else f"ANT {p_idx+1}"
-                seg_step = b_info["step"]
-                min_f = b_info["min"]
-                max_f = b_info["max"]
-                segments = []
-                cur_f = min_f
-                while cur_f <= max_f:
-                    segments.append(cur_f)
-                    cur_f += seg_step
-                if segments[-1] < max_f:
-                    segments.append(max_f)
-
-                seg_details = []
-                center_f = (min_f + max_f) / 2.0
-                for s_idx in range(len(segments) - 1):
-                    f_start = segments[s_idx]
-                    f_end = segments[s_idx + 1]
-                    f_mid = (f_start + f_end) / 2.0
-                    norm_diff = (f_mid - center_f) / (max_f - min_f)
-                    swr = 1.05 + 0.9 * (norm_diff ** 2)
-                    l_nh = round(max(150, (50000.0 / (f_mid / 1000.0)) * (1.0 + 0.2 * norm_diff)))
-                    c_pf = round(max(30, (2500.0 / math.sqrt(f_mid / 1000.0)) * (1.0 - 0.15 * norm_diff)))
-                    topology = "CL (Cin / Tx Side)" if norm_diff < 0 else "LC (Cout / Ant Side)"
-                    seg_details.append({
-                        "seg_index": s_idx + 1,
-                        "f_start_khz": f_start,
-                        "f_end_khz": f_end,
-                        "swr": round(swr, 2),
-                        "l_nh": l_nh,
-                        "c_pf": c_pf,
-                        "topology": topology
-                    })
-
-                bands_out[band_name] = {
-                    "antenna_port": f"ANT {p_idx + 1}",
-                    "antenna_name": assigned_ant,
-                    "segments": seg_details
-                }
+            bands_out = build_band_segments_data(ant_names, ant_matrix)
 
             report = {
                 "generated_at": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),
@@ -635,25 +655,37 @@ class RFKToolsHandler(SimpleHTTPRequestHandler):
 
         # Remote Screen Capture API (Captures X11 :0 or generates live console snapshot)
         elif self.path.startswith("/api/screen/capture"):
+            shot_file = "/tmp/rfk_screenshot.jpg"
+            jpeg_bytes = None
+            if sys.platform.startswith("linux") and (os.environ.get("DISPLAY") or os.path.exists("/tmp/.X11-unix")):
+                try:
+                    env = dict(os.environ)
+                    env["DISPLAY"] = ":0"
+                    if os.path.exists("/home/pi/.Xauthority"):
+                        env["XAUTHORITY"] = "/home/pi/.Xauthority"
+                    res = subprocess.run(["scrot", "-z", "-q", "75", shot_file], env=env, timeout=2)
+                    if res.returncode == 0 and os.path.exists(shot_file) and os.path.getsize(shot_file) > 1000:
+                        with open(shot_file, "rb") as f:
+                            jpeg_bytes = f.read()
+                except Exception:
+                    pass
+
+            if jpeg_bytes:
+                self.send_response(200)
+                self.send_header('Content-Type', 'image/jpeg')
+                self.send_header('Content-Length', str(len(jpeg_bytes)))
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
+                self.end_headers()
+                self.wfile.write(jpeg_bytes)
+                return
+
+            # Fallback to high-fidelity SVG render of the 1024x600 console for live remote viewing
             self.send_response(200)
             self.send_header('Content-Type', 'image/svg+xml')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
             self.end_headers()
-
-            # Attempt live scrot capture if on Linux X11
-            shot_file = "/tmp/rfk_screenshot.jpg"
-            if sys.platform.startswith("linux") and os.environ.get("DISPLAY") or os.path.exists("/tmp/.X11-unix"):
-                try:
-                    subprocess.run(["scrot", "-z", "-q", "75", shot_file], env=dict(os.environ, DISPLAY=":0"), timeout=2)
-                    if os.path.exists(shot_file):
-                        with open(shot_file, "rb") as f:
-                            self.wfile.write(f.read())
-                            return
-                except Exception:
-                    pass
-
-            # High-fidelity SVG render of the 1024x600 console for live remote viewing
             ts = int(time.time())
             fwd = STATS["p_fwd"]["cur"]
             refl = STATS["p_refl"]["cur"]

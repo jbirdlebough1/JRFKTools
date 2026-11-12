@@ -354,7 +354,7 @@
                                 <td><span style="color:var(--data-cyan); font-weight:bold;">${b.antenna_port}</span></td>
                                 <td>${b.antenna_name}</td>
                                 <td>${segs.length} Segments</td>
-                                <td>${lMin.toLocaleString()} - ${lMax.toLocaleString()} nH</td>
+                                <td>${lMin.toLocaleString()} - ${lMax.toLocaleString()} nH <span style="color:var(--bp-line-dim);">(${(lMin/1000.0).toFixed(2)} - ${(lMax/1000.0).toFixed(2)} µH)</span></td>
                                 <td>${cMin} - ${cMax} pF</td>
                                 <td>${topo}</td>
                             `;
