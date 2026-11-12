@@ -267,16 +267,21 @@ fi
 # ------------------------------------------------------------------------------
 show_step "6/7" "Installing RFK Python & UI dependencies and configuring Direct-to-RFK fullscreen boot..."
 export DEBIAN_FRONTEND=noninteractive
-NEED_PKGS=""
-python3 -c "import can" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-can can-utils"
-python3 -c "from PIL import ImageTk" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-pil.imagetk"
-python3 -c "import tkinter" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-tk"
-python3 -c "import serial" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-serial"
-python3 -c "import paramiko" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-paramiko"
-python3 -c "import Hamlib" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-hamlib"
-python3 -c "import websocket" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-websocket"
-command -v openbox >/dev/null 2>&1 || NEED_PKGS="$NEED_PKGS openbox"
-command -v pip3 >/dev/null 2>&1 || NEED_PKGS="$NEED_PKGS python3-pip"
+compute_need_pkgs() {
+    local pkgs=""
+    python3 -c "import can" 2>/dev/null || pkgs="$pkgs python3-can can-utils"
+    python3 -c "from PIL import ImageTk" 2>/dev/null || pkgs="$pkgs python3-pil.imagetk"
+    python3 -c "import tkinter" 2>/dev/null || pkgs="$pkgs python3-tk"
+    python3 -c "import serial" 2>/dev/null || pkgs="$pkgs python3-serial"
+    python3 -c "import paramiko" 2>/dev/null || pkgs="$pkgs python3-paramiko"
+    python3 -c "import Hamlib" 2>/dev/null || pkgs="$pkgs python3-hamlib"
+    python3 -c "import websocket" 2>/dev/null || pkgs="$pkgs python3-websocket"
+    python3 -c "import yaml" 2>/dev/null || pkgs="$pkgs python3-yaml"
+    python3 -c "import cgi" 2>/dev/null || pkgs="$pkgs python3-legacy-cgi"
+    command -v openbox >/dev/null 2>&1 || pkgs="$pkgs openbox"
+    command -v pip3 >/dev/null 2>&1 || pkgs="$pkgs python3-pip"
+    echo "$pkgs"
+}
 
 # Stage offline pure-Python dependencies (simple_rpc, pysftp) from jrfk_payload if present
 if [ -d "$PAYLOAD_DIR/py_deps" ]; then
@@ -287,28 +292,21 @@ if [ -d "$PAYLOAD_DIR/py_deps" ]; then
         [ -d "$PY_SITE" ] && cp -a "$PAYLOAD_DIR/py_deps/." "$PY_SITE/" 2>/dev/null || true
     done
     for GUI_DIR in "$TARGET_HOME"/rf-kit-gui*; do
-        [ -d "$GUI_DIR" ] && cp -a "$PAYLOAD_DIR/py_deps/." "$GUI_DIR/" 2>/dev/null || true
+        if [ -d "$GUI_DIR" ]; then
+            rm -rf "$GUI_DIR/simple_rpc" "$GUI_DIR/pysftp" 2>/dev/null || true
+            cp -a "$PAYLOAD_DIR/py_deps/." "$GUI_DIR/" 2>/dev/null || true
+        fi
     done
 fi
 
-# Install bundled offline arm64 .deb packages (python3-pil.imagetk, python3-can, python3-paramiko, python3-hamlib, etc.)
+# Install bundled offline arm64 .deb packages (python3-pil.imagetk, python3-can, python3-paramiko, python3-hamlib, python3-yaml, python3-legacy-cgi, etc.)
 if [ -d "$PAYLOAD_DIR/pi_debs" ] && ls "$PAYLOAD_DIR/pi_debs"/*.deb >/dev/null 2>&1; then
     echo "[*] Installing bundled offline 64-bit .deb packages from $PAYLOAD_DIR/pi_debs..."
     dpkg -i --force-confdef --force-confold "$PAYLOAD_DIR/pi_debs"/*.deb || true
     dpkg --configure -a || true
     ldconfig 2>/dev/null || true
-    # Re-evaluate NEED_PKGS after offline .deb installation
-    NEED_PKGS=""
-    python3 -c "import can" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-can can-utils"
-    python3 -c "from PIL import ImageTk" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-pil.imagetk"
-    python3 -c "import tkinter" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-tk"
-    python3 -c "import serial" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-serial"
-    python3 -c "import paramiko" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-paramiko"
-    python3 -c "import Hamlib" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-hamlib"
-    python3 -c "import websocket" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-websocket"
-    command -v openbox >/dev/null 2>&1 || NEED_PKGS="$NEED_PKGS openbox"
-    command -v pip3 >/dev/null 2>&1 || NEED_PKGS="$NEED_PKGS python3-pip"
 fi
+NEED_PKGS=$(compute_need_pkgs)
 
 NET_ONLINE=0
 if [ -n "$NEED_PKGS" ]; then
@@ -329,10 +327,10 @@ if [ -n "$NEED_PKGS" ]; then
     fi
 fi
 
-# Ensure simple-rpc and pysftp are importable system-wide if missing
-if ! python3 -c "import simple_rpc, pysftp" 2>/dev/null; then
+# Ensure arduino-simple-rpc and pysftp are importable system-wide if missing
+if ! python3 -c "from simple_rpc import Interface; import pysftp" 2>/dev/null; then
     if command -v pip3 >/dev/null 2>&1 && (timeout 4 getent hosts pypi.org >/dev/null 2>&1 || timeout 4 ping -c1 -W2 1.1.1.1 >/dev/null 2>&1); then
-        timeout 90 pip3 install --break-system-packages --no-input simple-rpc pysftp 2>/dev/null || true
+        timeout 90 pip3 install --break-system-packages --no-input arduino-simple-rpc pysftp 2>/dev/null || true
     fi
 fi
 
@@ -341,12 +339,17 @@ relink_64bit_hamlib
 
 echo "[*] Verifying 64-bit RFK Python imports..."
 python3 - << 'PYCHK' || true
-for mod in ("tkinter", "PIL.ImageTk", "can", "serial", "paramiko", "simple_rpc", "pysftp", "Hamlib"):
+for mod in ("tkinter", "PIL.ImageTk", "can", "serial", "paramiko", "yaml", "cgi", "simple_rpc", "pysftp", "Hamlib"):
     try:
         __import__(mod)
         print(f"    [OK] import {mod}")
     except Exception as e:
         print(f"    [WARN] import {mod} failed: {e}")
+try:
+    from simple_rpc import Interface  # noqa: F401
+    print("    [OK] from simple_rpc import Interface")
+except Exception as e:
+    print(f"    [WARN] simple_rpc.Interface failed: {e}")
 PYCHK
 
 export USER="$TARGET_USER"
@@ -490,20 +493,7 @@ if [ -f "\$HOME/.jrfk_migration_complete_prompt" ] && [ -f "\$HOME/rfk_postboot_
     rm -f "\$HOME/.jrfk_migration_complete_prompt"
 fi
 
-# Temporarily hide desktop panel while RFK GUI runs fullscreen, and restore it if GUI ever exits
-_restore_panel() {
-    if command -v wf-panel-pi >/dev/null 2>&1 && ! pgrep -x wf-panel-pi >/dev/null 2>&1 && [ -n "\${WAYLAND_DISPLAY:-}" ]; then
-        nohup wf-panel-pi >/dev/null 2>&1 </dev/null &
-    elif command -v lxpanel >/dev/null 2>&1 && ! pgrep -x lxpanel >/dev/null 2>&1; then
-        nohup lxpanel --profile LXDE-pi >/dev/null 2>&1 </dev/null &
-    fi
-}
-trap _restore_panel EXIT
-
-pkill -f lxpanel 2>/dev/null || true
-pkill -f wf-panel-pi 2>/dev/null || true
-pkill -f sfwbar 2>/dev/null || true
-
+# Fullscreen RFK GUI covers the desktop panel naturally without killing lxpanel/wf-panel-pi.
 # Brief wait for USB controller symlink on Pi 4 / Pi 5
 for _i in 1 2 3 4 5 6; do
     [ -e /dev/rfk_controller ] && break
@@ -512,7 +502,6 @@ done
 
 cd "$TARGET_HOME/rf-kit-statics"
 python3 gui_starter.py &>> rf-kit-gui.log
-_restore_panel
 EOF
 chmod +x "$TARGET_HOME/Desktop/start_gui.sh" "$TARGET_HOME/rf-kit-statics/gui_starter.py" 2>/dev/null || true
 
@@ -597,7 +586,8 @@ else:
         f.write(f'<?xml version="1.0" encoding="UTF-8"?>\n<labwc_config>\n<windowRules>\n{lrule}</windowRules>\n</labwc_config>\n')
 PYEOF
 
-# Standard XDG autostart + LXDE-pi autostart
+# Standard XDG autostart (do not shadow /etc/xdg/lxsession/LXDE-pi/autostart which starts lxpanel)
+mkdir -p "$TARGET_HOME/.config/autostart" /etc/xdg/autostart
 cat << EOF > "$TARGET_HOME/.config/autostart/rf-kit-gui.desktop"
 [Desktop Entry]
 Name=rf-kit-gui
@@ -608,9 +598,8 @@ Terminal=false
 X-GNOME-Autostart-enabled=true
 EOF
 chmod +x "$TARGET_HOME/.config/autostart/rf-kit-gui.desktop" 2>/dev/null || true
-mkdir -p /etc/xdg/autostart "$TARGET_HOME/.config/lxsession/LXDE-pi"
 cp -f "$TARGET_HOME/.config/autostart/rf-kit-gui.desktop" /etc/xdg/autostart/rf-kit-gui.desktop 2>/dev/null || true
-echo "@$TARGET_HOME/Desktop/start_gui.sh" > "$TARGET_HOME/.config/lxsession/LXDE-pi/autostart"
+rm -f "$TARGET_HOME/.config/lxsession/LXDE-pi/autostart" 2>/dev/null || true
 
 chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME" 2>/dev/null || true
 

@@ -28,6 +28,9 @@ class JrfkEndToEndUnitTests(unittest.TestCase):
             txt = f.read()
         self.assertIn("32-64Bit RFK migration complete", txt)
         self.assertIn("rfk_postboot_prompt.py", txt)
+        self.assertNotIn("pkill -f lxpanel", txt)
+        self.assertNotIn("pkill -f wf-panel-pi", txt)
+        self.assertIn('rm -f "$TARGET_HOME/.config/lxsession/LXDE-pi/autostart"', txt)
         self.assertIn(".jrfk_migration_complete_prompt", txt)
         self.assertIn('text="Reboot"', txt)
         self.assertIn('<application class="Tk">', txt)
@@ -212,6 +215,63 @@ class JrfkEndToEndUnitTests(unittest.TestCase):
             self.assertIn("name: k7bit", ud)
             self.assertIn("passwd:", ud)
             self.assertIn("$6$goldSalt12345678$ExampleShadowHashValue1234567890", ud)
+
+    def test_bundled_arduino_simple_rpc_and_python313_bottle_shim(self):
+        py_deps = os.path.join(BASE_DIR, "tools", "py_deps")
+        fake_serial = mock.MagicMock()
+        fake_serial.serial_for_url = mock.MagicMock()
+        fake_serialutil = mock.MagicMock()
+        fake_serialutil.SerialException = Exception
+        fake_yaml = mock.MagicMock()
+        for mod_name in list(sys.modules):
+            if mod_name == "simple_rpc" or mod_name.startswith("simple_rpc."):
+                sys.modules.pop(mod_name, None)
+        with mock.patch.dict(
+            sys.modules,
+            {"serial": fake_serial, "serial.serialutil": fake_serialutil, "yaml": fake_yaml},
+        ):
+            sys.path.insert(0, py_deps)
+            try:
+                import simple_rpc
+                from simple_rpc import Interface
+
+                self.assertEqual(simple_rpc._get_metadata("Name"), "arduino-simple-rpc")
+                self.assertTrue(callable(Interface))
+            finally:
+                if sys.path and sys.path[0] == py_deps:
+                    sys.path.pop(0)
+                for mod_name in list(sys.modules):
+                    if mod_name == "simple_rpc" or mod_name.startswith("simple_rpc."):
+                        sys.modules.pop(mod_name, None)
+
+        scripts_dir = os.path.join(BASE_DIR, "scripts")
+        sys.path.insert(0, scripts_dir)
+        try:
+            import patch_antialias
+
+            with tempfile.TemporaryDirectory() as tmp:
+                sample = os.path.join(tmp, "bottle", "bottle.py")
+                os.makedirs(os.path.dirname(sample), exist_ok=True)
+                with open(sample, "w", encoding="utf-8") as f:
+                    f.write("from inspect import getargspec\nmode = Image.ANTIALIAS\n")
+                changed = patch_antialias.patch_dirs([tmp])
+                self.assertEqual(changed, 1)
+                with open(sample, "r", encoding="utf-8") as f:
+                    patched = f.read()
+                self.assertIn("from inspect import getfullargspec as getargspec", patched)
+                self.assertIn("getattr(Image, 'Resampling', Image).LANCZOS", patched)
+                ns = {}
+                exec(
+                    "from inspect import getfullargspec as getargspec\n"
+                    "def cb(a, b=5): return a + b\n"
+                    "spec = getargspec(cb)\n",
+                    ns,
+                )
+                self.assertEqual(list(ns["spec"][0]), ["a", "b"])
+                self.assertEqual(ns["spec"][3], (5,))
+        finally:
+            if sys.path and sys.path[0] == scripts_dir:
+                sys.path.pop(0)
 
 
 if __name__ == "__main__":

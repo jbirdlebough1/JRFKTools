@@ -1021,7 +1021,7 @@ def _stage_pure_python_deps(payload_dir):
     cache_dir = os.path.join(BASE_DIR, "tools", "py_deps")
     os.makedirs(cache_dir, exist_ok=True)
     pkg_specs = [
-        ("simple-rpc", "simple_rpc"),
+        ("arduino-simple-rpc", "simple_rpc"),
         ("pysftp", "pysftp"),
     ]
     for pypi_name, mod_name in pkg_specs:

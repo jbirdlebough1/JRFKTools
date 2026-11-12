@@ -17,6 +17,11 @@ def patch_dirs(target_dirs=None):
         if os.path.isdir(dynamic) and dynamic not in dirs:
             dirs.append(dynamic)
 
+    replacements = (
+        ("Image.ANTIALIAS", "getattr(Image, 'Resampling', Image).LANCZOS"),
+        ("from inspect import getargspec", "from inspect import getfullargspec as getargspec"),
+    )
+
     count = 0
     for d in dirs:
         if not os.path.isdir(d):
@@ -24,8 +29,11 @@ def patch_dirs(target_dirs=None):
         for py_file in glob.glob(os.path.join(d, "**", "*.py"), recursive=True):
             with open(py_file, "r", encoding="utf-8", errors="ignore") as f:
                 c = f.read()
-            if "Image.ANTIALIAS" in c:
-                c_new = c.replace("Image.ANTIALIAS", "getattr(Image, 'Resampling', Image).LANCZOS")
+            c_new = c
+            for old, new in replacements:
+                if old in c_new:
+                    c_new = c_new.replace(old, new)
+            if c_new != c:
                 with open(py_file, "w", encoding="utf-8") as f:
                     f.write(c_new)
                 count += 1
