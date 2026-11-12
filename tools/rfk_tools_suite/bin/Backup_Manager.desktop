@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=RFK Backup & Recovery
 Comment=RF-KIT Automated & Manual SD Duplicator
-Exec=/usr/bin/chromium-browser --app=http://localhost:8088/backup
+Exec=sh -c 'B=$(command -v chromium || command -v chromium-browser || echo chromium); exec "$B" --app=http://localhost:8088/backup'
 Icon=drive-removable-media
 Terminal=false
 Type=Application

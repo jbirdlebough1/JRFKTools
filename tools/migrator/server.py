@@ -1044,6 +1044,16 @@ network={{
 
     _stage_pure_python_deps(payload_dir)
 
+    src_debs = os.path.join(BASE_DIR, "tools", "pi_debs")
+    if os.path.isdir(src_debs):
+        deb_files = [fn for fn in os.listdir(src_debs) if fn.lower().endswith(".deb")]
+        if deb_files:
+            dst_debs = os.path.join(payload_dir, "pi_debs")
+            os.makedirs(dst_debs, exist_ok=True)
+            for fn in deb_files:
+                shutil.copyfile(os.path.join(src_debs, fn), os.path.join(dst_debs, fn))
+            append_log(f"[+] Staged: {dst_debs} ({len(deb_files)} offline arm64 .deb packages)")
+
     src_antialias = os.path.join(BASE_DIR, "scripts", "patch_antialias.py")
     if os.path.isfile(src_antialias):
         with open(src_antialias, "r", encoding="utf-8") as fa_in:

@@ -179,17 +179,22 @@ WPA_SRC=""
 if [ -n "$WPA_SRC" ]; then
     mkdir -p /etc/wpa_supplicant
     [ "$WPA_SRC" != "/etc/wpa_supplicant/wpa_supplicant.conf" ] && cp -f "$WPA_SRC" /etc/wpa_supplicant/wpa_supplicant.conf
+    sed -i 's/^country=GB$/country=US/' /etc/wpa_supplicant/wpa_supplicant.conf 2>/dev/null || true
     chmod 600 /etc/wpa_supplicant/wpa_supplicant.conf 2>/dev/null || true
 
     WIFI_SSID=$(python3 -c "import re,sys; t=open(sys.argv[1],errors='ignore').read(); m=re.search(r'ssid\s*=\s*\"([^\"]+)\"',t); print(m.group(1) if m else '')" "$WPA_SRC" 2>/dev/null || true)
     WIFI_PSK=$(python3 -c "import re,sys; t=open(sys.argv[1],errors='ignore').read(); m=re.search(r'psk\s*=\s*\"([^\"]+)\"',t); print(m.group(1) if m else '')" "$WPA_SRC" 2>/dev/null || true)
+    command -v rfkill >/dev/null 2>&1 && rfkill unblock wifi 2>/dev/null || true
+    command -v raspi-config >/dev/null 2>&1 && raspi-config nonint do_wifi_country US 2>/dev/null || true
     if [ -n "$WIFI_SSID" ] && command -v nmcli >/dev/null 2>&1; then
+        nmcli radio wifi on 2>/dev/null || true
         nmcli con delete "$WIFI_SSID" 2>/dev/null || true
         if [ -n "$WIFI_PSK" ]; then
             nmcli con add type wifi ifname wlan0 con-name "$WIFI_SSID" ssid "$WIFI_SSID" wifi-sec.key-mgmt wpa-psk wifi-sec.psk "$WIFI_PSK" connection.autoconnect yes 2>/dev/null || true
         else
             nmcli con add type wifi ifname wlan0 con-name "$WIFI_SSID" ssid "$WIFI_SSID" connection.autoconnect yes 2>/dev/null || true
         fi
+        timeout 15 nmcli con up "$WIFI_SSID" 2>/dev/null || true
     fi
 fi
 
@@ -222,6 +227,7 @@ if [ -d "$PAYLOAD_DIR/rfk_tools_suite" ]; then
     cp -a "$PAYLOAD_DIR/rfk_tools_suite/." "$TARGET_HOME/rfk_tools/" 2>/dev/null || true
     chmod +x "$TARGET_HOME/rfk_tools/bin/"*.sh 2>/dev/null || true
     cp -f "$TARGET_HOME/rfk_tools/bin/"*.desktop "$TARGET_HOME/Desktop/" 2>/dev/null || true
+    chmod +x "$TARGET_HOME/Desktop/"*.desktop 2>/dev/null || true
     if [ -f "$TARGET_HOME/rfk_tools/bin/jrfk_weekly_backup.cron" ]; then
         cp -f "$TARGET_HOME/rfk_tools/bin/jrfk_weekly_backup.cron" /etc/cron.d/jrfk_weekly_backup
         chmod 644 /etc/cron.d/jrfk_weekly_backup
@@ -277,6 +283,25 @@ if [ -d "$PAYLOAD_DIR/py_deps" ]; then
     for GUI_DIR in "$TARGET_HOME"/rf-kit-gui*; do
         [ -d "$GUI_DIR" ] && cp -a "$PAYLOAD_DIR/py_deps/." "$GUI_DIR/" 2>/dev/null || true
     done
+fi
+
+# Install bundled offline arm64 .deb packages (python3-pil.imagetk, python3-can, python3-paramiko, python3-hamlib, etc.)
+if [ -d "$PAYLOAD_DIR/pi_debs" ] && ls "$PAYLOAD_DIR/pi_debs"/*.deb >/dev/null 2>&1; then
+    echo "[*] Installing bundled offline 64-bit .deb packages from $PAYLOAD_DIR/pi_debs..."
+    dpkg -i --force-confdef --force-confold "$PAYLOAD_DIR/pi_debs"/*.deb || true
+    dpkg --configure -a || true
+    ldconfig 2>/dev/null || true
+    # Re-evaluate NEED_PKGS after offline .deb installation
+    NEED_PKGS=""
+    python3 -c "import can" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-can can-utils"
+    python3 -c "from PIL import ImageTk" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-pil.imagetk"
+    python3 -c "import tkinter" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-tk"
+    python3 -c "import serial" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-serial"
+    python3 -c "import paramiko" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-paramiko"
+    python3 -c "import Hamlib" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-hamlib"
+    python3 -c "import websocket" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-websocket"
+    command -v openbox >/dev/null 2>&1 || NEED_PKGS="$NEED_PKGS openbox"
+    command -v pip3 >/dev/null 2>&1 || NEED_PKGS="$NEED_PKGS python3-pip"
 fi
 
 NET_ONLINE=0

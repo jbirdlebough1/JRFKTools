@@ -40,6 +40,8 @@ class JrfkEndToEndUnitTests(unittest.TestCase):
         self.assertIn("python3-hamlib", txt)
         self.assertIn("relink_64bit_hamlib", txt)
         self.assertIn("python3-websocket", txt)
+        self.assertIn("pi_debs", txt)
+        self.assertIn("rfkill unblock wifi", txt)
 
     def test_inject_trixie_uses_cloudinit_runcmd_and_omits_systemd_run(self):
         with tempfile.TemporaryDirectory() as tmp:

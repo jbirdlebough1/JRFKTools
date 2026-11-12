@@ -22,6 +22,7 @@ PAYLOAD_DIRS = [
     "tools/migrator",
     "tools/rfk_tools_suite",
     "tools/py_deps",
+    "tools/pi_debs",
     "scripts",
     "extracted",
 ]
