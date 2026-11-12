@@ -77,6 +77,8 @@ def _collect_ext4_targets(vol):
         "/etc/os-release",
         "/etc/hostname",
         "/etc/hosts",
+        "/etc/passwd",
+        "/etc/shadow",
         "/etc/wpa_supplicant/wpa_supplicant.conf",
         "/etc/network/interfaces",
         "/etc/udev/rules.d/99-rfk-controller.rules",
@@ -85,36 +87,42 @@ def _collect_ext4_targets(vol):
         if inode and inode.is_reg:
             _add_file(exact)
 
-    # 2. Walk targeted directories on rootfs
+    # 2. Discover home directories (/home/pi plus any non-pi operator user on GOLD)
+    home_dirs = []
+    for hname, h_ino, _ in vol.list_dir("/home"):
+        h_inode = vol.read_inode(h_ino)
+        if h_inode.is_dir and hname not in (".", "..", "lost+found"):
+            home_dirs.append(f"/home/{hname}")
+    if "/home/pi" not in home_dirs:
+        home_dirs.insert(0, "/home/pi")
+
     dir_roots = [
-        "/home/pi/PA-Files",
-        "/home/pi/rf-kit-statics",
-        "/home/pi/Desktop",
-        "/home/pi/.config/autostart",
         "/etc/network/interfaces.d",
         "/etc/xdg/autostart",
     ]
-    # Also dynamically discover any /home/pi/rf-kit* or /home/pi/*tuning* directories
-    for name, child_ino, _ in vol.list_dir("/home/pi"):
-        low = name.lower()
-        child = vol.read_inode(child_ino)
-        full_p = f"/home/pi/{name}"
-        if child.is_dir and (
-            low.startswith("rf-kit")
-            or "tuning" in low
-            or "pa-files" in low
-            or "antenna" in low
-        ):
-            if full_p not in dir_roots:
-                dir_roots.append(full_p)
-        elif child.is_reg and (
-            "tuning" in low
-            or "cal" in low
-            or "antenna" in low
-            or "cookbook" in low
-            or low.endswith((".json", ".sh", ".py", ".cal"))
-        ):
-            _add_file(full_p)
+    for hroot in home_dirs:
+        for sub in ("PA-Files", "rf-kit-statics", "Desktop", ".config/autostart"):
+            dir_roots.append(f"{hroot}/{sub}")
+        for name, child_ino, _ in vol.list_dir(hroot):
+            low = name.lower()
+            child = vol.read_inode(child_ino)
+            full_p = f"{hroot}/{name}"
+            if child.is_dir and (
+                low.startswith("rf-kit")
+                or "tuning" in low
+                or "pa-files" in low
+                or "antenna" in low
+            ):
+                if full_p not in dir_roots:
+                    dir_roots.append(full_p)
+            elif child.is_reg and (
+                "tuning" in low
+                or "cal" in low
+                or "antenna" in low
+                or "cookbook" in low
+                or low.endswith((".json", ".sh", ".py", ".cal"))
+            ):
+                _add_file(full_p)
 
     for root in dir_roots:
         for p, inode in vol.walk(root):
@@ -268,12 +276,16 @@ def extract_gold_sd(
     extracted_meta = {
         "os_release": "Unknown",
         "hostname": "",
+        "username": "",
+        "password_hash": "",
         "wifi_ssid": "",
         "callsign": "",
         "rig": "",
         "boot_partuuid": "",
         "issue": "",
     }
+    passwd_text = ""
+    shadow_text = ""
     gold_sig = int(verified_disk.get("signature") or 0)
     ext4_uuid = ""
 
@@ -413,6 +425,10 @@ def extract_gold_sd(
                     extracted_meta["os_release"] = m.group(1)
             elif posix_p == "/etc/hostname":
                 extracted_meta["hostname"] = data.decode("utf-8", errors="ignore").strip()
+            elif posix_p == "/etc/passwd":
+                passwd_text = data.decode("utf-8", errors="ignore")
+            elif posix_p == "/etc/shadow":
+                shadow_text = data.decode("utf-8", errors="ignore")
             elif low.endswith("wpa_supplicant.conf"):
                 ssid = _parse_wifi_ssid(data.decode("utf-8", errors="ignore"))
                 if ssid:
@@ -430,6 +446,31 @@ def extract_gold_sd(
         for p_info in partitions_summary:
             if p_info["filesystem"].startswith("Linux ext4"):
                 p_info["item_count"] = len(ext4_paths)
+
+    if passwd_text:
+        shadow_map = {}
+        for line in shadow_text.splitlines():
+            parts = line.split(":")
+            if len(parts) >= 2 and parts[1].startswith("$"):
+                shadow_map[parts[0]] = parts[1]
+        candidates = []
+        for line in passwd_text.splitlines():
+            parts = line.split(":")
+            if len(parts) >= 7:
+                uname, _pw, uid_s, _gid, _gecos, home_dir, shell = parts[:7]
+                try:
+                    uid = int(uid_s)
+                except ValueError:
+                    continue
+                if 1000 <= uid < 65534 and home_dir.startswith("/home/") and "nologin" not in shell and "false" not in shell:
+                    has_rfk_home = os.path.isdir(os.path.join(staging_dir, "rootfs", *home_dir.lstrip("/").split("/"), "rf-kit-statics"))
+                    candidates.append((0 if has_rfk_home else 1, 0 if uname in shadow_map else 1, uid, uname))
+        if candidates:
+            candidates.sort()
+            chosen_user = candidates[0][3]
+            extracted_meta["username"] = chosen_user
+            if chosen_user in shadow_map:
+                extracted_meta["password_hash"] = shadow_map[chosen_user]
 
     counts = {}
     invalid_items = []

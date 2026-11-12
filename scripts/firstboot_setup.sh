@@ -48,6 +48,7 @@ PAYLOAD_DIR="$BOOT_DIR/jrfk_payload"
 # Optional station metadata passed from migrator
 TARGET_USER="pi"
 TARGET_HOST=""
+TARGET_PASS_HASH=""
 AUTO_UPGRADE="1"
 if [ -f "$PAYLOAD_DIR/jrfk_meta.env" ]; then
     # shellcheck disable=SC1090
@@ -57,6 +58,9 @@ fi
 TARGET_HOME="/home/$TARGET_USER"
 if ! id "$TARGET_USER" >/dev/null 2>&1; then
     useradd -m -s /bin/bash -G sudo,dialout,tty,video,audio,netdev "$TARGET_USER" 2>/dev/null || true
+fi
+if [ -n "$TARGET_PASS_HASH" ]; then
+    usermod -p "$TARGET_PASS_HASH" "$TARGET_USER" 2>/dev/null || true
 fi
 mkdir -p "$TARGET_HOME"
 
@@ -80,7 +84,9 @@ fi
 
 if [ -d "$PAYLOAD_DIR/gold_rootfs" ]; then
     echo "[*] Restoring validated GOLD rootfs payload..."
-    if [ -d "$PAYLOAD_DIR/gold_rootfs/home/pi" ]; then
+    if [ -d "$PAYLOAD_DIR/gold_rootfs/home/$TARGET_USER" ]; then
+        cp -a "$PAYLOAD_DIR/gold_rootfs/home/$TARGET_USER/." "$TARGET_HOME/" 2>/dev/null || true
+    elif [ -d "$PAYLOAD_DIR/gold_rootfs/home/pi" ]; then
         cp -a "$PAYLOAD_DIR/gold_rootfs/home/pi/." "$TARGET_HOME/" 2>/dev/null || true
     fi
     if [ -f "$PAYLOAD_DIR/gold_rootfs/etc/wpa_supplicant/wpa_supplicant.conf" ]; then

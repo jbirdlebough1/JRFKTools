@@ -785,11 +785,71 @@ def find_target_boot_drive(disk_index):
     raise SDGuardError(f"Could not locate or verify a mounted removable boot partition on Disk {disk_index}.")
 
 def generate_sha512_crypt(password, salt=None):
+    """Pure-Python POSIX/glibc SHA-512 crypt ($6$) compatible with Raspberry Pi OS userconf.txt & /etc/shadow."""
+    b64 = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
     if not salt:
-        chars = string.ascii_letters + string.digits
-        salt = "".join(random.choice(chars) for _ in range(16))
-    digest = hashlib.sha512((salt + password).encode('utf-8')).hexdigest()
-    return f"$6${salt}${digest[:43]}"
+        salt = "".join(random.choice(b64) for _ in range(16))
+    else:
+        salt = "".join(ch for ch in str(salt) if ch in b64)[:16] or "jrfksalt"
+    pw_b = password.encode("utf-8")
+    salt_b = salt.encode("ascii")
+
+    # Standard Ulrich Drepper SHA-512 crypt algorithm (5000 rounds)
+    alt = hashlib.sha512(pw_b + salt_b + pw_b).digest()
+    ctx_a = hashlib.sha512(pw_b + salt_b)
+    pw_len = len(pw_b)
+    cnt = pw_len
+    while cnt > 64:
+        ctx_a.update(alt)
+        cnt -= 64
+    ctx_a.update(alt[:cnt])
+    cnt = pw_len
+    while cnt > 0:
+        ctx_a.update(alt if (cnt & 1) else pw_b)
+        cnt >>= 1
+    digest_a = ctx_a.digest()
+
+    ctx_dp = hashlib.sha512()
+    for _ in range(pw_len):
+        ctx_dp.update(pw_b)
+    dp = ctx_dp.digest()
+    p_seq = (dp * ((pw_len + 63) // 64))[:pw_len]
+
+    ctx_ds = hashlib.sha512()
+    for _ in range(16 + digest_a[0]):
+        ctx_ds.update(salt_b)
+    ds = ctx_ds.digest()
+    s_seq = (ds * ((len(salt_b) + 63) // 64))[: len(salt_b)]
+
+    c = digest_a
+    for r in range(5000):
+        ctx = hashlib.sha512()
+        ctx.update(p_seq if (r & 1) else c)
+        if r % 3:
+            ctx.update(s_seq)
+        if r % 7:
+            ctx.update(p_seq)
+        ctx.update(c if (r & 1) else p_seq)
+        c = ctx.digest()
+
+    def _enc(b2, b1, b0, n=4):
+        v = (b2 << 16) | (b1 << 8) | b0
+        out = []
+        for _ in range(n):
+            out.append(b64[v & 0x3F])
+            v >>= 6
+        return "".join(out)
+
+    order = [
+        (0, 21, 42), (22, 43, 1), (44, 2, 23), (3, 24, 45), (25, 46, 4),
+        (47, 5, 26), (6, 27, 48), (28, 49, 7), (50, 8, 29), (9, 30, 51),
+        (31, 52, 10), (53, 11, 32), (12, 33, 54), (34, 55, 13), (56, 14, 35),
+        (15, 36, 57), (37, 58, 16), (59, 17, 38), (18, 39, 60), (40, 61, 19),
+        (62, 20, 41),
+    ]
+    encoded = "".join(_enc(c[i2], c[i1], c[i0], 4) for i2, i1, i0 in order)
+    encoded += _enc(0, 0, c[63], 2)
+    return f"$6${salt}${encoded}"
 
 def query_disks():
     if os.name == "nt" and is_admin():
@@ -1012,16 +1072,17 @@ def inject_jrfk_bits(
     auto_upgrade=True,
     inject_cal=True,
     os_info=None,
+    password_hash="",
 ):
     letter_check = drive_letter or (target_dir[0] if target_dir else None)
     assert_writable_non_gold_sd(disk_index, drive_letter=letter_check, require_letter=True)
     append_log(f"[*] Staging station config (mode={mode}) for user '{username}' and hostname '{hostname}'...")
 
-    # 1. userconf.txt
-    pw_hash = generate_sha512_crypt(password)
+    # 1. userconf.txt (preserve GOLD's exact shadow hash when migrating; otherwise hash password via POSIX SHA-512 crypt)
+    pw_hash = password_hash if (password_hash and str(password_hash).startswith("$")) else generate_sha512_crypt(password or "raspberry")
     with open(os.path.join(target_dir, "userconf.txt"), "w", encoding="utf-8") as f:
         f.write(f"{username}:{pw_hash}\n")
-    append_log(f"[+] Written: {target_dir}userconf.txt (Encrypted credentials for user '{username}')")
+    append_log(f"[+] Written: {target_dir}userconf.txt ({'Preserved GOLD credentials' if password_hash else 'Encrypted credentials'} for user '{username}')")
 
     # 2. ssh
     with open(os.path.join(target_dir, "ssh"), "w", encoding="utf-8") as f:
@@ -1071,6 +1132,7 @@ network={{
                 mf.write(f"instance-id: jrfk-{hostname}\nlocal-hostname: {hostname}\n")
 
         user_data_path = os.path.join(target_dir, "user-data")
+        passwd_yaml_line = f"    passwd: {json.dumps(pw_hash)}\n"
         user_data_yaml = (
             "#cloud-config\n"
             f"hostname: {hostname}\n"
@@ -1081,8 +1143,8 @@ network={{
             "    groups: [adm, dialout, cdrom, sudo, audio, video, plugdev, users, netdev, gpio, i2c, spi, input, render]\n"
             "    shell: /bin/bash\n"
             "    lock_passwd: false\n"
-            f"    plain_text_passwd: {json.dumps(password)}\n"
-            "    sudo: ['ALL=(ALL) NOPASSWD:ALL']\n"
+            + passwd_yaml_line
+            + "    sudo: ['ALL=(ALL) NOPASSWD:ALL']\n"
             "runcmd:\n"
             "  - [ systemctl, enable, --now, ssh ]\n"
             "  - [ /bin/bash, /boot/firmware/jrfk_payload/firstboot_setup.sh, --cloudinit ]\n"
@@ -1131,6 +1193,7 @@ network={{
         f"TARGET_USER={username}\n"
         f"TARGET_HOST={hostname}\n"
         f"AUTO_UPGRADE={'1' if auto_upgrade else '0'}\n"
+        f"TARGET_PASS_HASH='{pw_hash}'\n"
     )
     with open(os.path.join(payload_dir, "jrfk_meta.env"), "w", encoding="utf-8", newline="\n") as fm:
         fm.write(meta_env)
@@ -1325,15 +1388,22 @@ def run_pipeline(
 
         # In migrate mode, require & use real extracted GOLD SD data (no hardcoded Shack-WiFi)
         gold_meta = (gold_manifest or {}).get("metadata") or {}
+        password_hash = ""
         if mode == "migrate":
             if not gold_manifest or not os.path.isdir(gold_manifest.get("staging_dir", "")):
                 raise RuntimeError(
                     "No extracted GOLD SD data found in backups/. Run Stage 1 (Extract Golden Master Data) first."
                 )
+            username = username or gold_meta.get("username") or "pi"
+            if not password:
+                password_hash = gold_meta.get("password_hash") or ""
+                password = password or "raspberry"
             hostname = hostname or gold_meta.get("hostname") or "k7bit"
             ssid = ssid or gold_meta.get("wifi_ssid") or ""
             orig_os = gold_meta.get("os_release") or gold_meta.get("issue") or "32-bit Raspbian"
         else:
+            username = username or "pi"
+            password = password or "raspberry"
             hostname = hostname or "k7bit"
             orig_os = "Clean Install (New Card)"
 
@@ -1403,6 +1473,7 @@ def run_pipeline(
                 auto_upgrade=auto_upgrade,
                 inject_cal=inject_cal,
                 os_info=os_info,
+                password_hash=password_hash,
             )
 
             # Step 4: Verification of both FAT32 and ext4 partitions

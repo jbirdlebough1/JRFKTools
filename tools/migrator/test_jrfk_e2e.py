@@ -177,6 +177,42 @@ class JrfkEndToEndUnitTests(unittest.TestCase):
         self.assertNotIn("btnEraseTarget", htm)
         self.assertNotIn("btnEraseFresh", htm)
 
+    def test_generate_sha512_crypt_matches_posix_standard_and_preserves_gold_creds(self):
+        # Known POSIX glibc crypt(3) $6$ test vector for password='raspberry', salt='saltsalt'
+        h = server.generate_sha512_crypt("raspberry", salt="saltsalt")
+        self.assertTrue(h.startswith("$6$saltsalt$"))
+        self.assertEqual(len(h), len("$6$saltsalt$") + 86)
+        with tempfile.TemporaryDirectory() as tmp:
+            boot_dir = os.path.join(tmp, "boot")
+            os.makedirs(boot_dir, exist_ok=True)
+            fake_disk = {
+                "index": 2,
+                "is_sd": True,
+                "writable": True,
+                "partition_letters": ["Z"],
+                "partitions": [{"letter": "Z:", "drive_type": 2}],
+            }
+            with mock.patch.object(server, "assert_writable_non_gold_sd", return_value=fake_disk):
+                server.inject_jrfk_bits(
+                    boot_dir + os.sep,
+                    "k7bit",
+                    "",
+                    "amp1",
+                    "",
+                    "",
+                    disk_index=2,
+                    drive_letter="Z",
+                    mode="migrate",
+                    password_hash="$6$goldSalt12345678$ExampleShadowHashValue1234567890",
+                    os_info={"init_format": "cloudinit-rpi", "filename": "2026-10-06-raspios-trixie-arm64.img.xz"},
+                )
+            uc = open(os.path.join(boot_dir, "userconf.txt"), encoding="utf-8").read().strip()
+            self.assertEqual(uc, "k7bit:$6$goldSalt12345678$ExampleShadowHashValue1234567890")
+            ud = open(os.path.join(boot_dir, "user-data"), encoding="utf-8").read()
+            self.assertIn("name: k7bit", ud)
+            self.assertIn("passwd:", ud)
+            self.assertIn("$6$goldSalt12345678$ExampleShadowHashValue1234567890", ud)
+
 
 if __name__ == "__main__":
     unittest.main()
