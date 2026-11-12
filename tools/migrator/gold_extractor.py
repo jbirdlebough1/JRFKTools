@@ -24,7 +24,7 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 DEFAULT_BACKUP_ROOT = os.path.join(BASE_DIR, "backups")
 LATEST_MANIFEST_NAME = "gold_latest_manifest.json"
 
-SKIP_DIR_NAMES = {"__pycache__", ".git", "node_modules", ".cache", "Trash"}
+SKIP_DIR_NAMES = {"__pycache__", ".git", "node_modules", ".cache", "Trash", "hamlib"}
 
 
 def _categorize_path(posix_p):
@@ -239,6 +239,7 @@ def extract_gold_sd(
     log_fn=None,
     device_path_override=None,
     disks=None,
+    progress_fn=None,
 ):
     """
     Strictly read-only extraction & validation of the installed GOLD SD card.
@@ -375,10 +376,15 @@ def extract_gold_sd(
 
         # 2. Read Partition 1 (Linux ext4 rootfs) targets
         ext4_paths = _collect_ext4_targets(ext4_vol)
-        _log(f"[*] Partition 1 (ext4 rootfs, UUID={ext4_uuid}): Extracting {len(ext4_paths)} RFK/user/tuning files...")
+        total_ext4 = len(ext4_paths)
+        _log(f"[*] Partition 1 (ext4 rootfs, UUID={ext4_uuid}): Extracting {total_ext4} RFK/user/tuning files...")
 
-        for posix_p in ext4_paths:
+        for idx, posix_p in enumerate(ext4_paths, 1):
             data = ext4_vol.read_file(posix_p)
+            if idx % 25 == 0 or idx == total_ext4:
+                _log(f"[*] Extracted {idx} / {total_ext4} files from GOLD ext4...")
+                if progress_fn:
+                    progress_fn(15 + int((idx / max(total_ext4, 1)) * 80))
             rel_p = "rootfs/" + posix_p.lstrip("/")
             dst = os.path.join(staging_dir, *rel_p.split("/"))
             os.makedirs(os.path.dirname(dst), exist_ok=True)

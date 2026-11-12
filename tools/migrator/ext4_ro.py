@@ -130,13 +130,25 @@ class RawReadOnlyStream:
     def read_at(self, offset, length):
         if length <= 0:
             return b""
-        # Bulk sequential reads (e.g. coalesced file extents >= 16 KiB) go straight to aligned bulk ReadFile
+        # Bulk sequential reads (e.g. coalesced file extents >= 16 KiB) go straight to aligned 512 KiB ReadFile chunks
         if length >= 16384:
             align = max(4096, self.sector_size)
             aligned_start = (offset // align) * align
             aligned_end = ((offset + length + align - 1) // align) * align
             total = aligned_end - aligned_start
-            raw = self._read_raw_aligned(aligned_start, total)
+            max_usb_xfer = 512 * 1024
+            if total <= max_usb_xfer:
+                raw = self._read_raw_aligned(aligned_start, total)
+            else:
+                buf_parts = []
+                cur = aligned_start
+                rem = total
+                while rem > 0:
+                    step = min(rem, max_usb_xfer)
+                    buf_parts.append(self._read_raw_aligned(cur, step))
+                    cur += step
+                    rem -= step
+                raw = b"".join(buf_parts)
             rel = offset - aligned_start
             return raw[rel : rel + length]
 
@@ -376,7 +388,7 @@ class Ext4Volume:
         remaining = inode.size
         run_phys = None
         run_blocks = 0
-        max_run_blocks = max(1, (4 * 1024 * 1024) // self.block_size)
+        max_run_blocks = max(1, (512 * 1024) // self.block_size)
 
         def _flush_run():
             nonlocal remaining

@@ -116,16 +116,50 @@ if [ -f "$PAYLOAD_DIR/patch_antialias.py" ]; then
     python3 "$PAYLOAD_DIR/patch_antialias.py" "$TARGET_HOME"/rf-kit* 2>/dev/null || true
 fi
 
-for GUI_DIR in "$TARGET_HOME"/rf-kit-gui*; do
-    if [ -d "$GUI_DIR" ]; then
-        mkdir -p "$GUI_DIR/hamlib/v4_6_5_bindings_backport/lib/python3_7/site_packages"
-        HL_PATH=$(python3 -c "import Hamlib, os; print(os.path.dirname(Hamlib.__file__))" 2>/dev/null || true)
-        if [ -n "$HL_PATH" ] && [ -d "$HL_PATH" ]; then
-            ln -sf "$HL_PATH/Hamlib.py" "$GUI_DIR/hamlib/v4_6_5_bindings_backport/lib/python3_7/site_packages/Hamlib.py" 2>/dev/null || true
-            ln -sf "$HL_PATH/_Hamlib.so" "$GUI_DIR/hamlib/v4_6_5_bindings_backport/lib/python3_7/site_packages/_Hamlib.so" 2>/dev/null || true
+relink_64bit_hamlib() {
+    local hl_path
+    hl_path=$(python3 -c "import Hamlib, os; print(os.path.dirname(Hamlib.__file__))" 2>/dev/null || true)
+    [ -z "$hl_path" ] || [ ! -d "$hl_path" ] && return 0
+    local first_so
+    first_so=$(ls "$hl_path"/_Hamlib*.so 2>/dev/null | head -n 1 || true)
+    for GUI_DIR in "$TARGET_HOME"/rf-kit-gui*; do
+        [ -d "$GUI_DIR" ] || continue
+        mkdir -p "$GUI_DIR/hamlib/v4_6_5_bindings_backport/lib/python3_7/site_packages" \
+                 "$GUI_DIR/hamlib/v4_0_rc2/lib/python3_7/site_packages"
+        touch "$GUI_DIR/hamlib/__init__.py" \
+              "$GUI_DIR/hamlib/v4_6_5_bindings_backport/__init__.py" \
+              "$GUI_DIR/hamlib/v4_6_5_bindings_backport/lib/__init__.py" \
+              "$GUI_DIR/hamlib/v4_6_5_bindings_backport/lib/python3_7/__init__.py" \
+              "$GUI_DIR/hamlib/v4_6_5_bindings_backport/lib/python3_7/site_packages/__init__.py" \
+              "$GUI_DIR/hamlib/v4_0_rc2/__init__.py" \
+              "$GUI_DIR/hamlib/v4_0_rc2/lib/__init__.py" \
+              "$GUI_DIR/hamlib/v4_0_rc2/lib/python3_7/__init__.py" \
+              "$GUI_DIR/hamlib/v4_0_rc2/lib/python3_7/site_packages/__init__.py" 2>/dev/null || true
+        for SUB_SP in "$GUI_DIR"/hamlib/*/lib/*/site*packages; do
+            [ -d "$SUB_SP" ] || continue
+            ln -sf "$hl_path/Hamlib.py" "$SUB_SP/Hamlib.py" 2>/dev/null || true
+            rm -f "$SUB_SP"/_Hamlib*.so 2>/dev/null || true
+            for _so in "$hl_path"/_Hamlib*.so; do
+                [ -e "$_so" ] && ln -sf "$_so" "$SUB_SP/$(basename "$_so")" 2>/dev/null || true
+            done
+            if [ -n "$first_so" ] && [ ! -e "$SUB_SP/_Hamlib.so" ]; then
+                ln -sf "$first_so" "$SUB_SP/_Hamlib.so" 2>/dev/null || true
+            fi
+        done
+        # Replace bundled 32-bit libhamlib*.so* with 64-bit system libs so CatBaseProcess LD_LIBRARY_PATH works on aarch64
+        if ls /usr/lib/aarch64-linux-gnu/libhamlib.so* >/dev/null 2>&1; then
+            for HAM_LIB_DIR in "$GUI_DIR"/hamlib/*/lib; do
+                [ -d "$HAM_LIB_DIR" ] || continue
+                rm -f "$HAM_LIB_DIR"/libhamlib*.so* 2>/dev/null || true
+                for _sys_so in /usr/lib/aarch64-linux-gnu/libhamlib*.so*; do
+                    [ -e "$_sys_so" ] && ln -sf "$_sys_so" "$HAM_LIB_DIR/$(basename "$_sys_so")" 2>/dev/null || true
+                done
+            done
         fi
-    fi
-done
+    done
+}
+
+relink_64bit_hamlib
 
 # ------------------------------------------------------------------------------
 # Step 4/7: Configure Wi-Fi (NetworkManager + wpa_supplicant) & Hostname
@@ -228,6 +262,7 @@ python3 -c "import tkinter" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-tk"
 python3 -c "import serial" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-serial"
 python3 -c "import paramiko" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-paramiko"
 python3 -c "import Hamlib" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-hamlib"
+python3 -c "import websocket" 2>/dev/null || NEED_PKGS="$NEED_PKGS python3-websocket"
 command -v openbox >/dev/null 2>&1 || NEED_PKGS="$NEED_PKGS openbox"
 command -v pip3 >/dev/null 2>&1 || NEED_PKGS="$NEED_PKGS python3-pip"
 
@@ -244,9 +279,17 @@ if [ -d "$PAYLOAD_DIR/py_deps" ]; then
     done
 fi
 
+NET_ONLINE=0
 if [ -n "$NEED_PKGS" ]; then
-    echo "[*] Checking network reachability for runtime packages:$NEED_PKGS"
-    if timeout 4 getent hosts deb.debian.org >/dev/null 2>&1 || timeout 4 ping -c1 -W2 1.1.1.1 >/dev/null 2>&1; then
+    echo "[*] Waiting up to 15s for network reachability to install runtime packages:$NEED_PKGS"
+    for _net_try in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+        if timeout 3 getent hosts deb.debian.org >/dev/null 2>&1 || timeout 2 ping -c1 -W1 1.1.1.1 >/dev/null 2>&1; then
+            NET_ONLINE=1
+            break
+        fi
+        sleep 1
+    done
+    if [ "$NET_ONLINE" = "1" ]; then
         echo "[*] Installing required 64-bit runtime packages:$NEED_PKGS"
         timeout 90 apt-get update -qq -o Acquire::http::Timeout=8 -o Acquire::Retries=1 2>/dev/null && \
             timeout 180 apt-get install -y --no-install-recommends -qq -o Acquire::http::Timeout=8 $NEED_PKGS 2>/dev/null || true
@@ -262,23 +305,8 @@ if ! python3 -c "import simple_rpc, pysftp" 2>/dev/null; then
     fi
 fi
 
-# Re-link 64-bit Hamlib bindings after python3-hamlib install
-HL_PATH=$(python3 -c "import Hamlib, os; print(os.path.dirname(Hamlib.__file__))" 2>/dev/null || true)
-if [ -n "$HL_PATH" ] && [ -d "$HL_PATH" ]; then
-    for GUI_DIR in "$TARGET_HOME"/rf-kit-gui*; do
-        if [ -d "$GUI_DIR" ]; then
-            mkdir -p "$GUI_DIR/hamlib/v4_6_5_bindings_backport/lib/python3_7/site_packages"
-            ln -sf "$HL_PATH/Hamlib.py" "$GUI_DIR/hamlib/v4_6_5_bindings_backport/lib/python3_7/site_packages/Hamlib.py" 2>/dev/null || true
-            ln -sf "$HL_PATH/_Hamlib.so" "$GUI_DIR/hamlib/v4_6_5_bindings_backport/lib/python3_7/site_packages/_Hamlib.so" 2>/dev/null || true
-            for SUB_SP in "$GUI_DIR"/hamlib/*/lib/*/site*packages; do
-                if [ -d "$SUB_SP" ]; then
-                    ln -sf "$HL_PATH/Hamlib.py" "$SUB_SP/Hamlib.py" 2>/dev/null || true
-                    ln -sf "$HL_PATH/_Hamlib.so" "$SUB_SP/_Hamlib.so" 2>/dev/null || true
-                fi
-            done
-        fi
-    done
-fi
+# Re-link 64-bit Hamlib bindings & shared libs after python3-hamlib install
+relink_64bit_hamlib
 
 echo "[*] Verifying 64-bit RFK Python imports..."
 python3 - << 'PYCHK' || true

@@ -461,6 +461,7 @@ def flash_raw_image(img_path, disk_index, progress_callback=None, verified_disk=
         chunk_size = 2 * 1024 * 1024
         bytes_written_total = 0
         bytes_written_win32 = wintypes.DWORD()
+        expected_head = None
 
         opener = lzma.open if is_xz else open
         with opener(img_path, "rb") as f_src:
@@ -478,6 +479,8 @@ def flash_raw_image(img_path, disk_index, progress_callback=None, verified_disk=
                 remainder = len(data) % 4096
                 if remainder != 0:
                     data = data + b'\x00' * (4096 - remainder)
+                if expected_head is None:
+                    expected_head = data[:4096]
 
                 ok = kernel32.WriteFile(
                     h_disk,
@@ -488,9 +491,13 @@ def flash_raw_image(img_path, disk_index, progress_callback=None, verified_disk=
                 )
                 if not ok:
                     err = kernel32.GetLastError()
-                    raise RuntimeError(f"WriteFile failed at byte offset {bytes_written_total}: Windows error {err}")
+                    raise RuntimeError(f"WriteFile failed at byte offset {bytes_written_total}: Windows error {err} (SD card may be damaged)")
+                if bytes_written_win32.value != len(data):
+                    raise RuntimeError(
+                        f"Short WriteFile at byte offset {bytes_written_total}: wrote {bytes_written_win32.value}/{len(data)} bytes (SD card may be damaged)"
+                    )
 
-                bytes_written_total += min(bytes_written_win32.value, len(data))
+                bytes_written_total += bytes_written_win32.value
                 t_now = time.time()
                 if progress_callback and (t_now - last_report >= 2.0 or bytes_written_total >= total_size):
                     last_report = t_now
@@ -503,6 +510,19 @@ def flash_raw_image(img_path, disk_index, progress_callback=None, verified_disk=
             speed = (bytes_written_total / (t_now - t0)) / (1024 * 1024) if (t_now - t0) > 0 else 0
             progress_callback(100, bytes_written_total, bytes_written_total, speed)
         kernel32.FlushFileBuffers(h_disk)
+
+        # Read-back check on sector 0 (MBR + partition table) to detect damaged/write-faulted SD cards immediately
+        if expected_head and len(expected_head) >= 512:
+            pos = ctypes.c_longlong(0)
+            kernel32.SetFilePointerEx(h_disk, ctypes.c_longlong(0), ctypes.byref(pos), 0)
+            verify_buf = ctypes.create_string_buffer(4096)
+            verify_read = wintypes.DWORD(0)
+            v_ok = kernel32.ReadFile(h_disk, verify_buf, 4096, ctypes.byref(verify_read), None)
+            if not v_ok or verify_read.value < 512 or verify_buf.raw[:512] != expected_head[:512] or verify_buf.raw[510:512] != b"\x55\xaa":
+                raise RuntimeError(
+                    f"SD card write verification failed at sector 0 on Disk {disk_index} — card may be physically damaged or write-faulted."
+                )
+
         kernel32.DeviceIoControl(h_disk, IOCTL_DISK_UPDATE_PROPERTIES, None, 0, None, 0, ctypes.byref(bytes_returned), None)
     finally:
         kernel32.DeviceIoControl(h_disk, FSCTL_UNLOCK_VOLUME, None, 0, None, 0, ctypes.byref(bytes_returned), None)
@@ -1213,13 +1233,14 @@ def run_pipeline(
         ACTIVE_JOB["progress"] = 30
         _set_windows_automount(False)
         try:
-            def _on_imager_prog(pct):
+            def _on_raw_prog(pct, done_bytes, tot_bytes, speed_mb):
                 ACTIVE_JOB["progress"] = 30 + int(pct * 0.35)
+                append_log(f"[*] Flashing 64-bit OS: {pct}% ({done_bytes // (1024**2)} / {tot_bytes // (1024**2)} MB @ {speed_mb:.1f} MB/s)")
 
-            rpi_imager_cli_flash(
+            flash_raw_image(
                 img_for_imager,
                 disk_index,
-                progress_callback=_on_imager_prog,
+                progress_callback=_on_raw_prog,
                 verified_disk=verified_disk,
             )
 
@@ -1263,7 +1284,7 @@ def run_pipeline(
             except Exception as ej_err:
                 append_log(f"[-] Post-build unmount note: {ej_err}")
         finally:
-            pass
+            _set_windows_automount(True)
 
         # Step 5: Migration Trace & Operator Deployment Instructions
         ACTIVE_JOB["step"] = "complete"
@@ -1705,7 +1726,10 @@ class MigratorHandler(http.server.SimpleHTTPRequestHandler):
                     }
                     try:
                         manifest = gold_extractor.extract_gold_sd(
-                            disk_idx, drive_letter=clean_letter or None, log_fn=append_log
+                            disk_idx,
+                            drive_letter=clean_letter or None,
+                            log_fn=append_log,
+                            progress_fn=lambda pct: ACTIVE_JOB.__setitem__("progress", pct),
                         )
                         ACTIVE_JOB["gold_manifest"] = manifest
                         ACTIVE_JOB["original_metadata"] = manifest.get("metadata")
@@ -1839,9 +1863,7 @@ def run_server():
     append_log(f"JRFK Migrator Server starting on port {PORT}...")
     if is_admin():
         append_log("[+] Running with elevated Administrator privileges.")
-        _set_windows_automount(False)
-        atexit.register(_set_windows_automount, True)
-        append_log("[+] Windows automount disabled during JRFK session (prevents Linux ext4 Format popups).")
+        _set_windows_automount(True)
     else:
         append_log("[-] Running with standard user privileges (Elevation available via Web UI).")
     append_log("Ready for SD provisioning.")

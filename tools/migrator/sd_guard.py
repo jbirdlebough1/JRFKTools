@@ -215,6 +215,62 @@ def _get_volume_info_safe(k32, root, timeout_sec=1.0):
     return res[0], res[1]
 
 
+def _cim_disk_sizes_fallback():
+    """Cached Win32_DiskDrive size/media lookup when USB card reader geometry IOCTL stalls."""
+    sizes = {}
+    try:
+        ps = (
+            "Get-CimInstance Win32_DiskDrive | "
+            "Select-Object Index,Size,MediaLoaded,MediaType | "
+            "ConvertTo-Json -Compress"
+        )
+        p = subprocess.run(
+            ["powershell", "-NoProfile", "-NonInteractive", "-InputFormat", "None", "-Command", ps],
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            text=True,
+            timeout=18,
+        )
+        if p.returncode == 0 and p.stdout.strip():
+            data = json.loads(p.stdout.strip())
+            if isinstance(data, dict):
+                data = [data]
+            for item in data or []:
+                idx = int(item.get("Index", -1))
+                if idx >= 0:
+                    sz = int(item.get("Size") or 0)
+                    sizes[idx] = (sz, bool(item.get("MediaLoaded")) and sz > 0)
+    except Exception:
+        pass
+    return sizes
+
+
+def _get_drive_geometry_bounded(k32, dev_path, timeout_sec=2.5):
+    """Query IOCTL_DISK_GET_DRIVE_GEOMETRY_EX with a strict timeout so stalling USB readers don't hang Rescan."""
+    res = [None]
+    file_share_rw = 0x00000001 | 0x00000002
+    invalid_handle = ctypes.c_void_p(-1).value
+
+    def _probe():
+        h = k32.CreateFileW(dev_path, 0, file_share_rw, None, 3, 0, None)
+        if h == invalid_handle or h == -1:
+            return
+        try:
+            gbuf = ctypes.create_string_buffer(256)
+            gret = wintypes.DWORD(0)
+            if k32.DeviceIoControl(h, 0x000700A0, None, 0, gbuf, 256, ctypes.byref(gret), None):
+                if gret.value >= 32:
+                    sz = struct.unpack_from("<Q", gbuf.raw, 24)[0]
+                    res[0] = (sz, sz > 0)
+        finally:
+            k32.CloseHandle(h)
+
+    t = threading.Thread(target=_probe, daemon=True)
+    t.start()
+    t.join(timeout_sec)
+    return res[0]
+
+
 def _query_disks_win32():
     """
     Fast synchronous native Win32 disk enumeration via kernel32 DeviceIoControl.
@@ -268,8 +324,9 @@ def _query_disks_win32():
             finally:
                 k32.CloseHandle(h)
 
-    # 2. Query \\.\PhysicalDrive0..31 directly via IOCTL_STORAGE_QUERY_PROPERTY & GET_DRIVE_GEOMETRY_EX
+    # 2. Query \\.\PhysicalDrive0..31 directly via IOCTL_STORAGE_QUERY_PROPERTY & bounded geometry
     results = []
+    cim_sizes = None
     for idx in range(32):
         dev_path = f"\\\\.\\PhysicalDrive{idx}"
         h = k32.CreateFileW(dev_path, 0, file_share_rw, None, open_existing, 0, None)
@@ -294,14 +351,13 @@ def _query_disks_win32():
                     prod = _cstr_at(raw, p_off)
                     ser = _cstr_at(raw, s_off)
 
-            gbuf = ctypes.create_string_buffer(256)
-            gret = wintypes.DWORD(0)
-            size_bytes = 0
-            media_loaded = False
-            if k32.DeviceIoControl(h, 0x000700A0, None, 0, gbuf, 256, ctypes.byref(gret), None):
-                if gret.value >= 32:
-                    size_bytes = struct.unpack_from("<Q", gbuf.raw, 24)[0]
-                    media_loaded = size_bytes > 0
+            g_res = _get_drive_geometry_bounded(k32, dev_path, timeout_sec=2.5)
+            if g_res is not None and g_res[0] > 0:
+                size_bytes, media_loaded = g_res
+            else:
+                if cim_sizes is None:
+                    cim_sizes = _cim_disk_sizes_fallback()
+                size_bytes, media_loaded = cim_sizes.get(idx, g_res if g_res is not None else (0, False))
         finally:
             k32.CloseHandle(h)
 

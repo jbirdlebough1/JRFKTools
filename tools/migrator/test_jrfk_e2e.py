@@ -38,6 +38,8 @@ class JrfkEndToEndUnitTests(unittest.TestCase):
         self.assertIn("simple_rpc", txt)
         self.assertIn("pysftp", txt)
         self.assertIn("python3-hamlib", txt)
+        self.assertIn("relink_64bit_hamlib", txt)
+        self.assertIn("python3-websocket", txt)
 
     def test_inject_trixie_uses_cloudinit_runcmd_and_omits_systemd_run(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -141,6 +143,32 @@ class JrfkEndToEndUnitTests(unittest.TestCase):
                 self.assertEqual(info["source"], "cached")
             finally:
                 server.IMAGES_DIR = orig_images_dir
+
+    def test_run_pipeline_uses_flash_raw_image_and_restores_automount(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            boot_dir = os.path.join(tmp, "Z_boot")
+            os.makedirs(boot_dir, exist_ok=True)
+            fake_disk = {
+                "index": 2,
+                "is_sd": True,
+                "writable": True,
+                "partition_letters": ["Z"],
+                "partitions": [{"letter": "Z:", "drive_type": 2, "file_system": "FAT32"}],
+            }
+            os_info = {"name": "Raspberry Pi OS (64-bit)", "release_date": "2026-10-06", "init_format": "cloudinit-rpi"}
+            with mock.patch.object(server, "assert_writable_non_gold_sd", return_value=fake_disk), \
+                 mock.patch.object(server.sd_guard, "resolve_verified_drive_letter", return_value="Z"), \
+                 mock.patch.object(server, "ensure_latest_rpi_os_image", return_value=(os.path.join(tmp, "os.img.xz"), os_info)), \
+                 mock.patch.object(server, "flash_raw_image") as mock_flash, \
+                 mock.patch.object(server, "find_target_boot_drive", return_value=boot_dir + os.sep), \
+                 mock.patch.object(server, "inject_jrfk_bits"), \
+                 mock.patch.object(server, "validate_sd_partitions", return_value={"boot_partition_ok": True, "linux_partition_ok": True, "details": ["ok"]}), \
+                 mock.patch.object(server, "safely_eject_drive"), \
+                 mock.patch.object(server, "_set_windows_automount") as mock_automount:
+                server.run_pipeline(2, "Z", "pi", "raspberry", "k7bit", "", "", mode="fresh")
+            mock_flash.assert_called_once()
+            self.assertEqual(mock_automount.call_args_list[0].args, (False,))
+            self.assertEqual(mock_automount.call_args_list[-1].args, (True,))
 
 
 if __name__ == "__main__":

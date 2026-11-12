@@ -878,6 +878,16 @@ function logFresh(msg) {
 }
 
 async function scanDisks() {
+  const sdPill = document.getElementById('sdPill');
+  if (sdPill) {
+    sdPill.textContent = "⏳ Scanning USB / SD drives...";
+    sdPill.classList.remove('ok');
+    sdPill.classList.add('amber');
+  }
+  ['driveSelectOriginal', 'driveSelectTarget', 'driveSelectFresh'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = "<option value=''>Scanning USB / SD drives...</option>";
+  });
   try {
     const res = await fetch('/api/disks');
     if (res.ok) {
