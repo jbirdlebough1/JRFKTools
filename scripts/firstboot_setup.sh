@@ -510,7 +510,9 @@ xset s noblank 2>/dev/null || true
 
 # Lock Waveshare / 7-inch display to native 1024x600 so Xorg does not pick 1152x864/1080p
 for _out in HDMI-1 HDMI-2 HDMI-A-1 HDMI-A-2; do
-    xrandr --output "\$_out" --mode 1024x600 2>/dev/null || true
+    xrandr --newmode "1024x600_60.00" 49.00 1024 1072 1168 1312 600 603 613 624 -hsync +vsync 2>/dev/null || true
+    xrandr --addmode "\$_out" "1024x600_60.00" 2>/dev/null || true
+    xrandr --output "\$_out" --mode "1024x600_60.00" 2>/dev/null || true
 done
 
 # First graphical boot after firstboot setup: show completion popup with Reboot button
