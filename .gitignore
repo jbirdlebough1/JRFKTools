@@ -13,3 +13,7 @@ __pycache__/
 *.db
 *.wasm
 *.wasm.gz
+*.log
+*.log.*
+*.old
+lastlog

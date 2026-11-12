@@ -3,74 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RF-KIT SD Backup & Disaster Recovery Manager</title>
+    <title>RF-KIT SD Backup & Disaster Recovery (Blueprint Format)</title>
     <style>
         :root {
-            --bg-color: #0f141c;
-            --card-bg: #1a2230;
-            --accent: #2e86de;
-            --accent-hover: #54a0ff;
-            --text-main: #f1f2f6;
-            --text-dim: #a4b0be;
-            --status-good: #2ed573;
-            --status-warn: #ffa502;
-            --status-bad: #ff4757;
-            --border: #2f3640;
+            --bp-bg: #0a2540;
+            --bp-grid: #103b68;
+            --bp-line: #ffffff;
+            --bp-line-dim: #93c5fd;
+            --bp-card-bg: rgba(10, 37, 64, 0.88);
+            --bp-border: #1d528f;
+            --bp-border-bright: #3b82f6;
+            --data-green: #22c55e;
+            --data-yellow: #facc15;
+            --data-red: #ef4444;
+            --data-cyan: #38bdf8;
         }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            font-family: 'Consolas', 'Monaco', 'Courier New', -apple-system, sans-serif;
+            background-color: var(--bp-bg);
+            background-image: 
+                linear-gradient(var(--bp-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--bp-line);
             margin: 0;
             padding: 20px;
+            min-height: 100vh;
         }
+
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 15px;
+            border: 2px solid var(--bp-line);
+            padding: 16px 20px;
             margin-bottom: 20px;
+            background: var(--bp-card-bg);
+            position: relative;
+        }
+        .header::after {
+            content: "DWG NO. RFK-REC-004 | REV 2.0 | REF: PICLONE DISASTER RECOVERY PIPELINE";
+            position: absolute;
+            bottom: 3px;
+            right: 15px;
+            font-size: 10px;
+            color: var(--bp-line-dim);
+            letter-spacing: 1px;
         }
         .header h1 {
             margin: 0;
-            font-size: 24px;
-            letter-spacing: 0.5px;
+            font-size: 22px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 800;
         }
         .header .meta {
-            font-size: 14px;
-            color: var(--text-dim);
+            font-size: 13px;
+            color: var(--bp-line-dim);
+            margin-top: 4px;
         }
+
         .nav-tools {
             display: flex;
             gap: 10px;
         }
         .btn {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 8px 16px;
-            border-radius: 6px;
+            background-color: var(--bp-bg);
+            border: 1px solid var(--bp-line);
+            color: var(--bp-line);
+            padding: 8px 14px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
             cursor: pointer;
-            font-weight: 600;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            transition: all 0.2s ease;
+            gap: 6px;
+            transition: all 0.15s ease;
+            text-transform: uppercase;
         }
         .btn:hover {
-            border-color: var(--accent);
-            color: var(--accent-hover);
+            background-color: var(--bp-border-bright);
+            color: #ffffff;
         }
-        .btn-primary {
-            background-color: var(--accent);
-            border-color: var(--accent);
+        .btn-active {
+            background-color: #1e40af !important;
+            border-color: #60a5fa !important;
+        }
+        .btn-action {
+            background-color: #0284c7;
+            border-color: #38bdf8;
             color: #fff;
         }
-        .btn-primary:hover {
-            background-color: var(--accent-hover);
-            color: #fff;
-        }
+
         .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -78,105 +109,84 @@
             margin-bottom: 20px;
         }
         .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
+            background: var(--bp-card-bg);
+            border: 1px solid var(--bp-line);
+            padding: 18px 22px;
         }
         .card h2 {
             margin-top: 0;
-            font-size: 18px;
-            border-bottom: 1px solid var(--border);
+            font-size: 16px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--bp-border);
             padding-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .badge {
-            font-size: 12px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        .badge-good { background: rgba(46, 213, 115, 0.2); color: var(--status-good); }
-        .badge-bad { background: rgba(255, 71, 87, 0.2); color: var(--status-bad); }
-        .badge-warn { background: rgba(255, 165, 2, 0.2); color: var(--status-warn); }
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 12px 0;
-            font-size: 14px;
-        }
-        .stat-label { color: var(--text-dim); }
-        .stat-value { font-weight: bold; font-family: monospace; }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 14px;
-            color: var(--text-dim);
-        }
-        .form-control {
-            width: 100%;
-            padding: 10px;
-            background-color: #121824;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: #fff;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-        .form-control:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-        .checkbox-group {
+
+        .device-info {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-top: 15px;
+            justify-content: space-between;
+            background: #07172b;
+            border: 1px solid var(--bp-border);
+            padding: 12px 16px;
+            margin-bottom: 12px;
+        }
+        .device-info .title {
+            font-weight: bold;
             font-size: 14px;
         }
+        .device-info .sub {
+            font-size: 11px;
+            color: var(--bp-line-dim);
+            margin-top: 3px;
+        }
+        .badge {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .badge-green { background: rgba(34, 197, 94, 0.2); color: var(--data-green); border: 1px solid var(--data-green); }
+        .badge-warn { background: rgba(250, 204, 21, 0.2); color: var(--data-yellow); border: 1px solid var(--data-yellow); }
+
         .log-box {
-            background-color: #0c1017;
-            border: 1px solid var(--border);
-            border-radius: 6px;
+            background: #040d1a;
+            border: 1px solid var(--bp-border);
             padding: 12px;
             font-family: monospace;
             font-size: 12px;
-            color: #a4b0be;
+            color: #38bdf8;
             height: 180px;
             overflow-y: auto;
             white-space: pre-wrap;
+            line-height: 1.4;
         }
-        .recovery-steps {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .recovery-steps li {
-            position: relative;
-            padding-left: 36px;
-            margin-bottom: 16px;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        .step-num {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 24px;
-            height: 24px;
-            background-color: var(--accent);
-            color: #fff;
-            border-radius: 50%;
+
+        .form-row {
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
+            justify-content: space-between;
+        }
+        .form-row label {
+            font-size: 13px;
+            color: var(--bp-line-dim);
+        }
+        select, input[type="time"] {
+            background: #07172b;
+            color: #fff;
+            border: 1px solid var(--bp-line);
+            padding: 6px 12px;
+            font-family: inherit;
+        }
+
+        @media print {
+            body { background: white !important; color: black !important; background-image: none !important; }
+            .header, .card, .device-info { background: white !important; border-color: #000 !important; color: black !important; }
+            .nav-tools { display: none !important; }
         }
     </style>
 </head>
@@ -184,60 +194,62 @@
 
     <div class="header">
         <div>
-            <h1>RF-KIT Disaster Recovery & Backup Suite</h1>
-            <div class="meta" id="stationMeta">Callsign: K7BIT | Automated Boot Cloner</div>
+            <h1>RF-KIT SD Disaster Recovery &amp; Automated Cloning</h1>
+            <div class="meta">STATION CALLSIGN: K7BIT | ARCHITECTURE: 64-BIT AARCH64 DUAL-SD RECOVERY PIPELINE</div>
         </div>
         <div class="nav-tools">
-            <a href="/antenna" class="btn">Antenna Mapper</a>
-            <a href="/health" class="btn">Health Monitor</a>
-            <a href="/backup" class="btn btn-primary">Backup Manager</a>
+            <a href="/antenna" class="btn">🗺️ Antenna Mapper</a>
+            <a href="/health" class="btn">📈 Health Monitor</a>
+            <a href="/screen" class="btn">📺 Remote Screen</a>
+            <a href="/backup" class="btn btn-active">💾 SD Backup</a>
+            <button class="btn" onclick="window.print()">🖨️ Print Sheet</button>
         </div>
     </div>
 
     <div class="grid-2">
-        <!-- Drive Media Detection -->
+        <!-- Target Media Status -->
         <div class="card">
             <h2>
-                <span>Drive Storage Media</span>
-                <span id="targetStatusBadge" class="badge badge-warn">Scanning...</span>
+                <span>Active Storage Subsystem</span>
+                <span class="badge badge-green" id="storageStatus">READY</span>
             </h2>
-            <div class="stat-row">
-                <span class="stat-label">Source Boot Media:</span>
-                <span class="stat-value" id="bootDevDisplay">/dev/mmcblk0 (Internal SD)</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">Boot SD Capacity:</span>
-                <span class="stat-value" id="bootSizeDisplay">-- GB</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">External USB SD Reader:</span>
-                <span class="stat-value" id="targetDevDisplay">Detecting...</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">Target Media Model:</span>
-                <span class="stat-value" id="targetModelDisplay">--</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">Target Capacity:</span>
-                <span class="stat-value" id="targetSizeDisplay">-- GB</span>
+
+            <div class="device-info">
+                <div>
+                    <div class="title" style="color:var(--data-cyan);">BOOT DRIVE (System Active)</div>
+                    <div class="sub" id="bootDev">Device: /dev/mmcblk0 | 32 GB SanDisk Extreme V30</div>
+                </div>
+                <span class="badge badge-green">LIVE</span>
             </div>
 
-            <div style="margin-top: 20px; display: flex; gap: 10px;">
-                <button class="btn btn-primary" id="btnRunNow" onclick="runBackupNow()">Run Backup Now</button>
-                <button class="btn" onclick="fetchStatus()">Refresh Status</button>
+            <div class="device-info">
+                <div>
+                    <div class="title" style="color:var(--data-yellow);">TARGET CLONE SD (USB 3.0 Slot)</div>
+                    <div class="sub" id="targetDev">Device: /dev/sda | 32 GB SanDisk Ultra USB Reader</div>
+                </div>
+                <span class="badge badge-green" id="targetBadge">DETECTED</span>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button class="btn btn-action" style="width:100%; justify-content:center; padding:12px;" onclick="startBackup()">
+                    ⚡ Execute Immediate Full System Clone
+                </button>
             </div>
         </div>
 
-        <!-- Weekly Schedule Configuration -->
+        <!-- Weekly Automated Schedule -->
         <div class="card">
-            <h2>Automated Weekly Schedule</h2>
-            <p style="font-size: 13px; color: var(--text-dim); margin-top: 0;">
-                Pick a recurring weekly time. Leave the amplifier powered or on standby and the system clones automatically.
-            </p>
-            <div class="form-group">
-                <label for="schedDay">Day of the Week:</label>
-                <select id="schedDay" class="form-control">
-                    <option value="0" selected>Sunday (Recommended)</option>
+            <h2>Automated Backup Schedule</h2>
+
+            <div class="form-row">
+                <label>Automatic Weekly Cloning:</label>
+                <input type="checkbox" id="schedEnabled" checked style="width:20px; height:20px;">
+            </div>
+
+            <div class="form-row">
+                <label>Execution Day of Week:</label>
+                <select id="schedDay">
+                    <option value="0" selected>Sunday (03:00 UTC)</option>
                     <option value="1">Monday</option>
                     <option value="2">Tuesday</option>
                     <option value="3">Wednesday</option>
@@ -246,131 +258,73 @@
                     <option value="6">Saturday</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label for="schedTime">Scheduled Time (24h format):</label>
-                <input type="time" id="schedTime" class="form-control" value="03:00">
+
+            <div class="form-row">
+                <label>Execution Time (UTC):</label>
+                <input type="time" id="schedTime" value="03:00">
             </div>
-            <div class="checkbox-group">
-                <input type="checkbox" id="schedEnabled" checked>
-                <label for="schedEnabled">Enable Automated Weekly Backup</label>
-            </div>
-            <div style="margin-top: 15px;">
-                <button class="btn btn-primary" onclick="saveSchedule()">Save Schedule</button>
-                <span id="saveStatus" style="font-size: 13px; margin-left: 10px; color: var(--status-good);"></span>
+
+            <div style="margin-top: 25px;">
+                <button class="btn" style="width:100%; justify-content:center;" onclick="saveSchedule()">
+                    💾 Save Cron Schedule (/etc/cron.d/jrfk_weekly_backup)
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="grid-2">
-        <!-- Disaster Recovery Instructions -->
-        <div class="card">
-            <h2>Disaster Recovery Walkthrough</h2>
-            <ul class="recovery-steps">
-                <li>
-                    <div class="step-num">1</div>
-                    <strong>Swap SD Cards:</strong> In the event of primary boot SD failure, power off the amplifier and remove the internal SD card from the Raspberry Pi slot. Remove the cloned backup SD card from the external USB reader and insert it directly into the Raspberry Pi internal slot.
-                </li>
-                <li>
-                    <div class="step-num">2</div>
-                    <strong>Power On & Automated First Boot:</strong> Turn on amplifier main power. The built-in <code>jrfk_restore_check</code> service automatically verifies user files, aligns partition UUIDs, logs restoration, and executes a single clean reboot.
-                </li>
-                <li>
-                    <div class="step-num">3</div>
-                    <strong>Immediate Resumption:</strong> Following the automatic reboot, the system launches directly into the fullscreen RFKGUI touch interface with 100% of your antenna memory maps, calibration potentiometers, and operational logs completely intact!
-                </li>
-            </ul>
-        </div>
-
-        <!-- Real-Time Activity Log -->
-        <div class="card">
-            <h2>Backup Activity Log</h2>
-            <div class="log-box" id="logContent">Loading activity logs...</div>
-        </div>
+    <!-- Live Backup Log -->
+    <div class="card">
+        <h2>Cloning Pipeline Log (/var/log/rfk_backup.log)</h2>
+        <div class="log-box" id="logBox">Loading backup log stream...</div>
     </div>
 
     <script>
-        async function fetchStatus() {
-            try {
-                const res = await fetch('/api/backup/status');
-                const data = await res.json();
-                
-                document.getElementById('bootDevDisplay').innerText = data.boot_dev + " (Active Boot)";
-                document.getElementById('bootSizeDisplay').innerText = (data.boot_size_bytes / (1024*1024*1024)).toFixed(1) + " GB";
-                
-                const badge = document.getElementById('targetStatusBadge');
-                if (data.target_found) {
-                    badge.className = "badge badge-good";
-                    badge.innerText = "Target Ready";
-                    document.getElementById('targetDevDisplay').innerText = data.target_dev;
-                    document.getElementById('targetModelDisplay').innerText = data.target_name || "USB Flash Media";
-                    document.getElementById('targetSizeDisplay').innerText = (data.target_size_bytes / (1024*1024*1024)).toFixed(1) + " GB";
-                    document.getElementById('btnRunNow').disabled = false;
-                } else {
-                    badge.className = "badge badge-bad";
-                    badge.innerText = "No Target SD Reader Detected";
-                    document.getElementById('targetDevDisplay').innerText = "Not Connected";
-                    document.getElementById('targetModelDisplay').innerText = "Please insert USB SD reader into rear port";
-                    document.getElementById('targetSizeDisplay').innerText = "0 GB";
-                    document.getElementById('btnRunNow').disabled = true;
-                }
-
-                if (data.log) {
-                    document.getElementById('logContent').innerText = data.log;
-                }
-
-                if (data.schedule) {
-                    document.getElementById('schedDay').value = data.schedule.day;
-                    document.getElementById('schedTime').value = data.schedule.time;
-                    document.getElementById('schedEnabled').checked = data.schedule.enabled;
-                }
-            } catch (e) {
-                console.error("Error fetching backup status", e);
-            }
+        function fetchStatus() {
+            fetch('/api/backup/status')
+                .then(r => r.json())
+                .then(d => {
+                    if (d.boot_dev) document.getElementById('bootDev').innerText = `Device: ${d.boot_dev} | ${(d.boot_size_bytes/1073741824).toFixed(1)} GB`;
+                    if (d.target_dev) document.getElementById('targetDev').innerText = `Device: ${d.target_dev} | ${d.target_name || 'USB SD'} (${(d.target_size_bytes/1073741824).toFixed(1)} GB)`;
+                    if (d.log) document.getElementById('logBox').innerText = d.log;
+                    if (d.schedule) {
+                        document.getElementById('schedDay').value = d.schedule.day || "0";
+                        document.getElementById('schedTime').value = d.schedule.time || "03:00";
+                        document.getElementById('schedEnabled').checked = d.schedule.enabled !== false;
+                    }
+                })
+                .catch(() => {});
         }
 
-        async function saveSchedule() {
-            const day = document.getElementById('schedDay').value;
-            const time = document.getElementById('schedTime').value;
-            const enabled = document.getElementById('schedEnabled').checked;
-
-            try {
-                const res = await fetch('/api/backup/schedule', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({day, time, enabled})
+        function startBackup() {
+            if (!confirm("Start full system replication from /dev/mmcblk0 to USB SD? Ensure target SD contains no vital data.")) return;
+            fetch('/api/backup/start', {method: 'POST'})
+                .then(r => r.json())
+                .then(d => {
+                    alert("Cloning task dispatched in background! Progress logged to /var/log/rfk_backup.log");
+                    fetchStatus();
                 });
-                const resp = await res.json();
-                const saveStatus = document.getElementById('saveStatus');
-                saveStatus.innerText = "Schedule saved successfully!";
-                setTimeout(() => { saveStatus.innerText = ""; }, 3000);
-            } catch (e) {
-                alert("Failed to save schedule: " + e);
-            }
         }
 
-        async function runBackupNow() {
-            if (!confirm("Are you sure you want to clone the active boot SD to the external backup SD? This will overwrite the target card.")) {
-                return;
-            }
-            const btn = document.getElementById('btnRunNow');
-            btn.disabled = true;
-            btn.innerText = "Backup Running...";
-            
-            try {
-                await fetch('/api/backup/start', {method: 'POST'});
-                alert("Backup initiated in background. Check the Activity Log below for real-time progress.");
-                setTimeout(fetchStatus, 3000);
-            } catch (e) {
-                alert("Error starting backup: " + e);
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Run Backup Now";
-            }
+        function saveSchedule() {
+            let payload = {
+                day: document.getElementById('schedDay').value,
+                time: document.getElementById('schedTime').value,
+                enabled: document.getElementById('schedEnabled').checked
+            };
+            fetch('/api/backup/schedule', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            })
+            .then(r => r.json())
+            .then(d => {
+                alert("Backup schedule committed successfully!");
+                fetchStatus();
+            });
         }
 
-        // Poll status every 10 seconds
         fetchStatus();
-        setInterval(fetchStatus, 10000);
+        setInterval(fetchStatus, 5000);
     </script>
 </body>
 </html>

@@ -19,6 +19,7 @@ PAYLOAD_FILES = [
 ]
 
 PAYLOAD_DIRS = [
+    "docs",
     "tools/migrator",
     "tools/rfk_tools_suite",
     "tools/py_deps",

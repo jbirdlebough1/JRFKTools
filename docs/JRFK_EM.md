@@ -128,10 +128,12 @@
    * 14.2 Automated Weekly Cron Job Architecture & User Time Selection
    * 14.3 Disaster Recovery Workflow: The "Swap, Boot, Reboot, Run" Paradigm
 15. [Integrated Diagnostic Suite Architecture (rfk_tools_suite on Port 8088)](#15-integrated-diagnostic-suite-architecture-rfk_tools_suite-on-port-8088)
-   * 15.1 Port Allocation Matrix & Network Architecture
-   * 15.2 Antenna Mapper Interface (/antenna)
-   * 15.3 Amplifier Health & Thermal Monitor (/health)
-   * 15.4 Backup & Disaster Recovery Web Manager (/backup)
+   * 15.1 Architectural Blueprint Format & Port Allocation Matrix
+   * 15.2 Antenna Mapper Interface (/antenna): Segments, Port Map & Real L/C
+   * 15.3 Amplifier Health Monitor & 3-Tier Thermal Safety Guard (/health)
+   * 15.4 Circular Telemetry Logging (10 MB Rotating File)
+   * 15.5 Live Remote Web Screen Console (/screen)
+   * 15.6 Backup & Disaster Recovery Web Manager (/backup)
 16. [System Configuration, Database Engine & Station Personalization](#16-system-configuration-database-engine--station-personalization)
    * 16.1 Display Themes: Cross-Pointer vs Standard Bar Meters
    * 16.2 Station Callsign, Antenna Port Aliasing & Band Allocation
@@ -1218,49 +1220,138 @@ In the event of physical SD card failure, lightning damage, or filesystem corrup
 flowchart TD
     subgraph DataSources ["Telemetry & Data Plane"]
         CAN["SocketCAN (can0)<br/>53.5V Rail & Current"]
-        MCU["Controller MCU<br/>Tuner L/C/K EEPROM"]
-        RFK["RF-KIT GUI Core<br/>REST API (:8080)"]
+        MCU["Controller MCU<br/>Tuner L/C/K EEPROM & Switched Relays"]
+        RFK["RF-KIT GUI Core<br/>REST API (:8080) & Localhost RPC"]
+        DISP["X11 Framebuffer (:0)<br/>Waveshare 7 inch 1024x600 Console"]
     end
     subgraph ToolsServer ["RFK Tools Suite Server (Port 8088)"]
         Daemon["Telemetry Polling Daemon<br/>(Every 5 Seconds)"]
         RingBuf["1-Hour High-Res RAM Buffer<br/>(720 Data Points)"]
         SQLite["24-Hour Rolling SQLite DB<br/>(telemetry_history.db)"]
+        CircLog["10MB Circular Rolling Log<br/>(/home/pi/rfk_tools/telemetry_rolling.log)"]
+        ThermGuard["Thermal Guard State Machine<br/>(>50C Warn, >55C Red, >60C Unkey Trip)"]
+        ScreenAPI["Remote Screen Capture Engine<br/>(/api/screen/capture & /screen)"]
     end
-    subgraph UserInterface ["Operator Diagnostic Tools"]
-        Mapper["Antenna Mapper<br/>SWR Matrix & Segment Inspection"]
-        Health["Amplifier Health Monitor<br/>Power, Sag, Thermal Profile"]
-        Print["Standard CUPS / IP Network Printing<br/>(@media print Vector Sheet)"]
+    subgraph UserInterface ["Blueprint Diagnostic Tools (White on #0a2540)"]
+        Mapper["Antenna Mapper (/antenna)<br/>Bode Plot, | Segment Bounds, Real L(nH) & C(pF)"]
+        Health["Amplifier Health Monitor (/health)<br/>Typ/Min/Max Stats & 300s Thermal Countdown"]
+        ScreenViewer["Remote Web Screen Console (/screen)<br/>1024x600 Live RFK Streaming View"]
+        Backup["Disaster Recovery Manager (/backup)<br/>Weekly Cron Replication to USB SD"]
+        Print["Standard CUPS / IP Network Printing<br/>(@media print Vector Technical Sheet)"]
     end
     DataSources --> Daemon
+    DISP --> ScreenAPI
     Daemon --> RingBuf
     Daemon --> SQLite
+    Daemon --> CircLog
+    Daemon --> ThermGuard
     RingBuf --> Health
     SQLite --> Health
+    CircLog --> Health
+    ThermGuard --> Health
+    ThermGuard -->|Emergency Unkey / Standby| RFK
     MCU --> Mapper
+    ScreenAPI --> ScreenViewer
     Mapper --> Print
     Health --> Print
 ```
 
-### 15.1 Port Allocation Matrix & Network Architecture
+### 15.1 Architectural Blueprint Format & Port Allocation Matrix
+All user-facing diagnostic cards in the JRFK Tools Suite strictly utilize the **Architectural Blueprint Format**:
+* **Background Plane:** Deep architectural navy/cobalt blueprint blue (`#0a2540` / `#07172b`) with subtle isometric/Cartesian grid overlay (`#103b68` at $20\text{px}$ pitch).
+* **Structural Vectors & Annotations:** Crisp architectural white (`#ffffff`) borders, dimension lines, and technical metadata.
+* **Telemetry Data Accents:** Vivid functional status colors:
+  * Green (`#22c55e`): Normal operating duty ($\le 50^\circ\text{C}$, $\text{SWR} < 1.5:1$).
+  * Yellow (`#facc15` / `#d97706`): Warning zone ($> 50^\circ\text{C}$, $\text{SWR} 1.5 - 2.0:1$).
+  * Red (`#ef4444` / `#dc2626`): Critical alert / trip ($> 55^\circ\text{C}$, $\text{SWR} > 2.0:1$).
+  * Cyan (`#38bdf8`): RF power vectors, active antenna names, and frequency spans.
+
+**Network Port Allocation:**
 * **Port 8080:** Native RF-KIT REST API and remote control interface.
-* **Port 8088:** JRFK Diagnostic & Management Suite (Antenna Mapper, Health Monitor, Backup Manager).
-* **Port 5900:** Pure RealVNC server for remote graphical touch control.
+* **Port 8088:** JRFK Tools Suite (Antenna Mapper, Health Monitor, Remote Screen Viewer, Backup Manager).
+* **Port 22:** Pre-authorized SSH administration with dedicated public key authentication.
+* **Port 5900:** Pure RealVNC server for direct remote desktop manipulation.
+
+---
 
 ### 15.2 Antenna Mapper Interface (`/antenna`)
-Displays an interactive SWR matrix across all amateur bands (160m through 6m):
-* **Band Spinner:** Rapidly cycles through bands.
-* **Horizontal Scrollbar:** Smooth pan and zoom across frequency segments.
-* **Click-to-Inspect:** Clicking any frequency node reveals exact stored tuner relays ($L, C, K$ steps).
-* **Network IP Printing:** One-click `@media print` style sheet outputs crisp vector reports to any network printer via CUPS.
+The Antenna Mapper provides deep visibility into the automatic tuner (ATU) calibration matrices across all 11 amateur bands (160m through 6m):
+1. **Vertical Segment Boundary Markers (`|`):**
+   Amateur bands are divided into discrete tuning segments based on fractional bandwidth and loaded $Q$:
+   * **160m (1.800–2.000 MHz):** 20 kHz segments (10 discrete segments).
+   * **80m (3.500–4.000 MHz):** 25 kHz segments (20 discrete segments).
+   * **40m (7.000–7.300 MHz):** 15 kHz segments (20 discrete segments).
+   * **20m (14.000–14.350 MHz):** 25 kHz segments (14 discrete segments).
+   * **10m (28.000–29.700 MHz):** 50 kHz segments (34 discrete segments).
+   * **6m (50.000–54.000 MHz):** 100 kHz segments (40 discrete segments).
+   The SWR Bode plot explicitly marks each segment boundary with a vertical dividing rule and a `"|"` character at the frequency transition, providing immediate visual feedback of segment coverage.
+2. **Antenna Port Map Dynamic Synchronization:**
+   The `ACTIVE ANTENNA` field continuously reflects the band-to-port mapping configured in `config.json` (`selected_antennas` array and `custom_antenna_names`). As the operator scrolls through bands via the band spinner or quick-select keys, the antenna label dynamically switches to the assigned port (e.g. `ANT 2: 20m-6m SteppIR`), and the Bode plot instantly re-renders for that band's tuning curve.
+3. **Physical Engineering Units (Elimination of Clicks/Steps):**
+   Traditional raw stepper counts are converted directly into physical SI units:
+   * **Inductance ($L$):** Displayed in **nanohenries ($\text{nH}$)** and **microhenries ($\mu\text{H}$)** derived from the binary-weighted relay inductor bank:
+     $$\text{Relay Weights: } L_1=100\text{ nH},\, L_2=200\text{ nH},\, L_3=400\text{ nH},\, L_4=800\text{ nH},\, L_5=1600\text{ nH},\, L_6=3200\text{ nH},\, L_7=6400\text{ nH}$$
+   * **Capacitance ($C$):** Displayed in **picofarads ($\text{pF}$)** derived from the binary capacitor network:
+     $$\text{Relay Weights: } C_1=10\text{ pF},\, C_2=20\text{ pF},\, C_3=40\text{ pF},\, C_4=80\text{ pF},\, C_5=160\text{ pF},\, C_6=320\text{ pF},\, C_7=640\text{ pF},\, C_8=1280\text{ pF}$$
+   * **Matching Topology:** Explicitly displays low-pass or high-pass matching configuration: $\text{CL } (C_{\text{in}}\text{ transmitter side})$ or $\text{LC } (C_{\text{out}}\text{ antenna side})$.
 
-### 15.3 Amplifier Health & Thermal Monitor (`/health`)
-Provides real-time and historical health analytics:
-* **1-Hour Window:** High-resolution in-memory ring buffer sampled every 5 seconds (720 data points).
-* **24-Hour Window:** Historical telemetry persisted in SQLite (`telemetry_history.db`).
-* **Visual Gauges & Canvases:** Tracks Forward Power, Reflected Power, 53.5V DC rail sag under load, total PA current, and heat sink thermal rise with $38^\circ\text{C}$ and $42^\circ\text{C}$ fan trigger overlays.
+---
 
-### 15.4 Backup & Disaster Recovery Web Manager (`/backup`)
-Web-based management console for configuring weekly backup cron schedules, monitoring target media status, and reviewing real-time clone logs.
+### 15.3 Amplifier Health Monitor & 3-Tier Thermal Safety Guard (`/health`)
+The Health Monitor incorporates an autonomous **Thermal Guard State Machine** engineered to protect the LDMOS transistors ($2\times \text{MRFE6VP11KH}$ or equivalent) against thermal runaway:
+
+```
+[PA Heatsink Temp]
+       │
+       ├── <= 50.0°C  ──> TIER 1: NORMAL (Line GREEN | Fan Automation Active)
+       │
+       ├── > 50.0°C   ──> TIER 2: WARNING (Line YELLOW | Pop-over Warning Banner)
+       │
+       ├── > 55.0°C   ──> TIER 3: ALERT (Line RED | Critical Thermal Load Notification)
+       │
+       └── > 60.0°C   ──> TIER 4: HARDWARE TRIP LIMIT
+                               │
+                               ├── 1. Execute Controller Unkey (Force Core to STANDBY)
+                               ├── 2. Display Modal Alert: "AMPLIFIER DISABLED AND PROTECTED"
+                               ├── 3. Initiate Live 300-Second (5-Minute) Cooldown Countdown
+                               └── 4. SAFETY INTERLOCK LATCH:
+                                      When timer expires (0s):
+                                        If Temp < 50.0°C: Auto-re-enable OPERATE & notify operator
+                                        Else: Maintain Standby until Temp drops < 50.0°C
+```
+
+* **Live 300-Second Modal Overlay:** While in safety trip, a persistent countdown timer ticks down on the amplifier display and web console.
+* **Hysteresis Recovery Latch:** The amplifier will strictly refuse to return to Operate mode until the heatsink has dissipated excess heat and dropped below $50.0^\circ\text{C}$.
+
+---
+
+### 15.4 Circular Telemetry Logging (10 MB Rotating File)
+To guarantee storage stability and prevent flash memory wear on the Raspberry Pi MicroSD, telemetry is logged to a fixed-size rotating circular buffer:
+* **Log Location:** `/home/pi/rfk_tools/telemetry_rolling.log`
+* **Size Enforcement:** `RotatingFileHandler(maxBytes=10*1024*1024, backupCount=1)` strictly limits log footprint to 10 Megabytes.
+* **Statistical Tracking Engine:** The collector maintains running min, max, and typical (moving average) metrics for all key operational parameters:
+  * **Temperature ($^\circ\text{C}$):** Current, Typ, Min, Max.
+  * **53.5V DC Rail Voltage ($\text{V}$):** Monitored for sag under high-current carrier key-down.
+  * **Drain Current ($\text{A}$):** Current, Typ, Min, Max (verifying balance across LDMOS devices).
+  * **Forward & Reflected RF Power ($\text{W}$):** Peak and average envelope logging.
+  * **Calculated SWR:** Peak mismatch detection.
+
+---
+
+### 15.5 Live Remote Web Screen Console (`/screen`)
+To facilitate remote station operation and shack monitoring, the JRFK Tools Suite provides a web-based console mirror:
+* **Endpoint:** `http://<station-ip>:8088/screen`
+* **Display Capture:** Directly captures the native 1024x600 X11 framebuffer (`:0`) or serves an interactive SVG console mirror.
+* **Frame Rate Control:** Configurable refresh intervals (1.0 second, 2.0 seconds, 5.0 seconds, or Pause) for low-bandwidth LAN or WAN connections.
+* **Fullscreen Support:** One-click full-screen mode turns any tablet, laptop, or second monitor into an auxiliary RF-KIT touch console.
+
+---
+
+### 15.6 Backup & Disaster Recovery Web Manager (`/backup`)
+Web interface managing the automated replication of `/dev/mmcblk0` to an external USB 3.0 MicroSD reader (`/dev/sda`):
+* **One-Click Manual Replication:** Triggers `rfk_backup.sh` in the background with real-time log streaming.
+* **Weekly Automated Cron Management:** Commits execution schedules to `/etc/cron.d/jrfk_weekly_backup` (default: Sunday 03:00 UTC).
+* **Storage Media Sizing Guard:** Verifies target media capacity meets or exceeds boot drive capacity before initiating block-level copy.
 
 ---
 

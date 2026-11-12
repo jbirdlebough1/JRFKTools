@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RF-KIT Remote Screen Viewer (1024x600 Live Console)</title>
+    <style>
+        :root {
+            --bp-bg: #0a2540;
+            --bp-grid: #103b68;
+            --bp-line: #ffffff;
+            --bp-line-dim: #93c5fd;
+            --bp-card-bg: rgba(10, 37, 64, 0.88);
+            --bp-border: #1d528f;
+            --bp-border-bright: #3b82f6;
+            --data-green: #22c55e;
+            --data-yellow: #facc15;
+            --data-red: #ef4444;
+            --data-cyan: #38bdf8;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', -apple-system, sans-serif;
+            background-color: var(--bp-bg);
+            background-image: 
+                linear-gradient(var(--bp-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--bp-line);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid var(--bp-line);
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            background: var(--bp-card-bg);
+            position: relative;
+        }
+        .header::after {
+            content: "DWG NO. RFK-DISP-003 | REV 1.8 | REF: 1024x600 WAVESHARE DSI/HDMI CONSOLE";
+            position: absolute;
+            bottom: 3px;
+            right: 15px;
+            font-size: 10px;
+            color: var(--bp-line-dim);
+            letter-spacing: 1px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 22px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+        .header .meta {
+            font-size: 13px;
+            color: var(--bp-line-dim);
+            margin-top: 4px;
+        }
+
+        .nav-tools {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            background-color: var(--bp-bg);
+            border: 1px solid var(--bp-line);
+            color: var(--bp-line);
+            padding: 8px 14px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background-color: var(--bp-border-bright);
+            color: #ffffff;
+        }
+        .btn-active {
+            background-color: #1e40af !important;
+            border-color: #60a5fa !important;
+        }
+
+        /* Viewer Frame Card */
+        .viewer-card {
+            background: var(--bp-card-bg);
+            border: 2px solid var(--bp-line);
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .screen-toolbar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--bp-border);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: var(--bp-line-dim);
+        }
+
+        .screen-container {
+            width: 1024px;
+            max-width: 100%;
+            height: 600px;
+            max-height: 60vh;
+            border: 3px solid #38bdf8;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
+            background: #000;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .screen-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .pill-live {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid var(--data-green);
+            color: var(--data-green);
+        }
+
+        /* Remote Shack Quick Telemetry */
+        .remote-shack-bar {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            border-top: 1px solid var(--bp-border);
+            padding-top: 15px;
+        }
+        .stat-box {
+            border: 1px solid var(--bp-border);
+            padding: 10px 14px;
+            background: #071a2e;
+        }
+        .stat-box .lbl {
+            font-size: 10px;
+            color: var(--bp-line-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .stat-box .val {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1>RF-KIT Web Remote Console (1024x600 Live Display)</h1>
+            <div class="meta">STATION CALLSIGN: K7BIT | DISPLAY TARGET: X11 :0 WAVESHARE 7" 1024x600</div>
+        </div>
+        <div class="nav-tools">
+            <a href="/antenna" class="btn">🗺️ Antenna Mapper</a>
+            <a href="/health" class="btn">📈 Health Monitor</a>
+            <a href="/screen" class="btn btn-active">📺 Remote Screen</a>
+            <a href="/backup" class="btn">💾 SD Backup</a>
+            <button class="btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+        </div>
+    </div>
+
+    <div class="viewer-card">
+        <div class="screen-toolbar">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <span class="status-pill pill-live" id="streamStatus">● LIVE STREAM ACTIVE</span>
+                <span>RESOLUTION: <strong>1024 x 600</strong> (PURE KMS MODE)</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span>Refresh Interval:</span>
+                <select id="refreshRate" onchange="changeInterval()" style="background:#07172b; color:#fff; border:1px solid var(--bp-line); padding:4px 8px; font-family:inherit;">
+                    <option value="1000" selected>1.0 Second</option>
+                    <option value="2000">2.0 Seconds</option>
+                    <option value="5000">5.0 Seconds</option>
+                    <option value="0">Paused</option>
+                </select>
+                <button class="btn" style="padding:4px 10px;" onclick="refreshNow()">⚡ Refresh Now</button>
+            </div>
+        </div>
+
+        <div class="screen-container" id="screenContainer">
+            <img id="screenFrame" class="screen-img" src="/api/screen/capture" alt="RF-KIT Live Screen Stream">
+        </div>
+
+        <div class="remote-shack-bar">
+            <div class="stat-box">
+                <div class="lbl">RF Forward Power</div>
+                <div class="val" id="stat-fwd" style="color:var(--data-cyan);">1,450 W</div>
+            </div>
+            <div class="stat-box">
+                <div class="lbl">SWR &amp; Reflected</div>
+                <div class="val" id="stat-swr" style="color:var(--data-green);">1.18:1 (14W)</div>
+            </div>
+            <div class="stat-box">
+                <div class="lbl">PA Heatsink Temp</div>
+                <div class="val" id="stat-temp" style="color:var(--data-green);">34.5 °C</div>
+            </div>
+            <div class="stat-box">
+                <div class="lbl">DC Rail Regulation</div>
+                <div class="val" id="stat-volt" style="color:#ffffff;">53.4 V @ 28.4 A</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let timer = null;
+        let refreshMs = 1000;
+
+        function refreshNow() {
+            let img = document.getElementById('screenFrame');
+            img.src = '/api/screen/capture?t=' + new Date().getTime();
+            fetchTele();
+        }
+
+        function fetchTele() {
+            fetch('/api/telemetry')
+                .then(r => r.json())
+                .then(d => {
+                    if (d.stats) {
+                        let s = d.stats;
+                        document.getElementById('stat-fwd').innerText = `${s.p_fwd.cur.toFixed(0)} W`;
+                        document.getElementById('stat-swr').innerText = `${s.swr.cur.toFixed(2)}:1 (${s.p_refl.cur.toFixed(0)}W)`;
+                        document.getElementById('stat-temp').innerText = `${s.temp.cur.toFixed(1)} °C`;
+                        document.getElementById('stat-volt').innerText = `${s.volt.cur.toFixed(1)} V @ ${s.curr.cur.toFixed(1)} A`;
+
+                        let tempColor = s.temp.cur <= 50 ? 'var(--data-green)' : (s.temp.cur <= 55 ? 'var(--data-yellow)' : 'var(--data-red)');
+                        document.getElementById('stat-temp').style.color = tempColor;
+                    }
+                })
+                .catch(() => {});
+        }
+
+        function changeInterval() {
+            let val = parseInt(document.getElementById('refreshRate').value);
+            refreshMs = val;
+            if (timer) clearInterval(timer);
+            if (refreshMs > 0) {
+                timer = setInterval(refreshNow, refreshMs);
+                document.getElementById('streamStatus').innerText = '● LIVE STREAM ACTIVE';
+                document.getElementById('streamStatus').className = 'status-pill pill-live';
+            } else {
+                document.getElementById('streamStatus').innerText = '⏸ STREAM PAUSED';
+                document.getElementById('streamStatus').className = 'status-pill';
+            }
+        }
+
+        function toggleFullscreen() {
+            let el = document.getElementById('screenContainer');
+            if (!document.fullscreenElement) {
+                el.requestFullscreen().catch(err => alert(err.message));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Initialize streaming
+        changeInterval();
+    </script>
+</body>
+</html>
