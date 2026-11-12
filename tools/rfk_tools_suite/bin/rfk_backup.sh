@@ -32,16 +32,32 @@ fi
 # 2. Search for External USB Target
 find_target_dev() {
     local target=""
+    local root_part=$(findmnt -n -o SOURCE / 2>/dev/null || echo "")
+    local boot_part=$(findmnt -n -o SOURCE /boot 2>/dev/null || findmnt -n -o SOURCE /boot/firmware 2>/dev/null || echo "")
+
     for dev in /dev/sd[a-z]; do
         if [ -b "$dev" ]; then
-            # Ensure it is not the active root or boot partition
-            if ! grep -qs "$dev" /proc/mounts; then
-                target="$dev"
-                break
+            # 1. Verify media capacity is > 0 (empty USB card readers report 0 bytes)
+            local sz=$(lsblk -bno SIZE "$dev" 2>/dev/null | head -n1 || echo "0")
+            if [ -n "$sz" ] && [ "$sz" -gt 0 ] 2>/dev/null; then
+                # 2. Ensure this disk does NOT contain the active root or boot partition
+                if [[ "$root_part" != "${dev}"* ]] && [[ "$boot_part" != "${dev}"* ]]; then
+                    target="$dev"
+                    break
+                fi
             fi
         fi
     done
     echo "$target"
+}
+
+unmount_target_partitions() {
+    local target="$1"
+    if [ -n "$target" ] && [ -b "$target" ]; then
+        for mnt in $(grep "^${target}" /proc/mounts 2>/dev/null | awk '{print $2}'); do
+            umount -l "$mnt" 2>/dev/null || true
+        done
+    fi
 }
 
 TARGET_DEV=$(find_target_dev)
@@ -53,9 +69,11 @@ if [ "$1" == "--status" ]; then
     TARGET_NAME="None"
     TARGET_FOUND=false
     if [ -n "$TARGET_DEV" ] && [ -b "$TARGET_DEV" ]; then
-        TARGET_FOUND=true
         TARGET_SIZE=$(lsblk -bno SIZE "$TARGET_DEV" 2>/dev/null | head -n1 || echo "0")
-        TARGET_NAME=$(lsblk -no MODEL "$TARGET_DEV" 2>/dev/null | head -n1 || echo "$TARGET_DEV")
+        if [ "$TARGET_SIZE" -gt 0 ] 2>/dev/null; then
+            TARGET_FOUND=true
+            TARGET_NAME=$(lsblk -no MODEL "$TARGET_DEV" 2>/dev/null | head -n1 || echo "$TARGET_DEV")
+        fi
     fi
     LAST_LOG=$(tail -n 10 "$LOG_FILE" 2>/dev/null || echo "No backups run yet.")
     
@@ -91,6 +109,10 @@ if [ "$1" == "--auto" ] || [ "$1" == "--cron" ]; then
     TARGET_BYTES=$(lsblk -bno SIZE "$TARGET_DEV" | head -n1)
     log "[*] Capacity Check: Source=${BOOT_BYTES} B, Target=${TARGET_BYTES} B"
     
+    # Safely unmount any desktop automounted partitions on target before cloning
+    log "[*] Unmounting any active target partitions on $TARGET_DEV..."
+    unmount_target_partitions "$TARGET_DEV"
+
     log "[*] Executing live partition clone via piclone with UUID re-generation..."
     if which piclone >/dev/null 2>&1; then
         if piclone -f "$BOOT_DEV" "$TARGET_DEV" >> "$LOG_FILE" 2>&1; then
@@ -151,6 +173,9 @@ read -p "Proceed with full clone and user data sync? (y/N): " CONFIRM
 
 if [[ "$CONFIRM" =~ ^[Yy]$ ]]; then
     echo ""
+    echo "[*] Unmounting any active target partitions on $TARGET_DEV..."
+    unmount_target_partitions "$TARGET_DEV"
+    
     echo "[*] Initiating clone (this may take several minutes)..."
     log "Interactive backup initiated by operator from $BOOT_DEV to $TARGET_DEV"
     if which piclone >/dev/null 2>&1; then

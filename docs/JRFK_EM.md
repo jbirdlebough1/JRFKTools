@@ -14,7 +14,7 @@
 
 > [!CAUTION]
 > **RESEARCH EXPERIMENTATION & LIABILITY DISCLAIMER**  
-> This software and documentation is purely research experimentation and is provided strictly **"AS IS"**. It communicates directly with high-voltage RF power amplifier hardware and high-current DC power supply subsystems ($53.5\text{ VDC} @ 55\text{ A}$). It may damage your amplifier, power supply, LDMOS transistors, exciter/transceiver, antenna system, or computer. The goal of this project is the experimental exploration of what is possible in modern 64-bit embedded Linux platforms, real-time telemetry diagnostics, and resilient disaster recovery for amateur radio linear amplifiers. Users accept all risks and agree to hold authors, contributors, and developers completely harmless regardless of outcome. **USE AT YOUR OWN RISK.**
+> This software and documentation is purely research experimentation and is provided strictly **"AS IS"**. It communicates directly with high-voltage RF power amplifier hardware and high-current DC power supply subsystems (53.5 VDC @ 55 A). It may damage your amplifier, power supply, LDMOS transistors, exciter/transceiver, antenna system, or computer. The goal of this project is the experimental exploration of what is possible in modern 64-bit embedded Linux platforms, real-time telemetry diagnostics, and resilient disaster recovery for amateur radio linear amplifiers. Users accept all risks and agree to hold authors, contributors, and developers completely harmless regardless of outcome. **USE AT YOUR OWN RISK.**
 > 
 > **Community Rules:**
 > 1. **Open Source & Copyleft:** Keep all innovations accessible, auditable, and free for everyone.
@@ -201,9 +201,9 @@ The **JRFK Project** provides a complete, turnkey 64-bit appliance operating env
 # 2. Controller Evolution: Original Mega 2560 vs. Updated Controller
 
 ### 2.1 The Original B26 Mega 2560 Backplane Design
-The original B26 amplifier design centered around an Atmel ATmega2560 8-bit AVR microcontroller running at $16\text{ MHz}$, mounted on a custom motherboard backplane. In this topology:
+The original B26 amplifier design centered around an Atmel ATmega2560 8-bit AVR microcontroller running at 16 MHz, mounted on a custom motherboard backplane. In this topology:
 * Analog voltages from directional couplers, DC shunts, voltage dividers, and thermistors were fed directly to the ATmega2560 10-bit analog-to-digital converter (ADC) pins (`A0` through `A7`).
-* Digital relay outputs were routed via high-voltage, high-current Darlington transistor arrays (ULN2803A) to drive $12\text{ V}$ relay coils on the LPF, ATU, and Antenna Selector boards.
+* Digital relay outputs were routed via high-voltage, high-current Darlington transistor arrays (ULN2803A) to drive 12 V relay coils on the LPF, ATU, and Antenna Selector boards.
 * Non-volatile configuration was stored in an external I2C Ferroelectric RAM (FRAM FM24CL64).
 * The Raspberry Pi host communicated with the ATmega2560 over a standard USB serial port (`/dev/ttyACM0`) using the STK500v2 protocol for firmware upgrades and SimpleRPC for runtime operations.
 
@@ -225,11 +225,11 @@ Despite the lack of public schematics for the updated controller, thorough empir
    * `R17`: Low Pass Filter (LPF) Forward Power Protection Balance.
    * `R19`: Forward Peak Power Display Scaling.
    * `R20`: Reflected Power & SWR Display Scaling.
-   * `R21`: LDMOS Quiescent Bias Current ($I_{dq}$) Display Scaling.
+   * `R21`: LDMOS Quiescent Bias Current (Idq) Display Scaling.
    * `SPARE`: PA Pallet Current Limiter Latch Monitor.
 2. **Identical ADC Channel Mapping:** The firmware continues to map analog signals to the same logical channels (`A0` to `A5`), scaling them internally to conform to the SimpleRPC data types.
 3. **Identical SimpleRPC Wire-Format:** The 71 remote procedure call signatures, parameter ordering, bitmasks, and return tuple structures remain 100% identical.
-4. **Identical Protection Mechanisms:** Fast analog hardware comparator trip loops continue to clamp gate bias and release transmit relays within $< 5\text{ ms}$ upon sensing excessive RF input drive or severe antenna mismatch.
+4. **Identical Protection Mechanisms:** Fast analog hardware comparator trip loops continue to clamp gate bias and release transmit relays within < 5 ms upon sensing excessive RF input drive or severe antenna mismatch.
 
 Consequently, all calibration steps, test procedures, and diagnostic tools described in this manual apply with equal precision to both the original Mega 2560 controller and the updated proprietary controller.
 
@@ -425,7 +425,7 @@ Every iteration of `get_all_values` returns the following register payload:
 | :---: | :--- | :---: | :---: | :--- |
 | `[0]` | `p_forward` | `int` | Watts (W) | Forward peak power detected at directional coupler (ADC A0). |
 | `[1]` | `p_reflected` | `int` | Watts (W) | Reflected power detected at directional coupler (ADC A1). |
-| `[2]` | `swr` | `float` | Ratio (X:1) | Calculated Standing Wave Ratio: $\frac{1 + \sqrt{P_{ref}/P_{fwd}}}{1 - \sqrt{P_{ref}/P_{fwd}}}$. |
+| `[2]` | `swr` | `float` | Ratio (X:1) | Calculated Standing Wave Ratio: \frac{1 + sqrt(P_{ref)/Pfwd}}{1 - sqrt(P_{ref)/Pfwd}}. |
 | `[3]` | `pa_voltage` | `float` | Volts (V) | Main high-current DC rail voltage (Nominal 53.5V via R1/R2 divider). |
 | `[4]` | `pa_current` | `float` | Amperes (A) | Total PA current consumption (Nominal 5.8A Idq up to 38A full drive). |
 | `[5]` | `temperature` | `float` | Celsius (°C) | Heat sink temperature measured via LM35 / NTC thermistor. |
@@ -573,28 +573,28 @@ Two distinct hardware iterations exist across the RF-KIT amplifier lineage:
 
 The controller backplane routes signals across standardized header blocks:
 * **Analog Channels (Header A):**
-  - `A0`: Directional Coupler Forward Power Peak Detector ($0–5\text{ V} \equiv 0–2500\text{ W}$).
+  - `A0`: Directional Coupler Forward Power Peak Detector (0–5 V ≡ 0–2500 W).
   - `A1`: Antenna Tuner RF Detector Gain Booster (Aligned to 600 ADC @ 10W drive).
   - `A2`: LPF Forward Power Detector (Aligned to 93 ADC @ 50W drive for fault trips).
   - `A3`: PA Pallet Current Limiter Latch Monitor (Aligned to 1000 ADC via SPARE pot).
-  - `A4`: 53.5V High-Voltage Supply Divider ($R_1 = 100\text{ k}\Omega, R_2 = 10\text{ k}\Omega$, ratio 11:1).
-  - `A5`: Heat Sink Temperature Sensor ($10\text{ mV}/^\circ\text{C}$).
+  - `A4`: 53.5V High-Voltage Supply Divider (R1 = 100 kΩ, R2 = 10 kΩ, ratio 11:1).
+  - `A5`: Heat Sink Temperature Sensor (10 mV/°C).
 * **Digital Outputs (ULN2803 Drivers):**
   - Pins `D22`–`D29`: Low Pass Filter Relay Select (160m, 80m, 60/40m, 30/20m, 17/15m, 12/10m, 6m).
-  - Pins `D30`–`D37`: Antenna Tuner Inductor Matrix Relays ($L_1$ through $L_8$).
-  - Pins `D38`–`D45`: Antenna Tuner Capacitor Matrix Relays ($C_1$ through $C_8$).
+  - Pins `D30`–`D37`: Antenna Tuner Inductor Matrix Relays (L1 through L8).
+  - Pins `D38`–`D45`: Antenna Tuner Capacitor Matrix Relays (C1 through C8).
   - Pins `D46`–`D49`: Antenna Selection Coaxial Relays (ANT 1 through ANT 4).
   - Pin `D50`: Main RF Input / PA Bias Enable Key Line.
 
 ### 6.3 ADC Prescalers, Sampling Windows & Anti-Aliasing Filters
 
-On the ATmega2560, the ADC clock is derived by dividing the 16 MHz system clock by a prescaler factor of 128, producing an ADC clock of 125 kHz. A normal 10-bit successive approximation conversion requires 13 ADC clock cycles ($104\ \mu\text{s}$). To ensure noise-free measurements under extreme RF fields ($1500\text{ W}$ in close chassis proximity), each analog line incorporates a dual-pole $RC$ low-pass filter ($1\text{ k}\Omega + 100\text{ nF}$ ceramic capacitor) delivering a cutoff frequency of $f_c \approx 1.59\text{ kHz}$.
+On the ATmega2560, the ADC clock is derived by dividing the 16 MHz system clock by a prescaler factor of 128, producing an ADC clock of 125 kHz. A normal 10-bit successive approximation conversion requires 13 ADC clock cycles (104 µs). To ensure noise-free measurements under extreme RF fields (1500 W in close chassis proximity), each analog line incorporates a dual-pole RC low-pass filter (1 kΩ + 100 nF ceramic capacitor) delivering a cutoff frequency of fc ≈ 1.59 kHz.
 
 #### Microcontroller Register Configuration
-* **`ADMUX` (ADC Multiplexer Selection Register):** Configured with bits `REFS0 = 1, REFS1 = 0` selecting the internal precision $5.0\text{ V}$ AVCC reference, paired with an external $100\text{ nF}$ decoupling capacitor on the AREF pin to suppress digital switching ripple.
-* **`ADCSRA` (ADC Control and Status Register A):** Configured with bits `ADPS2 = 1, ADPS1 = 1, ADPS0 = 1` establishing the $1:128$ clock prescaler, `ADEN = 1` enabling the ADC converter, and `ADIE = 0` operating in polled conversion mode during the SimpleRPC packet assembly thread.
-* **Hardware Fast Interrupt Vector (`INT0` / `D2`):** Wired to the transceiver PTT optocoupler line. When PTT transitions from High to Low, `INT0` triggers `ISR(INT0_vect)` within $1.75\ \mu\text{s}$, executing immediate relay qualification checks before enabling gate bias.
-* **Analog Comparator (`ACSR`):** Configured to monitor input power detector voltage against a precision hardware reference. When input exceeds $28\text{ W}$ ($2.5\text{ V}$ threshold on IC1 pin 5), the analog comparator interrupt fires in under $500\text{ ns}$, directly pulling down the PA bias line via hardware gate logic without waiting for software polling!
+* **`ADMUX` (ADC Multiplexer Selection Register):** Configured with bits `REFS0 = 1, REFS1 = 0` selecting the internal precision 5.0 V AVCC reference, paired with an external 100 nF decoupling capacitor on the AREF pin to suppress digital switching ripple.
+* **`ADCSRA` (ADC Control and Status Register A):** Configured with bits `ADPS2 = 1, ADPS1 = 1, ADPS0 = 1` establishing the 1:128 clock prescaler, `ADEN = 1` enabling the ADC converter, and `ADIE = 0` operating in polled conversion mode during the SimpleRPC packet assembly thread.
+* **Hardware Fast Interrupt Vector (`INT0` / `D2`):** Wired to the transceiver PTT optocoupler line. When PTT transitions from High to Low, `INT0` triggers `ISR(INT0_vect)` within 1.75 µs, executing immediate relay qualification checks before enabling gate bias.
+* **Analog Comparator (`ACSR`):** Configured to monitor input power detector voltage against a precision hardware reference. When input exceeds 28 W (2.5 V threshold on IC1 pin 5), the analog comparator interrupt fires in under 500 ns, directly pulling down the PA bias line via hardware gate logic without waiting for software polling!
 
 ### 6.4 ULN2803 Relay Drivers, Optoisolators & PTT Sequencing Loops
 
@@ -604,14 +604,14 @@ The physical PTT line from the transceiver is optoisolated via a fast **4N35 / P
 1. Optocoupler phototransistor conducts, pulling controller digital interrupt pin `D2` low.
 2. Microcontroller confirms band relays and ATU stepped relays are stationary.
 3. Microcontroller asserts PA bias relays and unclamps TVS gate protection.
-4. Total sequencing delay is deterministically clamped to $12\text{ ms}$, preventing "hot-switching" RF relays under load.
+4. Total sequencing delay is deterministically clamped to 12 ms, preventing "hot-switching" RF relays under load.
 
 ### 6.5 Non-Volatile Memory Architecture: FM24CL64 FRAM & MB85RC64 EEPROM
 
 To store antenna configurations, calibration offsets, and fine tuning solutions across power cycles without degrading storage media, the backplane integrates an I2C Ferroelectric RAM (**FM24CL64** or **MB85RC64**):
-* **Read/Write Endurance:** $10^{14}$ cycles (virtually unlimited compared to standard EEPROM $10^5$ limit).
+* **Read/Write Endurance:** 10^14 cycles (virtually unlimited compared to standard EEPROM 10^5 limit).
 * **Write Speed:** Zero bus write-delay (standard I2C 400 kHz transfer speed).
-* **Data Retention:** Over 10 years at $85^\circ\text{C}$.
+* **Data Retention:** Over 10 years at 85°C.
 
 ---
 
@@ -634,24 +634,24 @@ flowchart LR
 
 ### 7.1 The End-to-End RF Signal Flow
 
-The RF signal chain is engineered to deliver pristine linearity, low IMD3 figures ($< -32\text{ dBc}$), and robust harmonic suppression:
+The RF signal chain is engineered to deliver pristine linearity, low IMD3 figures (< -32 dBc), and robust harmonic suppression:
 1. **TRX Coaxial Input:** RF enters through the rear-panel TRX SO-239 connector and routes directly to the Relay Board.
-2. **Attenuator Stage:** Passes through a high-power power attenuator (typically $13\text{ dB}$ or $16\text{ dB}$) mounted to the main chassis heat sink.
+2. **Attenuator Stage:** Passes through a high-power power attenuator (typically 13 dB or 16 dB) mounted to the main chassis heat sink.
 3. **Protection Stage:** RF flows across TVS gate protection diodes and input peak detector circuits.
-4. **LDMOS Amplification Pallet:** Enters the RF2K5 pallet, where input balun transformers split phase to drive two push-pull LDMOS devices (BLF188XR, BLF189XR, or ART1600) operating in Class AB with $53.5\text{ V}$ drain voltage.
-5. **Output Balun & Matching:** Output transformer combines power into $50\ \Omega$ unbalanced coaxial cable.
-6. **Low Pass Filter (LPF):** Toroidal filter banks suppress 2nd and 3rd harmonics ($> 45\text{ dB}$ suppression).
+4. **LDMOS Amplification Pallet:** Enters the RF2K5 pallet, where input balun transformers split phase to drive two push-pull LDMOS devices (BLF188XR, BLF189XR, or ART1600) operating in Class AB with 53.5 V drain voltage.
+5. **Output Balun & Matching:** Output transformer combines power into 50 Ω unbalanced coaxial cable.
+6. **Low Pass Filter (LPF):** Toroidal filter banks suppress 2nd and 3rd harmonics (> 45 dB suppression).
 7. **Directional Coupler Bridge:** Stockton / Tandem match bridge measures forward and reflected RF voltages.
-8. **Automatic Antenna Tuner (ATU):** Stepped inductor and capacitor matrix transforms complex antenna impedances ($1:1$ up to $3:1$ SWR) to $50\ \Omega$.
+8. **Automatic Antenna Tuner (ATU):** Stepped inductor and capacitor matrix transforms complex antenna impedances (1:1 up to 3:1 SWR) to 50 Ω.
 9. **Antenna Selector:** 4-port relay bank delivers power to the designated coaxial output.
 
 ### 7.2 Step Attenuator Sizing, Transient Surge Protection & TVS Gate Clamping
 
-Modern LDMOS transistors feature extreme transconductance; **full legal power ($1500\text{ W}$) is achieved with only $1.5\text{ W}$ to $2.0\text{ W}$ applied directly to the transistor gates**. Operating an un-attenuated LDMOS amplifier with modern transceivers will instantly destroy the devices due to transceiver turn-on power overshoot.
+Modern LDMOS transistors feature extreme transconductance; **full legal power (1500 W) is achieved with only 1.5 W to 2.0 W applied directly to the transistor gates**. Operating an un-attenuated LDMOS amplifier with modern transceivers will instantly destroy the devices due to transceiver turn-on power overshoot.
 
 > [!CAUTION]
 > **The #1 Cause of LDMOS Failure is Overdriving!**
-> Most modern transceivers (such as the Icom IC-7610 and Yaesu FTDX-1200) produce an initial uncontrolled RF spike of **$120\text{ W}$ to $140\text{ W}$ PEP for $500\ \mu\text{s}$ to $1.5\text{ ms}$** before internal ALC loops throttle drive to the commanded level. An attenuator must be installed to absorb this spike.
+> Most modern transceivers (such as the Icom IC-7610 and Yaesu FTDX-1200) produce an initial uncontrolled RF spike of **120 W to 140 W PEP for 500 µs to 1.5 ms** before internal ALC loops throttle drive to the commanded level. An attenuator must be installed to absorb this spike.
 
 | Attenuator Value | Max Safe Transceiver Drive | Power Applied to LDMOS Gates | Recommended Amplifier Trip Setting |
 | :---: | :---: | :---: | :---: |
@@ -663,34 +663,34 @@ Modern LDMOS transistors feature extreme transconductance; **full legal power ($
 ### 7.3 Dual Directional Couplers & Stockton/Tandem Match Bridge Architecture
 
 The primary SWR bridge utilizes a **Tandem Match (Stockton)** topology consisting of two toroidal transformers (FT50-43 or T50-2 cores) wound with low-loss PTFE magnet wire:
-* **Current Transformer ($T_1$):** Samples line current $I$ passing through the primary conductor.
-* **Voltage Transformer ($T_2$):** Samples line voltage $V$ across the $50\ \Omega$ line.
-* **Detector Diodes:** 1N5711 Schottky barrier diodes rectify RF into proportional DC voltages ($V_{fwd}$ and $V_{ref}$).
-* **Trimmer Capacitors:** Precision ceramic trimmer pots allow balancing the bridge to achieve a deep null ($> 35\text{ dB}$ directivity) into a certified $50\ \Omega$ dummy load.
+* **Current Transformer (T1):** Samples line current I passing through the primary conductor.
+* **Voltage Transformer (T2):** Samples line voltage V across the 50 Ω line.
+* **Detector Diodes:** 1N5711 Schottky barrier diodes rectify RF into proportional DC voltages (V_fwd and V_ref).
+* **Trimmer Capacitors:** Precision ceramic trimmer pots allow balancing the bridge to achieve a deep null (> 35 dB directivity) into a certified 50 Ω dummy load.
 
 ### 7.4 Low Pass Filter (LPF) Board: Toroidal Band Switching & Harmonic Suppression
 
 The LPF board hosts 7 distinct low-pass filter segments covering:
-* 160m ($1.8–2.0\text{ MHz}$)
-* 80m ($3.5–4.0\text{ MHz}$)
-* 60m / 40m ($5.3–7.3\text{ MHz}$)
-* 30m / 20m ($10.1–14.35\text{ MHz}$)
-* 17m / 15m ($18.068–21.45\text{ MHz}$)
-* 12m / 10m ($24.89–29.7\text{ MHz}$)
-* 6m ($50.0–54.0\text{ MHz}$)
+* 160m (1.8–2.0 MHz)
+* 80m (3.5–4.0 MHz)
+* 60m / 40m (5.3–7.3 MHz)
+* 30m / 20m (10.1–14.35 MHz)
+* 17m / 15m (18.068–21.45 MHz)
+* 12m / 10m (24.89–29.7 MHz)
+* 6m (50.0–54.0 MHz)
 
-Each filter utilizes heavy-gauge silver-plated wire wound on Micrometals iron powder toroids (T94-2, T94-6) paired with high-voltage 500V/1000V porcelain ceramic (ATC) and silver mica capacitors capable of withstanding reactive RF circulating currents exceeding $15\text{ A}$.
+Each filter utilizes heavy-gauge silver-plated wire wound on Micrometals iron powder toroids (T94-2, T94-6) paired with high-voltage 500V/1000V porcelain ceramic (ATC) and silver mica capacitors capable of withstanding reactive RF circulating currents exceeding 15 A.
 
 ### 7.5 Automatic Antenna Tuner (ATU) Board: Binary Stepped L/C Matching Network
 
 The optional internal automatic antenna tuner employs a reversible L-network topology:
-* **Inductor Bank ($L_1$ to $L_8$):** Relays switch toroidal inductors configured in binary steps: $0.05\ \mu\text{H}, 0.1\ \mu\text{H}, 0.2\ \mu\text{H}, 0.4\ \mu\text{H}, 0.8\ \mu\text{H}, 1.6\ \mu\text{H}, 3.2\ \mu\text{H}, 6.4\ \mu\text{H}$ (Total $0–12.75\ \mu\text{H}$ across 256 discrete steps).
-* **Capacitor Bank ($C_1$ to $C_8$):** Relays switch high-voltage mica capacitors in binary steps: $10\text{ pF}, 20\text{ pF}, 40\text{ pF}, 80\text{ pF}, 160\text{ pF}, 320\text{ pF}, 640\text{ pF}, 1280\text{ pF}$ (Total $0–2550\text{ pF}$ across 256 discrete steps).
-* **Configuration Relay ($K$):** Switches shunt capacitance between generator side (low impedance step-down) and load side (high impedance step-up).
+* **Inductor Bank (L1 to L8):** Relays switch toroidal inductors configured in binary steps: 0.05 µH, 0.1 µH, 0.2 µH, 0.4 µH, 0.8 µH, 1.6 µH, 3.2 µH, 6.4 µH (Total 0–12.75 µH across 256 discrete steps).
+* **Capacitor Bank (C1 to C8):** Relays switch high-voltage mica capacitors in binary steps: 10 pF, 20 pF, 40 pF, 80 pF, 160 pF, 320 pF, 640 pF, 1280 pF (Total 0–2550 pF across 256 discrete steps).
+* **Configuration Relay (K):** Switches shunt capacitance between generator side (low impedance step-down) and load side (high impedance step-up).
 
 ### 7.6 4-Port Coaxial Antenna Switch Board: Isolation & RF Relay Dynamics
 
-The antenna selector board provides four independently addressable SO-239 / N-type coaxial output jacks. Isolation between unselected ports exceeds $60\text{ dB}$ at $30\text{ MHz}$. High-current, vacuum-sealed power relays ensure zero contact pitting during full legal power operation.
+The antenna selector board provides four independently addressable SO-239 / N-type coaxial output jacks. Isolation between unselected ports exceeds 60 dB at 30 MHz. High-current, vacuum-sealed power relays ensure zero contact pitting during full legal power operation.
 
 ### 7.7 Critical Component Bill of Materials (BOM) & Electrical Ratings
 
@@ -698,28 +698,28 @@ To assist repair technicians and builders, the following table lists the critica
 
 | Circuit Location | Component Description | Manufacturer & Part Number | Electrical Rating / Spec | Operating Tolerance & Notes |
 | :--- | :--- | :--- | :--- | :--- |
-| **RF Pallet (PA)** | Push-Pull LDMOS Transistors | Ampleon BLF188XR / ART1600 | $V_{ds} = 50\text{ V}, P_{out} = 1400–1600\text{ W}$ | $V_{(BR)DSS} = 135\text{ V}, I_d = 40\text{ A}, R_{th} = 0.15\text{ K/W}$. |
-| **RF Pallet (TVS)** | Transient Voltage Suppressors | Littlefuse 1.5KE8.2A / SMBJ8.0A | Clamp Voltage $V_c = 13.6\text{ V} @ 100\text{ A}$ | Clamps gate excursions exceeding $+11\text{ V}$. |
-| **Stockton Bridge** | Ferrite Toroidal Cores | Fair-Rite 5943000301 (FT50-43) | $\mu_i = 800$, Initial Permeability | Wound with $0.4\text{ mm}$ PTFE silver-plated wire. |
-| **Stockton Diodes**| Schottky RF Detector Diodes | Broadcom / Avago 1N5711 / HP 5082 | $V_{BR} = 70\text{ V}, C_t = 2.0\text{ pF}, t_{rr} < 100\text{ ps}$ | Forward drop $V_f \approx 0.38\text{ V} @ 1\text{ mA}$. |
-| **LPF Toroids (Low)**| Iron Powder Cores (160m–40m) | Micrometals T94-2 (Red/Grey) | $\mu_r = 10$, Temp Coeff $+95\text{ ppm/}^\circ\text{C}$ | Heavy gauge silver-plated solid copper wire. |
-| **LPF Toroids (High)**| Iron Powder Cores (30m–6m) | Micrometals T94-6 (Yellow/Grey) | $\mu_r = 8.5$, Temp Coeff $+35\text{ ppm/}^\circ\text{C}$ | Optimized for low loss above $15\text{ MHz}$. |
-| **LPF Capacitors** | High-Q Multilayer RF Capacitors| ATC 100B / CDE Silver Mica | $500\text{ V} / 1000\text{ VDC}$ Rated, Low ESR | Ultra-low dielectric loss under $15\text{ A}$ RF circulating current. |
-| **ATU Inductors** | Toroidal Stepped Cores | Micrometals T106-2 / T106-6 | $0.05\ \mu\text{H}$ to $6.4\ \mu\text{H}$ Steps | High saturation flux density ($B_{sat} > 1.0\text{ T}$). |
-| **ATU Relays** | Miniature High-Power Relays | Song Chuan 899-1C-C / Schrack RP410 | Contact Rating $16\text{ A} @ 250\text{ VAC}$ | Low contact resistance ($< 30\text{ m}\Omega$). |
-| **Antenna Relays** | Heavy-Duty Coaxial Relays | Finder 40.52 / Song Chuan 12VDC | $16\text{ A}$ Continuous, $> 60\text{ dB}$ Isolation | Sealed construction prevents atmospheric oxidation. |
-| **Relay Drivers** | 8-Channel Darlington Arrays | Texas Instruments ULN2803A | $50\text{ V}, 500\text{ mA}$ Collector Current | Internal inductive suppression diodes. |
-| **DC Power Supply**| High-Efficiency Switched Supply| Eltek Flatpack2 48/3000 HE | $53.5\text{ VDC} @ 55\text{ A} (3000\text{ W})$ | CAN bus controlled voltage setpoint ($125\text{ kbps}$). |
-| **Non-Volatile RAM**| Ferroelectric RAM (FRAM) | Cypress / Infineon FM24CL64B-G | $64\text{ Kbit} (8\text{ K}\times 8), \text{I2C } 400\text{ kHz}$ | $10^{14}$ read/write cycles, $10\text{-year}$ data retention. |
+| **RF Pallet (PA)** | Push-Pull LDMOS Transistors | Ampleon BLF188XR / ART1600 | V_ds = 50 V, P_out = 1400–1600 W | V_{(BR)DSS} = 135 V, I_d = 40 A, R_th = 0.15 K/W. |
+| **RF Pallet (TVS)** | Transient Voltage Suppressors | Littlefuse 1.5KE8.2A / SMBJ8.0A | Clamp Voltage V_c = 13.6 V @ 100 A | Clamps gate excursions exceeding +11 V. |
+| **Stockton Bridge** | Ferrite Toroidal Cores | Fair-Rite 5943000301 (FT50-43) | µ_i = 800, Initial Permeability | Wound with 0.4 mm PTFE silver-plated wire. |
+| **Stockton Diodes**| Schottky RF Detector Diodes | Broadcom / Avago 1N5711 / HP 5082 | V_BR = 70 V, C_t = 2.0 pF, t_rr < 100 ps | Forward drop V_f ≈ 0.38 V @ 1 mA. |
+| **LPF Toroids (Low)**| Iron Powder Cores (160m–40m) | Micrometals T94-2 (Red/Grey) | µ_r = 10, Temp Coeff +95 ppm/°C | Heavy gauge silver-plated solid copper wire. |
+| **LPF Toroids (High)**| Iron Powder Cores (30m–6m) | Micrometals T94-6 (Yellow/Grey) | µ_r = 8.5, Temp Coeff +35 ppm/°C | Optimized for low loss above 15 MHz. |
+| **LPF Capacitors** | High-Q Multilayer RF Capacitors| ATC 100B / CDE Silver Mica | 500 V / 1000 VDC Rated, Low ESR | Ultra-low dielectric loss under 15 A RF circulating current. |
+| **ATU Inductors** | Toroidal Stepped Cores | Micrometals T106-2 / T106-6 | 0.05 µH to 6.4 µH Steps | High saturation flux density (B_sat > 1.0 T). |
+| **ATU Relays** | Miniature High-Power Relays | Song Chuan 899-1C-C / Schrack RP410 | Contact Rating 16 A @ 250 VAC | Low contact resistance (< 30 mΩ). |
+| **Antenna Relays** | Heavy-Duty Coaxial Relays | Finder 40.52 / Song Chuan 12VDC | 16 A Continuous, > 60 dB Isolation | Sealed construction prevents atmospheric oxidation. |
+| **Relay Drivers** | 8-Channel Darlington Arrays | Texas Instruments ULN2803A | 50 V, 500 mA Collector Current | Internal inductive suppression diodes. |
+| **DC Power Supply**| High-Efficiency Switched Supply| Eltek Flatpack2 48/3000 HE | 53.5 VDC @ 55 A (3000 W) | CAN bus controlled voltage setpoint (125 kbps). |
+| **Non-Volatile RAM**| Ferroelectric RAM (FRAM) | Cypress / Infineon FM24CL64B-G | 64 Kbit (8 K× 8), I2C 400 kHz | 10^14 read/write cycles, 10-year data retention. |
 
 ### 7.8 DC Power Supply Subsystem: Eltek Flatpack2 53.5V Rail & CAN Bus Control
 
 The main DC power rail is energized by an industrial-grade **Eltek Flatpack2 48V/3000W HE (High Efficiency)** or **Mean Well** switched-mode power supply:
-* **DC Rail Voltage:** Adjusted via CAN bus or internal pot to **$53.5\text{ VDC}$**.
-* **Current Delivery:** Up to $55\text{ A}$ continuous ($3000\text{ W}$ capacity).
-* **CAN Bus Communication Protocol:** The Eltek Flatpack2 communicates over CAN bus at $125\text{ kbps}$ using identifier `0x05004804`. The controller transmits periodic keep-alive and voltage target frames:
-  `[0x05, 0x00, 0x48, 0x04, Data: 0x14, 0xE6, 0x00, 0x00]` setting rail voltage to $53.50\text{ VDC}$.
-* **AC Mains Operating Window:** Universal $100–250\text{ VAC}$. Note: When operated on $120\text{ VAC}$ residential circuits, output power must be limited to $1000\text{ W}$ to prevent tripping the $15\text{ A}$ wall breaker. $1500\text{ W}+$ operation requires a dedicated $240\text{ VAC}$ line.
+* **DC Rail Voltage:** Adjusted via CAN bus or internal pot to **53.5 VDC**.
+* **Current Delivery:** Up to 55 A continuous (3000 W capacity).
+* **CAN Bus Communication Protocol:** The Eltek Flatpack2 communicates over CAN bus at 125 kbps using identifier `0x05004804`. The controller transmits periodic keep-alive and voltage target frames:
+  `[0x05, 0x00, 0x48, 0x04, Data: 0x14, 0xE6, 0x00, 0x00]` setting rail voltage to 53.50 VDC.
+* **AC Mains Operating Window:** Universal 100–250 VAC. Note: When operated on 120 VAC residential circuits, output power must be limited to 1000 W to prevent tripping the 15 A wall breaker. 1500 W+ operation requires a dedicated 240 VAC line.
 
 ### 7.8 Thermal Management Subsystem: Front & Rear Fans, Venturi Shroud & Pinouts
 
@@ -731,21 +731,21 @@ Cooling is handled by three high-velocity DC brushless fans:
 > [!IMPORTANT]
 > **Fan Pinout & Tachometer Wire Preparation:**
 > All amplifier fans utilize 3-pin connectors with a specific pinout:
-> * **Center Wire (Red):** $+12\text{ VDC}$ Power.
-> * **Outer Wire (Black):** Ground ($0\text{ V}$).
+> * **Center Wire (Red):** +12 VDC Power.
+> * **Outer Wire (Black):** Ground (0 V).
 > * **Third Wire (Yellow/White):** Tachometer (TAC) pulse line.
 > **The Yellow TAC wire MUST BE CUT OFF on all three fans.** Leaving the tachometer line connected causes ground-loop pulsing into the analog controller board!
 >
 > **Thermal Fan Hysteresis Curve:**
-> * $T < 38^\circ\text{C}$: Low-speed quiet idle ($30\%$).
-> * $38^\circ\text{C} \le T \le 45^\circ\text{C}$: Moderate cooling ($60\%$).
-> * $T > 55^\circ\text{C}$: Maximum cooling ($100\%$).
-> * $T > 70^\circ\text{C}$: Thermal Protection Trip (PA gate bias disabled).
+> * T < 38°C: Low-speed quiet idle (30\%).
+> * 38°C ≤ T ≤ 45°C: Moderate cooling (60\%).
+> * T > 55°C: Maximum cooling (100\%).
+> * T > 70°C: Thermal Protection Trip (PA gate bias disabled).
 
 ### 7.9 AC Mains Power Switch Wiring & Safety Modifications
 
-On standard factory assemblies, the front panel AC rocker switch switches full $240\text{ VAC}$ mains current. Due to tight chassis clearances, tilting the front panel forward during maintenance can pull push-on terminals loose, exposing technicians to lethal shock.
-**The K7BIT Safety Mod:** Snip the slip-on terminals, solder 6-inch $14\text{ AWG}$ heat-shrinked extension jumpers to the switch terminals, allowing the front panel to lay completely flat on the workbench without tension or risk of shock.
+On standard factory assemblies, the front panel AC rocker switch switches full 240 VAC mains current. Due to tight chassis clearances, tilting the front panel forward during maintenance can pull push-on terminals loose, exposing technicians to lethal shock.
+**The K7BIT Safety Mod:** Snip the slip-on terminals, solder 6-inch 14 AWG heat-shrinked extension jumpers to the switch terminals, allowing the front panel to lay completely flat on the workbench without tension or risk of shock.
 
 ---
 
@@ -754,18 +754,18 @@ On standard factory assemblies, the front panel AC rocker switch switches full $
 Seamless band tracking and transceiver coordination are essential to prevent transmitting into mismatched low-pass filter segments:
 
 ### 8.1 Universal RF Sensing & Hardware Frequency Counter Interfacing
-When operated in **UNIVERSAL** mode, the amplifier requires no external data cables from the transceiver. RF drive entering the TRX port is sampled by a high-impedance divider on the Relay Board and fed to the prescaler counter IC. Within the first $12\text{ ms}$ of a CW dot or speech syllable, the counter measures the carrier frequency, determines the correct band filter (e.g., $14\text{ MHz} \rightarrow 20\text{m}$), and latches the corresponding ULN2803 relay drivers before full power is delivered.
+When operated in **UNIVERSAL** mode, the amplifier requires no external data cables from the transceiver. RF drive entering the TRX port is sampled by a high-impedance divider on the Relay Board and fed to the prescaler counter IC. Within the first 12 ms of a CW dot or speech syllable, the counter measures the carrier frequency, determines the correct band filter (e.g., 14 MHz → 20m), and latches the corresponding ULN2803 relay drivers before full power is delivered.
 
 ### 8.2 Icom CI-V Protocol & Open-Collector Wiring
 For Icom transceivers (IC-7300, IC-7610, IC-7851, etc.):
-* **Hardware Interface:** $3.5\text{ mm}$ mono mini-jack. Operates as an open-collector bidirectional single-wire bus pulled high to $+5\text{ V}$ via a $10\text{ k}\Omega$ resistor.
-* **Baud Rates:** $9600$, $19200$, or Auto-baud.
+* **Hardware Interface:** 3.5 mm mono mini-jack. Operates as an open-collector bidirectional single-wire bus pulled high to +5 V via a 10 kΩ resistor.
+* **Baud Rates:** 9600, 19200, or Auto-baud.
 * **Frame Structure:** Preamble `0xFE 0xFE`, To-Address `0x00` (Broadcast) or `0x94` (7610), From-Address `0xE0`, Command `0x00` (Frequency Send), BCD Encoded Frequency, End-of-Message `0xFD`.
 * **Behavior:** The amplifier continuously decodes transceiver frequency changes, pre-switching LPF relays and recalling tuner L/C solutions before the operator transmits!
 
 ### 8.3 Yaesu BCD Band Data & CAT Serial Emulation
 For Yaesu transceivers (FTDX-101D, FTDX-3000, FTDX-1200):
-* **Band Data BCD:** 4-bit parallel TTL line representing band codes ($0001 = 160\text{m}, 0010 = 80\text{m}, \dots$).
+* **Band Data BCD:** 4-bit parallel TTL line representing band codes (0001 = 160m, 0010 = 80m, \dots).
 * **RS-232 CAT Serial:** Standard 8-N-1 serial communication at 4800 to 38400 baud. Queries transceiver status via commands: `FA;` (Read Frequency VFO-A), parsing ASCII responses into kilohertz integers.
 
 ### 8.4 Kenwood, Elecraft & FlexRadio Serial Interfacing
@@ -797,16 +797,16 @@ flowchart TD
 The calibration procedure developed by John Birdlebough (K7BIT) and John Stafford (Island RF) enables **95% of all calibration steps to be completed safely with the expensive LDMOS pallet completely bypassed**, preventing accidental transistor destruction:
 
 * **Prerequisite Test Equipment:**
-  1. $50\ \Omega$ non-inductive $2500\text{ W}$ continuous dummy load connected to **ANT 1**.
-  2. Auxiliary $50\ \Omega$ $100\text{ W}$ dummy load with a coaxial T-connector (used to construct a certified $25\ \Omega$ load for $2.0:1$ SWR calibration).
-  3. Digital Multimeter (DMM) manually set to $10\text{ M}\Omega$ impedance range (do not use mechanical meters).
+  1. 50 Ω non-inductive 2500 W continuous dummy load connected to **ANT 1**.
+  2. Auxiliary 50 Ω 100 W dummy load with a coaxial T-connector (used to construct a certified 25 Ω load for 2.0:1 SWR calibration).
+  3. Digital Multimeter (DMM) manually set to 10 MΩ impedance range (do not use mechanical meters).
   4. Calibrated in-line external Wattmeter / SWR bridge (e.g., LP-700, Bird 43, or Telepost LP-100A).
-  5. HF transceiver capable of delivering adjustable CW carrier power from $1\text{ W}$ to $50\text{ W}$.
+  5. HF transceiver capable of delivering adjustable CW carrier power from 1 W to 50 W.
   6. Non-inductive plastic potentiometer alignment tool.
 * **The PA Bypass Harness:**
   - Disconnect the SMA cable from the PA pallet RF input.
-  - Leave PA output solder pads disconnected from the $11.5\text{-inch}$ PTFE coax.
-  - Solder the center conductor and shield of the $11.5\text{-inch}$ PTFE coax directly to the supplied short SMA test cable, plugging into the Relay Board PA port. All transceiver drive signals now flow directly into the LPF and SWR bridge without energizing the LDMOS transistors!
+  - Leave PA output solder pads disconnected from the 11.5-inch PTFE coax.
+  - Solder the center conductor and shield of the 11.5-inch PTFE coax directly to the supplied short SMA test cable, plugging into the Relay Board PA port. All transceiver drive signals now flow directly into the LPF and SWR bridge without energizing the LDMOS transistors!
 
 ### 9.2 Step 1: Temporarily Disable Input Protection
 To prevent premature tripping during initial power adjustments, turn potentiometer **R1** on the controller board 5 full turns counter-clockwise (CCW).
@@ -819,29 +819,29 @@ Locate the **SPARE potentiometer** positioned directly below R21 and above R17. 
 
 ### 9.5 Step 4: Calibrate 53.5V DC Voltage Display (R1/R2 Trimmers)
 1. Energize the amplifier on AC mains with PA bias jumpers removed.
-2. Measure the high-voltage DC supply rail using your calibrated DMM at the main supply output studs. Target: Exactly **$53.5\text{ VDC}$** (or $50.0\text{ VDC}$ depending on power supply variant).
+2. Measure the high-voltage DC supply rail using your calibrated DMM at the main supply output studs. Target: Exactly **53.5 VDC** (or 50.0 VDC depending on power supply variant).
 3. Observe the voltage readout on the front-panel touch display.
-4. Adjust multiturn potentiometer **R2** (or voltage trim pot) until the display reading matches the DMM voltage within $\pm 0.1\text{ V}$.
+4. Adjust multiturn potentiometer **R2** (or voltage trim pot) until the display reading matches the DMM voltage within ± 0.1 V.
 
 ### 9.6 Step 5: PA Pallet Bias Jumper Configuration & Verification
 Verify that both 2-pin bias jumpers on the RF2K5 PA pallet are set to the **REAR position (Bypass/Disabled)**. This ensures that gate bias cannot be energized while initial low-level RF switching tests are conducted.
 
 ### 9.7 Step 6: RF Coaxial Wiring Continuity & Port Verification
-1. Set transceiver to $14.175\text{ MHz}$ CW at $5\text{ W}$ output.
+1. Set transceiver to 14.175 MHz CW at 5 W output.
 2. Key transceiver into ANT 1 dummy load.
-3. Verify with external wattmeter that $5\text{ W}$ passes through the amplifier bypass harness with $< 1.1:1$ SWR, confirming all coaxial relay interconnects and SMA junctions are sound.
+3. Verify with external wattmeter that 5 W passes through the amplifier bypass harness with < 1.1:1 SWR, confirming all coaxial relay interconnects and SMA junctions are sound.
 
 ### 9.8 Step 7: Frequency Detector Prescaler Calibration (74HC4040/74)
 The amplifier includes an on-board frequency counter that samples RF from the input line, divides it via a high-speed **74HC4040 / 74HC74** prescaler counter IC, and delivers pulses to the microcontroller:
 1. In the GUI, navigate to `Menu -> Hardware -> Frequency Detector`.
-2. Set transceiver to $28.500\text{ MHz}$ at $10\text{ W}$ CW drive.
+2. Set transceiver to 28.500 MHz at 10 W CW drive.
 3. Key transceiver and observe detected frequency on the display.
-4. Adjust trimmer capacitor **C18 / R_FREQ** on the controller backplane until the counter reads exactly $28,500\text{ kHz}$.
-5. Test across $1.8\text{ MHz}$, $7.0\text{ MHz}$, $14.0\text{ MHz}$, and $50.0\text{ MHz}$ to verify clean counting across all bands.
+4. Adjust trimmer capacitor **C18 / R_FREQ** on the controller backplane until the counter reads exactly 28,500 kHz.
+5. Test across 1.8 MHz, 7.0 MHz, 14.0 MHz, and 50.0 MHz to verify clean counting across all bands.
 
 ### 9.9 Step 8: Low Pass Filter (LPF) Automatic Selection & Band Interfacing
 Verify that band switching operates seamlessly across all control modes:
-* **UNIVERSAL Mode (Default):** RF burst from transceiver triggers frequency counter, instantly selecting corresponding LPF filter relays within $15\text{ ms}$.
+* **UNIVERSAL Mode (Default):** RF burst from transceiver triggers frequency counter, instantly selecting corresponding LPF filter relays within 15 ms.
 * **CAT / CI-V Interface Mode:** Serial polling from transceiver CAT port pre-selects LPF relays before PTT is asserted.
 
 ---
@@ -856,28 +856,28 @@ flowchart TD
 ```
 
 ### 9.10 Step 9: SWR Bridge Balance & 2.9V Detector Reference Nulling
-1. Connect certified $50\ \Omega$ dummy load to ANT 1.
+1. Connect certified 50 Ω dummy load to ANT 1.
 2. Reverse TRX and ANT 1 coaxial connections on the back of the amplifier (Transceiver connected to ANT 1, dummy load to TRX input).
-3. Set transceiver to $50.0\text{ MHz}$ at $20\text{ W}$ CW drive.
-4. Key transceiver and adjust the ceramic coupling trimmer on the SWR Bridge board with a plastic tool for **absolute minimum voltage reading at the Reflected test pin** ($< 5\text{ mV}$ DC null).
+3. Set transceiver to 50.0 MHz at 20 W CW drive.
+4. Key transceiver and adjust the ceramic coupling trimmer on the SWR Bridge board with a plastic tool for **absolute minimum voltage reading at the Reflected test pin** (< 5 mV DC null).
 5. Restore coaxial cables to normal orientation (TRX to transceiver, ANT 1 to dummy load).
 
 ### 9.11 Step 10: Forward (R19) and Reflected (R20) Power Display Alignment
 1. **Forward Power Alignment:**
    - Amplifier in **STANDBY (RED)** mode.
-   - Set transceiver to $14.175\text{ MHz}$ at $50\text{ W}$ CW carrier into external calibrated wattmeter and dummy load.
-   - Key transceiver and adjust potentiometer **R19** until the front-panel forward power bar reads exactly **$50\text{ W}$**.
+   - Set transceiver to 14.175 MHz at 50 W CW carrier into external calibrated wattmeter and dummy load.
+   - Key transceiver and adjust potentiometer **R19** until the front-panel forward power bar reads exactly **50 W**.
 2. **Reflected Power & SWR Alignment:**
-   - Insert coaxial T-connector at ANT 1 with two $50\ \Omega$ dummy loads in parallel ($25\ \Omega$ load, representing a known $2.0:1$ SWR).
-   - Key transceiver at $50\text{ W}$ CW carrier.
-   - Adjust potentiometer **R20** until the front-panel SWR meter reads exactly **$2.0:1$ SWR**.
-   - Remove auxiliary dummy load, restoring pure $50\ \Omega$ load.
+   - Insert coaxial T-connector at ANT 1 with two 50 Ω dummy loads in parallel (25 Ω load, representing a known 2.0:1 SWR).
+   - Key transceiver at 50 W CW carrier.
+   - Adjust potentiometer **R20** until the front-panel SWR meter reads exactly **2.0:1 SWR**.
+   - Remove auxiliary dummy load, restoring pure 50 Ω load.
 
 ### 9.12 Step 11: Antenna Tuner Pre-Amplifier Gain Calibration (R15)
 To allow the automatic antenna tuner to detect fine phase and magnitude differences at low drive levels:
-1. Re-attach parallel dummy load ($25\ \Omega$ load for $2.0:1$ SWR).
+1. Re-attach parallel dummy load (25 Ω load for 2.0:1 SWR).
 2. In the GUI, navigate to `Menu -> Debug`. Locate analog reading **A1 PowerTunerGain**.
-3. Set transceiver to $10\text{ W}$ CW carrier at $14.175\text{ MHz}$.
+3. Set transceiver to 10 W CW carrier at 14.175 MHz.
 4. Key transceiver and adjust potentiometer **R15** until the **A1 reading displays exactly 600**.
 5. Remove parallel dummy load.
 
@@ -897,37 +897,37 @@ flowchart TD
 
 ### 9.13 Step 12: LPF Forward Power Protection Trip Calibration (R17)
 The controller continuously compares power at the LPF input versus LPF output to detect relay failure or shorted filter capacitors:
-1. Pure $50\ \Omega$ dummy load connected to ANT 1.
+1. Pure 50 Ω dummy load connected to ANT 1.
 2. In GUI, navigate to `Menu -> Debug`. Locate analog reading **A2 PowerPAModuleOut**.
-3. Set transceiver to $50\text{ W}$ CW carrier.
+3. Set transceiver to 50 W CW carrier.
 4. Key transceiver and adjust potentiometer **R17** until the **A2 reading displays exactly 93**.
 
 ### 9.14 Step 13: Input Overdrive Protection Trip Calibration (R1/R2 at 28W)
 This critical calibration establishes the fast hardware latch protecting LDMOS gates:
-1. For standard **$13\text{ dB}$ attenuators**, maximum safe continuous drive is $30\text{ W}$. We calibrate the trip point conservatively at **$28\text{ W}$** at $1.9\text{ MHz}$ (160m exhibits highest input sensitivity).
+1. For standard **13 dB attenuators**, maximum safe continuous drive is 30 W. We calibrate the trip point conservatively at **28 W** at 1.9 MHz (160m exhibits highest input sensitivity).
 2. Measure DC voltage at test point **IC1 pin 5**.
-3. Adjust potentiometer **R2** near the bottom of the board for exactly **$2.5\text{ VDC}$** on your DMM.
+3. Adjust potentiometer **R2** near the bottom of the board for exactly **2.5 VDC** on your DMM.
 4. In GUI, select **OPERATE (GREEN)** mode.
-5. Set transceiver to $1.900\text{ MHz}$ CW carrier at $28\text{ W}$ drive.
+5. Set transceiver to 1.900 MHz CW carrier at 28 W drive.
 6. Key transceiver and slowly rotate potentiometer **R1** clockwise until the amplifier trips, displaying **`Input Power Too High! Press Reset`**, immediately dropping the TX relay line.
-7. Unkey transceiver, press the green on-screen Reset button, and verify the trip point triggers repeatably at $28\text{ W}$ and never below $25\text{ W}$.
+7. Unkey transceiver, press the green on-screen Reset button, and verify the trip point triggers repeatably at 28 W and never below 25 W.
 
 ### 9.15 Step 14: Relative Input Drive Bar Alignment (R14 Trimmer)
 1. On the main operating screen, observe the horizontal drive bar beneath the forward power meter.
-2. Set transceiver to $27\text{ W}$ CW drive at $1.900\text{ MHz}$.
+2. Set transceiver to 27 W CW drive at 1.900 MHz.
 3. Key transceiver and adjust potentiometer **R14** until the yellow indicator bar completely fills the scale, alerting the operator when drive approaches trip limits.
 
 ### 9.16 Step 15: LDMOS Quiescent Bias Current (Idq) Measurement & Calibration (R21)
 1. Power down amplifier and disconnect AC mains cord.
-2. Disconnect red $+53.5\text{ V}$ cable from the PA pallet power stud.
-3. Insert DMM set to **10A DC current mode** in series between the $+53.5\text{ V}$ power cable and the PA pallet terminal.
+2. Disconnect red +53.5 V cable from the PA pallet power stud.
+3. Insert DMM set to **10A DC current mode** in series between the +53.5 V power cable and the PA pallet terminal.
 4. Move both PA pallet bias jumpers to the **FORWARD (Enabled)** position.
 5. Power up amplifier, select **OPERATE (GREEN)** mode.
-6. Set transceiver to minimum drive ($1\text{ W}$), key transceiver (PTT only, zero RF drive).
+6. Set transceiver to minimum drive (1 W), key transceiver (PTT only, zero RF drive).
 7. Confirm all three green LEDs illuminate on the RF2K5 pallet.
-8. Read DMM current: Typical quiescent bias current $I_{dq}$ is **$5.75\text{ A}$ to $6.15\text{ A}$**.
-9. Adjust potentiometer **R21** until the current reading on the front display matches the DMM value within $\pm 0.1\text{ A}$.
-10. Power down, restore $+53.5\text{ V}$ power cable securely to stud with $7.5\text{ mm}$ socket.
+8. Read DMM current: Typical quiescent bias current Idq is **5.75 A to 6.15 A**.
+9. Adjust potentiometer **R21** until the current reading on the front display matches the DMM value within ± 0.1 A.
+10. Power down, restore +53.5 V power cable securely to stud with 7.5 mm socket.
 
 ### 9.17 Step 16: Hardware Current Limiting Latch Calibration (SPARE Potentiometer)
 1. In GUI, navigate to `Menu -> Debug`. Locate analog reading **A3 PowerCurrentMon**.
@@ -937,36 +937,36 @@ This critical calibration establishes the fast hardware latch protecting LDMOS g
 1. Power down amplifier and disconnect AC mains.
 2. Disconnect and remove the temporary SMA PA bypass test harness.
 3. Reconnect the transceiver input SMA cable to the RF2K5 pallet input.
-4. Solder the center conductor and heavy copper shield braid of the $11.5\text{-inch}$ PTFE coaxial cable directly to the RF2K5 pallet output pads.
-5. Inspect all solder joints under bright light with a $10\times$ loupe for solder bridges or stray wire strands.
+4. Solder the center conductor and heavy copper shield braid of the 11.5-inch PTFE coaxial cable directly to the RF2K5 pallet output pads.
+5. Inspect all solder joints under bright light with a 10× loupe for solder bridges or stray wire strands.
 6. Secure all chassis covers and prepare for complete unit characterization testing!
 
 ---
 
 # 10. Complete 10-Part Amplifier Characterization & Unit Test Plan
 
-Following calibration, every amplifier must undergo the exhaustive 10-part K7BIT unit test plan into a certified $2500\text{ W}$ dummy load to document performance baselines:
+Following calibration, every amplifier must undergo the exhaustive 10-part K7BIT unit test plan into a certified 2500 W dummy load to document performance baselines:
 
 ### 10.1 Test 1: Power Supply Unit (PSU) DC Rail Stability Under Load
-Verify that the $53.5\text{ V}$ DC bus does not sag excessively under high current:
-* Idle Voltage: $53.5\text{ VDC} \pm 0.2\text{ V}$.
-* Full Load ($1500\text{ W}$ Output, $38\text{ A}$ Draw): $> 52.2\text{ VDC}$ ($< 1.3\text{ V}$ sag across internal busbars).
+Verify that the 53.5 V DC bus does not sag excessively under high current:
+* Idle Voltage: 53.5 VDC ± 0.2 V.
+* Full Load (1500 W Output, 38 A Draw): > 52.2 VDC (< 1.3 V sag across internal busbars).
 
 ### 10.2 Test 2: 50V/53.5V Standby / Operate Remote Control Switching
-Verify that switching between Standby and Operate properly asserts and de-asserts high-voltage DC inhibits and LDMOS gate bias within $50\text{ ms}$.
+Verify that switching between Standby and Operate properly asserts and de-asserts high-voltage DC inhibits and LDMOS gate bias within 50 ms.
 
 ### 10.3 Test 3: Display & Capacitive Touchscreen Coordinate Alignment
 Verify accurate touch coordinate tracking across all four corners and center of the 7-inch LCD panel.
 
 ### 10.4 Test 4: Antenna Relay Board RF Isolation & Port Routing
-Verify that selecting ANT 1, ANT 2, ANT 3, and ANT 4 properly energizes corresponding coaxial relays, with unselected ports exhibiting $> 60\text{ dB}$ isolation.
+Verify that selecting ANT 1, ANT 2, ANT 3, and ANT 4 properly energizes corresponding coaxial relays, with unselected ports exhibiting > 60 dB isolation.
 
 ### 10.5 Test 5: Manual Antenna Tuner Stepping & Non-Volatile Memory Storage
 For the beginning, middle, and end (BME) of every amateur band (160m through 6m):
-1. Key amplifier at $10\text{ W}$ CW drive.
-2. Step inductor ($<, >$) and capacitor ($<<, >>$) relays manually to achieve $1.0:1$ SWR.
+1. Key amplifier at 10 W CW drive.
+2. Step inductor (<, >) and capacitor (<<, >>) relays manually to achieve 1.0:1 SWR.
 3. Press and hold **STORE** button for 3 seconds.
-4. Confirm the Store button flashes **GREEN three times**, validating that $L, C, K$ coordinates are permanently written to FRAM non-volatile storage.
+4. Confirm the Store button flashes **GREEN three times**, validating that L, C, K coordinates are permanently written to FRAM non-volatile storage.
 
 ### 10.6 Test 6: Minimum Drive RF Characterization Across All Amateur Bands
 Document minimum input power required to activate auto-tuning and verify output linearity:
@@ -982,7 +982,7 @@ Document minimum input power required to activate auto-tuning and verify output 
 | **6m** | 50.125 MHz | 10 W | 110 W | 1.12:1 | PASS |
 
 ### 10.7 Test 7: 25W Drive CW Power Output & Linearity Baseline Matrix
-Establish the master legal-limit operational baseline with a fixed $25\text{ W}$ CW drive:
+Establish the master legal-limit operational baseline with a fixed 25 W CW drive:
 
 | Band | Frequency (MHz) | RF Input (W) | Output Power (W) | DC Volts (V) | DC Amps (A) | Efficiency (%) |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -995,7 +995,7 @@ Establish the master legal-limit operational baseline with a fixed $25\text{ W}$
 | **6m** | 50.150 | 25 W | 1150 W | 53.2 V | 34.0 A | 63.6 % |
 
 ### 10.8 Test 8: Station Communications, Ethernet, Wi-Fi & VNC Operation
-Verify DHCP and static network assignment across Ethernet and Wi-Fi, confirming remote VNC desktop operation at $1024\times 600$ resolution.
+Verify DHCP and static network assignment across Ethernet and Wi-Fi, confirming remote VNC desktop operation at 1024× 600 resolution.
 
 ### 10.9 Test 9: External USB Peripheral Port Verification
 Verify detection of USB flash drives and external SD card duplicator readers plugged into rear-panel USB sockets.
@@ -1010,11 +1010,11 @@ Using a fast digital storage oscilloscope, monitor transceiver RF output during 
 ### 11.1 Power Supply, Boot & Hardware Startup Faults
 * **Symptom: Raspberry Pi does not boot (Zero activity LED).**
   - *Cause:* Power supply 5V buck converter failed or corrupt SD card.
-  - *Test:* Measure DC voltage across GPIO Pin 2 (+5V) and Pin 6 (GND). Voltage must be between $4.95\text{ V}$ and $5.20\text{ V}$.
+  - *Test:* Measure DC voltage across GPIO Pin 2 (+5V) and Pin 6 (GND). Voltage must be between 4.95 V and 5.20 V.
   - *Fix:* Replace auxiliary buck converter or re-flash SD card using official Raspberry Pi Imager.
 * **Symptom: Main 53.5V DC rail does not energize.**
   - *Cause:* Eltek Flatpack2 AC line disconnect or remote inhibit line asserted.
-  - *Test:* Verify 240VAC across rear IEC inlet; test continuity of internal AC fuses. Check CAN bus termination resistors ($120\ \Omega$).
+  - *Test:* Verify 240VAC across rear IEC inlet; test continuity of internal AC fuses. Check CAN bus termination resistors (120 Ω).
   - *Fix:* Reset AC breaker; ensure Flatpack2 CAN address is set correctly in firmware.
 
 ### 11.2 Microcontroller Communication & Serial Link Failures
@@ -1031,7 +1031,7 @@ Using a fast digital storage oscilloscope, monitor transceiver RF output during 
 * **Symptom: Immediate "Input Power Too High! Press Reset" trip upon keying.**
   - *Cause:* Transceiver power set too high or turn-on RF spike exceeding 30W into 13dB attenuator.
   - *Test:* Verify transceiver output with external wattmeter in CW mode. Check potentiometer R1 alignment (Step 13).
-  - *Fix:* Reduce transceiver power to $\le 25\text{ W}$; adjust R1 clockwise to align trip point cleanly to $28\text{ W}$.
+  - *Fix:* Reduce transceiver power to ≤ 25 W; adjust R1 clockwise to align trip point cleanly to 28 W.
 * **Symptom: Input power relative yellow bar does not illuminate.**
   - *Cause:* Potentiometer R14 misaligned or defective RF detector diode on Relay Board.
   - *Test:* Measure DC voltage at wiper of R14 during keying with 27W drive.
@@ -1041,7 +1041,7 @@ Using a fast digital storage oscilloscope, monitor transceiver RF output during 
 * **Symptom: Front-panel SWR reads 1.5:1 or higher into a certified 50Ω dummy load.**
   - *Cause:* Stockton bridge trimmer capacitor drifted or reversed sense leads.
   - *Test:* Reverse TRX and ANT 1 cables and measure null voltage at Reflected test pin.
-  - *Fix:* Execute Step 9 SWR bridge calibration; adjust ceramic trimmer with plastic tool until reflected voltage nulls to $< 5\text{ mV}$.
+  - *Fix:* Execute Step 9 SWR bridge calibration; adjust ceramic trimmer with plastic tool until reflected voltage nulls to < 5 mV.
 * **Symptom: Reflected power jumps erratically on 6 meters.**
   - *Cause:* Excessive lead inductance on SWR bridge PCB or stray capacitive coupling.
   - *Test:* Inspect SWR bridge toroid leads; verify bifilar windings are tightly twisted and grounded.
@@ -1079,17 +1079,17 @@ When isolating hardware defects on unpowered boards, technicians should verify d
 
 | Test Point / Component | Positive Probe (+) | Negative Probe (-) | Expected Normal Reading | Indication of Failure / Defect |
 | :--- | :--- | :--- | :--- | :--- |
-| **Stockton Bridge Forward Diode** | Anode of D1 (1N5711) | Cathode of D1 | $0.34\text{ V} – 0.42\text{ V}$ | Open circuit ($> 2.0\text{ V}$) or short ($0.0\text{ V}$). |
-| **Stockton Bridge Reflected Diode**| Anode of D2 (1N5711) | Cathode of D2 | $0.34\text{ V} – 0.42\text{ V}$ | Bridge will not null or reads high SWR into 50Ω load. |
-| **PA Pallet TVS Gate Clamp** | Ground Copper Plane | Gate Stud / Trace | $0.62\text{ V} – 0.70\text{ V}$ (Internal diode) | Short circuit indicates LDMOS gate surge occurred. |
-| **LDMOS Gate Oxide Isolation** | Drain (Center Tab) | Gate Stud / Trace | Open Loop ($> 20\text{ M}\Omega$) | Any reading $< 100\text{ k}\Omega$ confirms blown gate oxide. |
-| **LDMOS Drain-to-Source Diode** | Source (Flange / GND)| Drain (Output Bus) | $0.48\text{ V} – 0.55\text{ V}$ (Body diode) | Direct short ($0\ \Omega$) indicates drain breakdown. |
-| **ULN2803A Darlington Input** | Pin 1–8 (Logic Input)| Pin 9 (GND) | $1.25\text{ V} – 1.45\text{ V}$ (Dual diode) | Open ($> 2.0\text{ V}$) or short indicates blown driver. |
-| **ULN2803A Clamp Diode** | Pin 10 (COM / +12V) | Pin 11–18 (Collectors) | $0.65\text{ V} – 0.75\text{ V}$ (Flyback clamp)| Open allows relay inductive spike to destroy chip. |
-| **PTT Optocoupler Input (4N35)** | Anode (Pin 1) | Cathode (Pin 2) | $1.15\text{ V} – 1.25\text{ V}$ (IR LED) | Open LED prevents PTT line detection from rig. |
-| **53.5V Divider Network** | Top of R1 (50V Stud) | Wiper / Node to A4 | $100\text{ k}\Omega \pm 1\%$ | Drift causes erroneous voltage display on GUI. |
-| **53.5V Ground Reference** | Node to A4 | Ground Plane | $10\text{ k}\Omega \pm 1\%$ | Open causes ADC A4 to peg at rail, triggering sag error. |
-| **I2C Bus Pull-Up Resistors** | +3.3V / +5V Rail | Pin 5 (SDA) / Pin 6 (SCL)| $4.7\text{ k}\Omega \pm 5\%$ | Missing pull-up causes I2C hang and missing memories. |
+| **Stockton Bridge Forward Diode** | Anode of D1 (1N5711) | Cathode of D1 | 0.34 V – 0.42 V | Open circuit (> 2.0 V) or short (0.0 V). |
+| **Stockton Bridge Reflected Diode**| Anode of D2 (1N5711) | Cathode of D2 | 0.34 V – 0.42 V | Bridge will not null or reads high SWR into 50Ω load. |
+| **PA Pallet TVS Gate Clamp** | Ground Copper Plane | Gate Stud / Trace | 0.62 V – 0.70 V (Internal diode) | Short circuit indicates LDMOS gate surge occurred. |
+| **LDMOS Gate Oxide Isolation** | Drain (Center Tab) | Gate Stud / Trace | Open Loop (> 20 MΩ) | Any reading < 100 kΩ confirms blown gate oxide. |
+| **LDMOS Drain-to-Source Diode** | Source (Flange / GND)| Drain (Output Bus) | 0.48 V – 0.55 V (Body diode) | Direct short (0 Ω) indicates drain breakdown. |
+| **ULN2803A Darlington Input** | Pin 1–8 (Logic Input)| Pin 9 (GND) | 1.25 V – 1.45 V (Dual diode) | Open (> 2.0 V) or short indicates blown driver. |
+| **ULN2803A Clamp Diode** | Pin 10 (COM / +12V) | Pin 11–18 (Collectors) | 0.65 V – 0.75 V (Flyback clamp)| Open allows relay inductive spike to destroy chip. |
+| **PTT Optocoupler Input (4N35)** | Anode (Pin 1) | Cathode (Pin 2) | 1.15 V – 1.25 V (IR LED) | Open LED prevents PTT line detection from rig. |
+| **53.5V Divider Network** | Top of R1 (50V Stud) | Wiper / Node to A4 | 100 kΩ ± 1\% | Drift causes erroneous voltage display on GUI. |
+| **53.5V Ground Reference** | Node to A4 | Ground Plane | 10 kΩ ± 1\% | Open causes ADC A4 to peg at rail, triggering sag error. |
+| **I2C Bus Pull-Up Resistors** | +3.3V / +5V Rail | Pin 5 (SDA) / Pin 6 (SCL)| 4.7 kΩ ± 5\% | Missing pull-up causes I2C hang and missing memories. |
 
 ---
 
@@ -1122,7 +1122,7 @@ The native update facility embedded within `pa055.py` connects to remote RF-KIT 
 
 ### 12.2 Firmware Validation, Integrity Hashing & Flashing Mechanics
 Prior to initiating updates:
-1. The system verifies available disk space ($> 500\text{ MB}$ required).
+1. The system verifies available disk space (> 500 MB required).
 2. Computes SHA256 checksums of `gui{ver}.zip` and `firmware{ver}.bin`.
 3. If microcontroller firmware is updated:
    - GUI invokes SimpleRPC command `enter_bootloader()`.
@@ -1134,14 +1134,14 @@ Prior to initiating updates:
 Because official RF-KIT software updates distribute 32-bit `_Hamlib.so` libraries, an unpatched 64-bit appliance would fail to boot immediately following an update!
 **The JRFK Self-Healing Hook:**
 JRFK installs an unyielding post-extraction trigger inside `gui_starter.py`. Immediately after `gui{ver}.zip` is extracted:
-1. Detects host architecture (`uname -m` $\rightarrow$ `aarch64`).
+1. Detects host architecture (`uname -m` → `aarch64`).
 2. Copies native 64-bit `_Hamlib.cpython-311-aarch64-linux-gnu.so` into the new version folder.
-3. Automatically applies the PIL `ANTIALIAS` $\rightarrow$ `LANCZOS` image scaling shim across all `.py` files.
+3. Automatically applies the PIL `ANTIALIAS` → `LANCZOS` image scaling shim across all `.py` files.
 4. Updates `/home/pi/rf-kit-statics/gui_path.json` pointing `start` to the newly extracted version and `fallback` to the proven previous version.
 
 ### 12.4 Fault Isolation & Automated Multi-Version Rollback Engine
 When `gui_starter.py` launches the new GUI instance, it starts an internal watchdog timer:
-* If `main.py` terminates or throws an uncaught exception within $3\text{ seconds}$ of execution, the watchdog trips.
+* If `main.py` terminates or throws an uncaught exception within 3 seconds of execution, the watchdog trips.
 * `gui_starter.py` logs the crash traceback to `/home/pi/PA-Files/crash.log`, instantly reverts `gui_path.json` back to the `fallback` folder, and restarts the proven stable version.
 * The amplifier is completely immune to bricking in the field!
 
@@ -1156,8 +1156,8 @@ When `gui_starter.py` launches the new GUI instance, it starts an internal watch
 
 ### 13.2 Application Performance Class (A2) & Endurance Requirements
 Standard consumer Class 10 cards fail rapidly under continuous SQLite database transactions. Only industrial-grade cards adhering to the following ratings are certified:
-* **Application Performance Class A2:** Guarantees minimum random read of $4000\text{ IOPS}$ and random write of $2000\text{ IOPS}$.
-* **Video Speed Class V30 / UHS Speed Class U3:** Guarantees sustained sequential write performance $\ge 30\text{ MB/s}$.
+* **Application Performance Class A2:** Guarantees minimum random read of 4000 IOPS and random write of 2000 IOPS.
+* **Video Speed Class V30 / UHS Speed Class U3:** Guarantees sustained sequential write performance ≥ 30 MB/s.
 * **Certified Media:** SanDisk Extreme PRO A2 V30, Samsung PRO Endurance, or Kingston Canvas Go! Plus.
 
 ### 13.3 Wear-Leveling Mechanics & Filesystem Journal Optimization
@@ -1260,12 +1260,12 @@ flowchart TD
 
 ### 15.1 Architectural Blueprint Format & Port Allocation Matrix
 All user-facing diagnostic cards in the JRFK Tools Suite strictly utilize the **Architectural Blueprint Format**:
-* **Background Plane:** Deep architectural navy/cobalt blueprint blue (`#0a2540` / `#07172b`) with subtle isometric/Cartesian grid overlay (`#103b68` at $20\text{px}$ pitch).
+* **Background Plane:** Deep architectural navy/cobalt blueprint blue (`#0a2540` / `#07172b`) with subtle isometric/Cartesian grid overlay (`#103b68` at 20px pitch).
 * **Structural Vectors & Annotations:** Crisp architectural white (`#ffffff`) borders, dimension lines, and technical metadata.
 * **Telemetry Data Accents:** Vivid functional status colors:
-  * Green (`#22c55e`): Normal operating duty ($\le 50^\circ\text{C}$, $\text{SWR} < 1.5:1$).
-  * Yellow (`#facc15` / `#d97706`): Warning zone ($> 50^\circ\text{C}$, $\text{SWR} 1.5 - 2.0:1$).
-  * Red (`#ef4444` / `#dc2626`): Critical alert / trip ($> 55^\circ\text{C}$, $\text{SWR} > 2.0:1$).
+  * Green (`#22c55e`): Normal operating duty (≤ 50°C, SWR < 1.5:1).
+  * Yellow (`#facc15` / `#d97706`): Warning zone (> 50°C, SWR 1.5 - 2.0:1).
+  * Red (`#ef4444` / `#dc2626`): Critical alert / trip (> 55°C, SWR > 2.0:1).
   * Cyan (`#38bdf8`): RF power vectors, active antenna names, and frequency spans.
 
 **Network Port Allocation:**
@@ -1279,7 +1279,7 @@ All user-facing diagnostic cards in the JRFK Tools Suite strictly utilize the **
 ### 15.2 Antenna Mapper Interface (`/antenna`)
 The Antenna Mapper provides deep visibility into the automatic tuner (ATU) calibration matrices across all 11 amateur bands (160m through 6m):
 1. **Vertical Segment Boundary Markers (`|`):**
-   Amateur bands are divided into discrete tuning segments based on fractional bandwidth and loaded $Q$:
+   Amateur bands are divided into discrete tuning segments based on fractional bandwidth and loaded Q:
    * **160m (1.800–2.000 MHz):** 20 kHz segments (10 discrete segments).
    * **80m (3.500–4.000 MHz):** 25 kHz segments (20 discrete segments).
    * **40m (7.000–7.300 MHz):** 15 kHz segments (20 discrete segments).
@@ -1291,16 +1291,16 @@ The Antenna Mapper provides deep visibility into the automatic tuner (ATU) calib
    The `ACTIVE ANTENNA` field continuously reflects the band-to-port mapping configured in `config.json` (`selected_antennas` array and `custom_antenna_names`). As the operator scrolls through bands via the band spinner or quick-select keys, the antenna label dynamically switches to the assigned port (e.g. `ANT 2: 20m-6m SteppIR`), and the Bode plot instantly re-renders for that band's tuning curve.
 3. **Physical Engineering Units (Elimination of Clicks/Steps):**
    Traditional raw stepper counts are converted directly into physical SI units:
-   * **Inductance ($L$):** Displayed in **nanohenries ($\text{nH}$)** and **microhenries ($\mu\text{H}$)** derived from the binary-weighted relay inductor bank:
-     $$\text{Relay Weights: } L_1=100\text{ nH},\, L_2=200\text{ nH},\, L_3=400\text{ nH},\, L_4=800\text{ nH},\, L_5=1600\text{ nH},\, L_6=3200\text{ nH},\, L_7=6400\text{ nH}$$
-   * **Capacitance ($C$):** Displayed in **picofarads ($\text{pF}$)** derived from the binary capacitor network:
-     $$\text{Relay Weights: } C_1=10\text{ pF},\, C_2=20\text{ pF},\, C_3=40\text{ pF},\, C_4=80\text{ pF},\, C_5=160\text{ pF},\, C_6=320\text{ pF},\, C_7=640\text{ pF},\, C_8=1280\text{ pF}$$
-   * **Matching Topology:** Explicitly displays low-pass or high-pass matching configuration: $\text{CL } (C_{\text{in}}\text{ transmitter side})$ or $\text{LC } (C_{\text{out}}\text{ antenna side})$.
+   * **Inductance (L):** Displayed in **nanohenries (nH)** and **microhenries (µH)** derived from the binary-weighted relay inductor bank:
+     Relay Weights: L1=100 nH, L2=200 nH, L3=400 nH, L4=800 nH, L5=1600 nH, L6=3200 nH, L7=6400 nH
+   * **Capacitance (C):** Displayed in **picofarads (pF)** derived from the binary capacitor network:
+     Relay Weights: C1=10 pF, C2=20 pF, C3=40 pF, C4=80 pF, C5=160 pF, C6=320 pF, C7=640 pF, C8=1280 pF
+   * **Matching Topology:** Explicitly displays low-pass or high-pass matching configuration: CL (Cin transmitter side) or LC (Cout antenna side).
 
 ---
 
 ### 15.3 Amplifier Health Monitor & 3-Tier Thermal Safety Guard (`/health`)
-The Health Monitor incorporates an autonomous **Thermal Guard State Machine** engineered to protect the LDMOS transistors ($2\times \text{MRFE6VP11KH}$ or equivalent) against thermal runaway:
+The Health Monitor incorporates an autonomous **Thermal Guard State Machine** engineered to protect the LDMOS transistors (2× MRFE6VP11KH or equivalent) against thermal runaway:
 
 ```
 [PA Heatsink Temp]
@@ -1323,7 +1323,7 @@ The Health Monitor incorporates an autonomous **Thermal Guard State Machine** en
 ```
 
 * **Live 300-Second Modal Overlay:** While in safety trip, a persistent countdown timer ticks down on the amplifier display and web console.
-* **Hysteresis Recovery Latch:** The amplifier will strictly refuse to return to Operate mode until the heatsink has dissipated excess heat and dropped below $50.0^\circ\text{C}$.
+* **Hysteresis Recovery Latch:** The amplifier will strictly refuse to return to Operate mode until the heatsink has dissipated excess heat and dropped below 50.0°C.
 
 ---
 
@@ -1332,10 +1332,10 @@ To guarantee storage stability and prevent flash memory wear on the Raspberry Pi
 * **Log Location:** `/home/pi/rfk_tools/telemetry_rolling.log`
 * **Size Enforcement:** `RotatingFileHandler(maxBytes=10*1024*1024, backupCount=1)` strictly limits log footprint to 10 Megabytes.
 * **Statistical Tracking Engine:** The collector maintains running min, max, and typical (moving average) metrics for all key operational parameters:
-  * **Temperature ($^\circ\text{C}$):** Current, Typ, Min, Max.
-  * **53.5V DC Rail Voltage ($\text{V}$):** Monitored for sag under high-current carrier key-down.
-  * **Drain Current ($\text{A}$):** Current, Typ, Min, Max (verifying balance across LDMOS devices).
-  * **Forward & Reflected RF Power ($\text{W}$):** Peak and average envelope logging.
+  * **Temperature (°C):** Current, Typ, Min, Max.
+  * **53.5V DC Rail Voltage (V):** Monitored for sag under high-current carrier key-down.
+  * **Drain Current (A):** Current, Typ, Min, Max (verifying balance across LDMOS devices).
+  * **Forward & Reflected RF Power (W):** Peak and average envelope logging.
   * **Calculated SWR:** Peak mismatch detection.
 
 ---
@@ -1554,10 +1554,10 @@ Following successful migration, operators gain access to the suite of web-based 
 #### 17.5.2 Antenna Matrix Mapper (`:8088/antenna`)
 * **4x4 Coaxial Matrix Configuration:** Provides a visual web interface to inspect and assign antenna ports across 160m through 6m amateur bands.
 * **Hardware Interlock Protection:** Enforces safety interlocks preventing high-power transmission on unassigned or disconnected ports, safeguarding the RF deck.
-* **ATU Solution Caching:** Displays real-time relay states for ATU inductors ($L_1–L_8$) and capacitors ($C_1–C_8$) stored in non-volatile FRAM.
+* **ATU Solution Caching:** Displays real-time relay states for ATU inductors (L1–L8) and capacitors (C1–C8) stored in non-volatile FRAM.
 
 #### 17.5.3 Amplifier Health & Thermal Monitor (`:8088/health`)
-* **Real-Time DC & RF Telemetry:** Live gauges displaying 53.5V rail voltage under load, BLF189XR quiescent current ($I_{DQ}$), peak forward RF power, reflected power, and heat sink thermistor temperature.
+* **Real-Time DC & RF Telemetry:** Live gauges displaying 53.5V rail voltage under load, BLF189XR quiescent current (I_DQ), peak forward RF power, reflected power, and heat sink thermistor temperature.
 * **24-Hour Rolling Historical Trends:** Powered by a lightweight SQLite database (`telemetry_history.db`), graphing DC rail sag during key-down contest conditions and thermal dissipation curves.
 * **Hardware Trip Log:** Captures and decodes fast analog comparator fault trips (Input Overdrive, High Reflected SWR, Thermal Limit) with millisecond timestamps.
 
@@ -1610,15 +1610,15 @@ Once the amplifier is running on the local network (either via Option A migratio
 * `D8`–`D11`: SPI Bus (Tuner Display / Auxiliary).
 * `D20` (SDA) / `D21` (SCL): I2C Bus to FM24CL64 Non-Volatile FRAM & RTC.
 * `D22`–`D28`: LPF Toroidal Relays (160m to 6m).
-* `D30`–`D37`: ATU Inductor Matrix Relays ($L_1$ to $L_8$).
-* `D38`–`D45`: ATU Capacitor Matrix Relays ($C_1$ to $C_8$).
+* `D30`–`D37`: ATU Inductor Matrix Relays (L1 to L8).
+* `D38`–`D45`: ATU Capacitor Matrix Relays (C1 to C8).
 * `D46`–`D49`: Antenna Selection Coaxial Relays (ANT 1 to ANT 4).
-* `A0`: Forward Power Analog Input ($0–5\text{ V}$).
-* `A1`: Tuner Gain Detector Analog Input ($0–5\text{ V}$).
-* `A2`: LPF Output Power Analog Input ($0–5\text{ V}$).
-* `A3`: Current Monitor Analog Input ($0–5\text{ V}$).
-* `A4`: 53.5V Rail Analog Input ($0–5\text{ V}$).
-* `A5`: Temperature Sensor Analog Input ($0–5\text{ V}$).
+* `A0`: Forward Power Analog Input (0–5 V).
+* `A1`: Tuner Gain Detector Analog Input (0–5 V).
+* `A2`: LPF Output Power Analog Input (0–5 V).
+* `A3`: Current Monitor Analog Input (0–5 V).
+* `A4`: 53.5V Rail Analog Input (0–5 V).
+* `A5`: Temperature Sensor Analog Input (0–5 V).
 
 ### B. Summary of Potentiometer Adjustments & Functions
 * **R1:** Input Overdrive Trip Comparator Level (Adjust at 28W CW drive).
@@ -1628,7 +1628,7 @@ Once the amplifier is running on the local network (either via Option A migratio
 * **R17:** LPF Forward Power Difference Trip Threshold (Adjust to 93 ADC with 50W drive).
 * **R19:** Forward Power Display Multiplier (Adjust to 50W display reading at 50W CW).
 * **R20:** Reflected Power / SWR Display Calibration (Adjust to 2.0:1 SWR with 25Ω load).
-* **R21:** LDMOS Quiescent Bias Current ($I_{dq}$) Display (Adjust to match DMM in series with rail).
+* **R21:** LDMOS Quiescent Bias Current (Idq) Display (Adjust to match DMM in series with rail).
 * **SPARE:** Hardware PA Module Current Limiter Latch (Adjust to 1000 ADC at idle bias).
 
 ---

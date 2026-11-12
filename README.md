@@ -12,7 +12,7 @@
 
 > [!CAUTION]
 > **RESEARCH EXPERIMENTATION & LIABILITY DISCLAIMER**  
-> This software and documentation is purely research experimentation and is provided strictly **"AS IS"**. It communicates directly with high-voltage RF power amplifier hardware and high-current DC power supply subsystems ($53.5\,\text{VDC} @ 55\,\text{A}$). It may damage your amplifier, power supply, LDMOS transistors, exciter/transceiver, antenna system, or computer. The goal of this project is the experimental exploration of what is possible in modern 64-bit embedded Linux platforms, real-time telemetry diagnostics, and resilient disaster recovery for amateur radio linear amplifiers. Users accept all risks and agree to hold authors, contributors, and developers completely harmless regardless of outcome. **USE AT YOUR OWN RISK.**
+> This software and documentation is purely research experimentation and is provided strictly **"AS IS"**. It communicates directly with high-voltage RF power amplifier hardware and high-current DC power supply subsystems (53.5 VDC @ 55 A). It may damage your amplifier, power supply, LDMOS transistors, exciter/transceiver, antenna system, or computer. The goal of this project is the experimental exploration of what is possible in modern 64-bit embedded Linux platforms, real-time telemetry diagnostics, and resilient disaster recovery for amateur radio linear amplifiers. Users accept all risks and agree to hold authors, contributors, and developers completely harmless regardless of outcome. **USE AT YOUR OWN RISK.**
 > 
 > **Community Rules:**
 > 1. **Open Source & Copyleft:** Keep all innovations accessible, auditable, and free for everyone.
@@ -29,13 +29,13 @@ The primary workflow is hosted in a self-contained, browser-based workbench loca
 
 ### Two Build Modes Available:
 * **Option A: Migrate Existing 32-Bit RFK SD Image (Primary Option — Data Preserved):**
-  1. Insert your original working amplifier SD card into a USB reader $\rightarrow$ click **Extract Golden Master Data** (extracts calibration, touch profiles, attenuator offsets, and network settings into a safe local archive `C:\RFK_Backups\RFK_Golden_Master.tar.gz`).
-  2. Remove and safely store your original SD card untouched. Insert a fresh 16GB/32GB A2/V30 SD card $\rightarrow$ click **Build & Flash 64-Bit Appliance Image** (writes 64-bit Bookworm OS, injects weekly Sunday 4:00 AM maintenance cron, injects all user calibrations, and sets `pi:pi 755` permissions).
-  3. Insert the new card into your amplifier and follow the automated **Boot 1** (auto-expansion & hardware discovery) $\rightarrow$ **Boot 2** (operational run into full-screen RFKGUI) sequence.
+  1. Insert your original working amplifier SD card into a USB reader → click **Extract Golden Master Data** (extracts calibration, touch profiles, attenuator offsets, and network settings into a safe local archive `C:\RFK_Backups\RFK_Golden_Master.tar.gz`).
+  2. Remove and safely store your original SD card untouched. Insert a fresh 16GB/32GB A2/V30 SD card → click **Build & Flash 64-Bit Appliance Image** (writes 64-bit Bookworm OS, injects weekly Sunday 4:00 AM maintenance cron, injects all user calibrations, and sets `pi:pi 755` permissions).
+  3. Insert the new card into your amplifier and follow the automated **Boot 1** (auto-expansion & hardware discovery) → **Boot 2** (operational run into full-screen RFKGUI) sequence.
 * **Option B: Clean Install — New Card & New System (Provision with Wi-Fi & Credentials):**
   1. Insert a new/blank 16GB or 32GB SD card.
   2. Enter your station credentials: RPi username (default `pi`), password, hostname (default `k7bit`), network mode (DHCP or Static IP), and Wi-Fi SSID / Password.
-  3. Click **Partition, Format & Build 64-Bit System** $\rightarrow$ writes 64-bit Bookworm, pre-configures `userconf.txt` and `wpa_supplicant.conf`, enables SSH, and injects the JRFK tools suite.
+  3. Click **Partition, Format & Build 64-Bit System** → writes 64-bit Bookworm, pre-configures `userconf.txt` and `wpa_supplicant.conf`, enables SSH, and injects the JRFK tools suite.
   4. Boot directly in your amplifier with working Wi-Fi on the network!
 
 ### Integrated Capabilities:
@@ -95,13 +95,13 @@ The authoritative 60-page engineering manual, containing 10 standalone vector di
 * **Native 64-Bit Hamlib Bridge:** Eliminates the fatal `ELFCLASS32` dynamic linker collision.
 
 ### 2. Execution Flow & 71 SimpleRPC Register Catalog
-* High-speed $20\,\text{ms}$ to $50\,\text{ms}$ continuous polling loop querying the controller microcontroller (`get_all_values`).
+* High-speed 20 ms to 50 ms continuous polling loop querying the controller microcontroller (`get_all_values`).
 * Complete register-by-register analysis of the 20-element telemetry return tuple (Forward Power, Reflected Power, SWR, 53.5V DC rail, Idq Current, Temperature, Band, Antenna, Tuner steps).
-* Fast hardware protection trip monitoring with $< 5\,\text{ms}$ automatic cutoff for over-drive ($> 28\,\text{W}$) and high SWR ($> 3.0:1$).
+* Fast hardware protection trip monitoring with < 5 ms automatic cutoff for over-drive (> 28 W) and high SWR (> 3.0:1).
 
 ### 3. Integrated Diagnostic Suite (`rfk_tools_suite` on Port 8088)
 * **Antenna Mapper (`/antenna`):** Visual SWR matrix across 160m–6m, band spinner, horizontal scrollbar, click-to-inspect tuner L/C/K steps, and one-click `@media print` network printing.
-* **Amplifier Health Monitor (`/health`):** 1-hour high-resolution RAM ring buffer (every 5 seconds) and 24-hour historical SQLite datastore (`telemetry_history.db`) for RF power, 53.5V rail sag, DC current, and temperature with $38^\circ\text{C}$ and $42^\circ\text{C}$ fan trigger overlays.
+* **Amplifier Health Monitor (`/health`):** 1-hour high-resolution RAM ring buffer (every 5 seconds) and 24-hour historical SQLite datastore (`telemetry_history.db`) for RF power, 53.5V rail sag, DC current, and temperature with 38°C and 42°C fan trigger overlays.
 * **SD Backup & Recovery Manager (`/backup`):** Real-time drive media status, user-configurable weekly cron schedule, and one-click manual backup trigger.
 
 ### 4. Automated Weekly Cron Backup & "Swap, Boot, Reboot, Run" Recovery
