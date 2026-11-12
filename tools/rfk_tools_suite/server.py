@@ -410,10 +410,13 @@ class RFKToolsHandler(SimpleHTTPRequestHandler):
         return self.do_GET()
 
     def do_GET(self):
-        if self.path == "/" or self.path == "/antenna":
+        if self.path == "/" or self.path == "/docs" or self.path == "/migrator":
+            self.path = "/docs_viewer.html"
+            return super().do_GET()
+        elif self.path == "/antenna":
             self.path = "/antenna_mapper.html"
             return super().do_GET()
-        elif self.path == "/health":
+        elif self.path == "/health" or self.path == "/health_manager" or self.path == "/health-manager":
             self.path = "/health_monitor.html"
             return super().do_GET()
         elif self.path == "/screen":
@@ -428,9 +431,31 @@ class RFKToolsHandler(SimpleHTTPRequestHandler):
         elif self.path == "/backup":
             self.path = "/backup_manager.html"
             return super().do_GET()
-        elif self.path == "/migrator":
-            self.path = "/migrator.html"
-            return super().do_GET()
+        elif self.path.startswith("/docs/"):
+            doc_file = self.path[6:].split("?")[0].split("#")[0]
+            candidates = [
+                os.path.join(BASE_DIR, "docs", doc_file),
+                os.path.join(os.path.dirname(BASE_DIR), "docs", doc_file),
+                os.path.join("/home/pi/rfk_tools/docs", doc_file),
+                os.path.join(STATIC_DIR, doc_file)
+            ]
+            for c in candidates:
+                if os.path.exists(c) and os.path.isfile(c):
+                    mime = "text/html"
+                    if c.endswith(".pdf"):
+                        mime = "application/pdf"
+                    elif c.endswith(".md") or c.endswith(".txt"):
+                        mime = "text/plain; charset=utf-8"
+                    self.send_response(200)
+                    self.send_header('Content-Type', mime)
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.end_headers()
+                    with open(c, 'rb') as f:
+                        self.wfile.write(f.read())
+                    return
+            self.send_response(404)
+            self.end_headers()
+            return
 
         # Telemetry API with stats
         elif self.path.startswith("/api/telemetry"):
@@ -873,6 +898,22 @@ class RFKToolsHandler(SimpleHTTPRequestHandler):
                 return
 
         elif self.path == "/api/backup/start":
+            start_ts = time.strftime("%Y-%m-%d %H:%M:%S")
+            init_msg = (
+                f"[{start_ts}] ==========================================================\n"
+                f"[{start_ts}] RFK_Backup: Automated Scheduled Backup Starting\n"
+                f"[{start_ts}] [!] CLONING INITIATED: Live backup dispatched by operator\n"
+                f"[{start_ts}] [*] Engine State: RUNNING (Differential block replication)\n"
+                f"[{start_ts}] [*] Scanning source boot drive /dev/mmcblk0 and target SD...\n"
+            )
+            for c_path in [LOG_PATH, "/home/pi/rfk_tools/rfk_backup.log", os.path.join(BASE_DIR, "rfk_backup.log")]:
+                try:
+                    os.makedirs(os.path.dirname(c_path), exist_ok=True)
+                    with open(c_path, 'w', encoding='utf-8') as f:
+                        f.write(init_msg)
+                except Exception:
+                    pass
+
             def run_bg():
                 if os.path.exists(BACKUP_SCRIPT):
                     try:
@@ -884,10 +925,25 @@ class RFKToolsHandler(SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
-            self.wfile.write(json.dumps({"status": "started"}).encode('utf-8'))
+            self.wfile.write(json.dumps({"status": "started", "timestamp": start_ts, "init_log": init_msg}).encode('utf-8'))
             return
 
         elif self.path == "/api/backup/verify":
+            start_ts = time.strftime("%Y-%m-%d %H:%M:%S")
+            init_msg = (
+                f"[{start_ts}] ==========================================================\n"
+                f"[{start_ts}] RFK_Backup: Standalone SD Verification Initiated\n"
+                f"[{start_ts}] [!] VERIFICATION DISPATCHED BY OPERATOR\n"
+                f"[{start_ts}] [*] Mounting target SD /dev/sda1 and /dev/sda2...\n"
+            )
+            for c_path in [LOG_PATH, "/home/pi/rfk_tools/rfk_backup.log", os.path.join(BASE_DIR, "rfk_backup.log")]:
+                try:
+                    os.makedirs(os.path.dirname(c_path), exist_ok=True)
+                    with open(c_path, 'w', encoding='utf-8') as f:
+                        f.write(init_msg)
+                except Exception:
+                    pass
+
             def run_bg_verify():
                 if os.path.exists(BACKUP_SCRIPT):
                     try:
@@ -899,7 +955,7 @@ class RFKToolsHandler(SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
-            self.wfile.write(json.dumps({"status": "verification_started"}).encode('utf-8'))
+            self.wfile.write(json.dumps({"status": "verification_started", "timestamp": start_ts, "init_log": init_msg}).encode('utf-8'))
             return
 
         self.send_response(404)

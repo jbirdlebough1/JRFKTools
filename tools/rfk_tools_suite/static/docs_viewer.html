@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RF-KIT Documentation & Station Reference Library</title>
+    <style>
+        :root {
+            --bp-bg: #1a5695;          /* Classic medium blueprint cyanotype blue */
+            --bp-grid: rgba(255, 255, 255, 0.18);
+            --bp-line: #ffffff;
+            --bp-line-dim: #dbeafe;
+            --bp-card-bg: rgba(26, 86, 149, 0.92);
+            --bp-border: #93c5fd;
+            --bp-border-bright: #ffffff;
+            --data-green: #22c55e;
+            --data-yellow: #facc15;
+            --data-red: #ef4444;
+            --data-cyan: #67e8f9;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', -apple-system, sans-serif;
+            background-color: var(--bp-bg);
+            background-image: 
+                linear-gradient(var(--bp-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--bp-line);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Technical Blueprint Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid var(--bp-line);
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            background: var(--bp-card-bg);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .header::after {
+            content: "DWG NO. RFK-DOC-001 | REV 2.4 | ARCHITECTURE: 64-BIT STATION LIBRARY";
+            position: absolute;
+            bottom: 3px;
+            right: 15px;
+            font-size: 10px;
+            color: var(--bp-line-dim);
+            letter-spacing: 1px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 22px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+        .header .meta {
+            font-size: 13px;
+            color: var(--bp-line-dim);
+            margin-top: 4px;
+        }
+
+        .nav-tools {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background-color: var(--bp-bg);
+            border: 1px solid var(--bp-line);
+            color: var(--bp-line);
+            padding: 8px 12px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background-color: var(--bp-border-bright);
+            color: #0c2340;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+        .btn-active {
+            background-color: #1e40af !important;
+            border-color: var(--data-cyan) !important;
+            color: var(--data-cyan) !important;
+            box-shadow: 0 0 10px rgba(103, 232, 249, 0.4);
+        }
+
+        /* Document Selector Grid */
+        .doc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .doc-card {
+            background: var(--bp-card-bg);
+            border: 2px solid var(--bp-border);
+            padding: 16px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: border-color 0.2s;
+        }
+        .doc-card:hover {
+            border-color: #ffffff;
+        }
+        .doc-card.selected {
+            border-color: var(--data-cyan);
+            background: rgba(30, 64, 175, 0.7);
+        }
+        .doc-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .doc-desc {
+            font-size: 12px;
+            color: var(--bp-line-dim);
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+        .doc-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* Embedded Reader Frame */
+        .viewer-container {
+            background: var(--bp-card-bg);
+            border: 2px solid var(--bp-line);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 650px;
+        }
+        .viewer-toolbar {
+            background: #0d2847;
+            padding: 10px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--bp-border);
+        }
+        .viewer-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--data-cyan);
+            letter-spacing: 0.5px;
+        }
+        .doc-iframe {
+            width: 100%;
+            height: 750px;
+            border: none;
+            background: #ffffff;
+        }
+
+        @media print {
+            body { background: white !important; color: black !important; }
+            .header, .nav-tools, .doc-grid, .viewer-toolbar { display: none !important; }
+            .doc-iframe { height: 100% !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Technical Header -->
+    <div class="header">
+        <div>
+            <h1>RF-KIT Documentation &amp; Reference Library</h1>
+            <div class="meta">STATION CALLSIGN: K7BIT | ARCHITECTURE: 64-BIT AARCH64 DOCUMENTATION REPOSITORY</div>
+        </div>
+        <div class="nav-tools">
+            <a href="/docs" class="btn btn-active">📖 Station Docs</a>
+            <a href="/antenna" class="btn">🗺️ Antenna Mapper</a>
+            <a href="/health" class="btn">📈 Health Monitor</a>
+            <a href="/screen" class="btn">📺 Remote Screen</a>
+            <a href="/backup" class="btn">💾 SD Backup</a>
+            <a href="/report" class="btn">📋 System Report</a>
+            <a href="/logs" class="btn">📜 Log Viewer</a>
+        </div>
+    </div>
+
+    <!-- Document Selection Grid -->
+    <div class="doc-grid">
+        <!-- Card 1: User's Guide (HTML) -->
+        <div class="doc-card selected" id="card-ug-html">
+            <div>
+                <div class="doc-title">📘 64-Bit User's &amp; Operator's Guide</div>
+                <div class="doc-desc">
+                    Comprehensive manual covering hardware prerequisites, GOLD 32-bit SD backups, 64-bit OS migration, 3-boot visual verification, and diagnostic suite operation.
+                </div>
+            </div>
+            <div class="doc-actions">
+                <button class="btn" style="border-color:var(--data-cyan); color:var(--data-cyan);" onclick="loadDoc('/docs/JRFK_Users_Guide.html', 'JRFK 64-Bit User\'s Guide (Interactive HTML)', 'card-ug-html')">📖 Read In Viewer</button>
+                <a href="/docs/JRFK_Users_Guide.html" target="_blank" class="btn">🌐 Open Tab</a>
+            </div>
+        </div>
+
+        <!-- Card 2: User's Guide (PDF) -->
+        <div class="doc-card" id="card-ug-pdf">
+            <div>
+                <div class="doc-title">📄 Printable PDF User's Manual</div>
+                <div class="doc-desc">
+                    Official publication-ready PDF compiled via headless Google Chrome. Complete with blueprint diagrams, schematics references, and troubleshooting tables for shack printing.
+                </div>
+            </div>
+            <div class="doc-actions">
+                <button class="btn" style="border-color:var(--data-cyan); color:var(--data-cyan);" onclick="loadDoc('/docs/JRFK_Users_Guide.pdf', 'JRFK 64-Bit User\'s Guide (Printable PDF)', 'card-ug-pdf')">📄 Read PDF</button>
+                <a href="/docs/JRFK_Users_Guide.pdf" target="_blank" class="btn">⬇️ Download PDF</a>
+            </div>
+        </div>
+
+        <!-- Card 3: Engineering Manual -->
+        <div class="doc-card" id="card-em">
+            <div>
+                <div class="doc-title">⚙️ JRFK Engineering Manual (EM)</div>
+                <div class="doc-desc">
+                    Exhaustive engineering specification detailing pure-Python RPC protocols, Python 3.13 deprecation patches, 1024x600 pure KMS DRM modelines, and Thermal Guard logic.
+                </div>
+            </div>
+            <div class="doc-actions">
+                <button class="btn" style="border-color:var(--data-cyan); color:var(--data-cyan);" onclick="loadDoc('/docs/JRFK_EM.md', 'JRFK Engineering Manual (Architecture Deep-Dive)', 'card-em')">⚙️ View Spec</button>
+                <a href="/docs/JRFK_EM.md" target="_blank" class="btn">🌐 Open Raw MD</a>
+            </div>
+        </div>
+
+        <!-- Card 4: Disaster Recovery & Quick-Start Card -->
+        <div class="doc-card" id="card-dr">
+            <div>
+                <div class="doc-title">🚨 Disaster Recovery Procedure</div>
+                <div class="doc-desc">
+                    Emergency "Swap, Boot, Reboot, Run" card. Instructions for hot-swapping the weekly automated USB backup SD into the internal slot if production storage ever degrades.
+                </div>
+            </div>
+            <div class="doc-actions">
+                <button class="btn" style="border-color:var(--data-cyan); color:var(--data-cyan);" onclick="loadDoc('/docs/JRFK_Users_Guide.html#07', 'Disaster Recovery & Quick Reference', 'card-dr')">⚡ Recovery Steps</button>
+                <a href="/backup" class="btn">💾 Open SD Backup</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Embedded Reader Frame -->
+    <div class="viewer-container">
+        <div class="viewer-toolbar">
+            <span class="viewer-title" id="activeDocTitle">ACTIVE DOCUMENT: JRFK 64-BIT USER'S &amp; OPERATOR'S GUIDE (INTERACTIVE HTML)</span>
+            <div style="display:flex; gap:10px;">
+                <button class="btn" style="padding:4px 10px; font-size:11px;" onclick="reloadFrame()">🔄 Reload</button>
+                <button class="btn" style="padding:4px 10px; font-size:11px;" onclick="openExternal()">🌐 Open Full Window</button>
+                <button class="btn" style="padding:4px 10px; font-size:11px;" onclick="printDoc()">🖨️ Print Document</button>
+            </div>
+        </div>
+        <iframe id="docFrame" class="doc-iframe" src="/docs/JRFK_Users_Guide.html"></iframe>
+    </div>
+
+    <script>
+        let currentDocUrl = '/docs/JRFK_Users_Guide.html';
+
+        function loadDoc(url, title, cardId) {
+            currentDocUrl = url;
+            let frame = document.getElementById('docFrame');
+            frame.src = url;
+            document.getElementById('activeDocTitle').innerText = `ACTIVE DOCUMENT: ${title.toUpperCase()}`;
+
+            document.querySelectorAll('.doc-card').forEach(c => c.classList.remove('selected'));
+            let activeCard = document.getElementById(cardId);
+            if (activeCard) activeCard.classList.add('selected');
+        }
+
+        function reloadFrame() {
+            let frame = document.getElementById('docFrame');
+            frame.src = currentDocUrl;
+        }
+
+        function openExternal() {
+            window.open(currentDocUrl, '_blank');
+        }
+
+        function printDoc() {
+            let frame = document.getElementById('docFrame');
+            try {
+                frame.contentWindow.print();
+            } catch (e) {
+                window.open(currentDocUrl, '_blank');
+            }
+        }
+    </script>
+</body>
+</html>

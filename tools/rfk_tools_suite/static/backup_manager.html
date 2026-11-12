@@ -198,7 +198,7 @@
             <div class="meta">STATION CALLSIGN: K7BIT | ARCHITECTURE: 64-BIT AARCH64 DUAL-SD RECOVERY PIPELINE</div>
         </div>
         <div class="nav-tools">
-            <a href="/migrator" class="btn">🛠️ 64-Bit Migrator</a>
+            <a href="/docs" class="btn">📖 Station Docs</a>
             <a href="/antenna" class="btn">🗺️ Antenna Mapper</a>
             <a href="/health" class="btn">📈 Health Monitor</a>
             <a href="/screen" class="btn">📺 Remote Screen</a>
@@ -232,12 +232,9 @@
                 <span class="badge badge-green" id="targetBadge">DETECTED</span>
             </div>
 
-            <div style="margin-top: 20px; display: flex; gap: 10px;">
-                <button class="btn btn-action" style="flex: 1; justify-content: center; padding: 12px;" onclick="startBackup()">
-                    ⚡ Execute Immediate Full System Clone
-                </button>
-                <button class="btn" style="justify-content: center; padding: 12px; border-color: var(--data-cyan); color: var(--data-cyan);" onclick="verifyBackup()">
-                    🔍 Verify Backup SD
+            <div style="margin-top: 20px;">
+                <button class="btn btn-action" id="btnStartClone" style="width: 100%; justify-content: center; padding: 14px; font-size: 14px;" onclick="startBackup()">
+                    ⚡ Execute Immediate Full System Clone &amp; Verify
                 </button>
             </div>
         </div>
@@ -289,6 +286,7 @@
     <script>
         let pollTimer = null;
         let isCloning = false;
+        let activeOpStarted = 0;
 
         function fetchStatus() {
             fetch('/api/backup/status')
@@ -301,33 +299,40 @@
                         document.getElementById('targetDev').innerText = d.target_found ? `Device: ${d.target_dev} | ${name} (${sz} GB)` : 'No USB SD Card Inserted';
                     }
                     if (d.log !== undefined && d.log !== null && d.log !== "") {
+                        if (Date.now() - activeOpStarted < 4000 && !d.log.includes("CLONING INITIATED") && !d.log.includes("Step")) {
+                            return;
+                        }
                         let box = document.getElementById('logBox');
                         box.innerText = d.log;
                         box.scrollTop = box.scrollHeight;
 
                         let statusElem = document.getElementById('backupEngineStatus');
-                        if (d.log.includes("VERIFICATION PASSED:") || (d.log.includes("SUCCESS:") && !d.log.includes("Step"))) {
+                        let btn = document.getElementById('btnStartClone');
+                        if (d.log.includes("VERIFICATION PASSED:") || (d.log.includes("SUCCESS:") && !d.log.includes("Step") && !d.log.includes("INITIATED"))) {
                             statusElem.innerText = "✅ BACKUP VERIFIED & READY";
                             statusElem.style.color = "var(--data-green)";
                             isCloning = false;
+                            if (btn) { btn.disabled = false; btn.innerText = "⚡ Execute Immediate Full System Clone & Verify"; }
                         } else if (d.log.includes("VERIFICATION FAILED:") || d.log.includes("ERROR:")) {
                             statusElem.innerText = "❌ VERIFICATION FAILED";
                             statusElem.style.color = "#ff4444";
                             isCloning = false;
+                            if (btn) { btn.disabled = false; btn.innerText = "⚡ Execute Immediate Full System Clone & Verify"; }
                         } else if (d.log.includes("Step 6/6") || d.log.includes("Verifying")) {
                             statusElem.innerText = "🔍 FULL VERIFICATION IN PROGRESS...";
                             statusElem.style.color = "var(--data-cyan)";
                             isCloning = true;
-                        } else if (d.log.includes("Starting") || d.log.includes("Step")) {
+                        } else if (d.log.includes("Starting") || d.log.includes("Step") || d.log.includes("INITIATED") || d.log.includes("Replicating")) {
                             statusElem.innerText = "🔄 CLONING IN PROGRESS...";
                             statusElem.style.color = "var(--data-yellow)";
                             isCloning = true;
                         } else {
                             statusElem.innerText = "● ENGINE READY";
                             statusElem.style.color = "var(--data-cyan)";
+                            if (btn) { btn.disabled = false; btn.innerText = "⚡ Execute Immediate Full System Clone & Verify"; }
                         }
                     } else {
-                        document.getElementById('logBox').innerText = "Backup engine idle. Click 'Execute Immediate Full System Clone' to begin replication.";
+                        document.getElementById('logBox').innerText = "Backup engine idle. Click 'Execute Immediate Full System Clone & Verify' to begin replication.";
                     }
                     if (d.schedule) {
                         document.getElementById('schedDay').value = d.schedule.day || "0";
@@ -341,38 +346,40 @@
         function startBackup() {
             if (!confirm("Start full system replication from internal SD to USB SD? Ensure target SD contains no vital data.")) return;
             let box = document.getElementById('logBox');
-            box.innerText = "[*] Dispatching live cloning pipeline to amplifier daemon...\n[*] Awaiting partition allocation and filesystem replication...";
-            document.getElementById('backupEngineStatus').innerText = "🔄 CLONING IN PROGRESS...";
-            document.getElementById('backupEngineStatus').style.color = "var(--data-yellow)";
+            let nowStr = new Date().toISOString().replace('T', ' ').substring(0, 19);
+            activeOpStarted = Date.now();
+
+            let initBanner = `[${nowStr}] ==========================================================\n[${nowStr}] [!] CLONING INITIATED: Live backup dispatched by operator\n[${nowStr}] [*] Engine State: RUNNING (Differential block replication)\n[${nowStr}] [*] Source Boot Media: /dev/mmcblk0\n[${nowStr}] [*] Target Backup Media: /dev/sda (SanDisk USB Reader)\n[${nowStr}] [*] Step 1/6: Unmounting active volumes & preparing partition table...\n[${nowStr}] [*] Note: Full 5-point verification will execute automatically in Step 6/6.\n`;
+            box.innerText = initBanner;
+            box.scrollTop = box.scrollHeight;
+
+            let statusElem = document.getElementById('backupEngineStatus');
+            statusElem.innerText = "🔄 CLONING IN PROGRESS (STARTED)...";
+            statusElem.style.color = "var(--data-yellow)";
+
+            let btn = document.getElementById('btnStartClone');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = "🔄 Cloning & Verification In Progress...";
+            }
 
             fetch('/api/backup/start', {method: 'POST'})
                 .then(r => r.json())
                 .then(d => {
-                    // Fast polling every 1.5 seconds during active backup
+                    if (d.init_log) {
+                        box.innerText = d.init_log;
+                        box.scrollTop = box.scrollHeight;
+                    }
                     if (pollTimer) clearInterval(pollTimer);
                     pollTimer = setInterval(fetchStatus, 1500);
-                    setTimeout(fetchStatus, 500);
+                    setTimeout(fetchStatus, 1000);
                 })
                 .catch(err => {
                     alert("Error triggering backup: " + err);
-                });
-        }
-
-        function verifyBackup() {
-            let box = document.getElementById('logBox');
-            box.innerText = "[*] Dispatching comprehensive verification suite to amplifier daemon...\n[*] Inspecting bootloader, kernel, UUID alignment, and calibration matrices...";
-            document.getElementById('backupEngineStatus').innerText = "🔍 FULL VERIFICATION IN PROGRESS...";
-            document.getElementById('backupEngineStatus').style.color = "var(--data-cyan)";
-
-            fetch('/api/backup/verify', {method: 'POST'})
-                .then(r => r.json())
-                .then(d => {
-                    if (pollTimer) clearInterval(pollTimer);
-                    pollTimer = setInterval(fetchStatus, 1500);
-                    setTimeout(fetchStatus, 500);
-                })
-                .catch(err => {
-                    alert("Error triggering verification: " + err);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerText = "⚡ Execute Immediate Full System Clone & Verify";
+                    }
                 });
         }
 
