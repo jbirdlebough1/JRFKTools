@@ -327,7 +327,6 @@ if [ "$1" == "--verify" ]; then
     verify_clone "$BOOT_DEV" "$TARGET_DEV"
     exit $?
 fi
-}
 
 if [ "$1" == "--auto" ] || [ "$1" == "--cron" ]; then
     log "=========================================================="
