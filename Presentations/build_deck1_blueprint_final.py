@@ -309,17 +309,17 @@ SLIDES = [
         "narration": "Examining the Health and Thermal Guard on screen. Starting at the top of the page, the thermal safety banner supervises the P A heatsink temperature against the sixty degree ceiling, unkeying the amplifier into standby if cooling limits are reached. Scrolling down into the instrument cluster, the meters display instantaneous forward power up to fifteen hundred Watts Peak Envelope Power and reflected power in Watts. Scrolling further down to the electrical status panel, the instruments monitor the fifty-three point five volt D C power supply rail and L-D moss current consumption in real time."
     },
     # -------------------------------------------------------------
-    # SLIDE 10: WEB TOOL 2 - REMOTE SCREEN VIEWER (BEHIND HEALTH MONITOR)
+    # SLIDE 10: WEB TOOL 2 - REMOTE SCREEN VIEWER (HDMI EXTENSION - READ ONLY)
     # -------------------------------------------------------------
     {
         "part": "PART 3: WEB TOOLS",
-        "category": "TOOL 2: REMOTE CONSOLE • LIVE LCD MIRROR",
-        "title": "Remote Screen Viewer: Live 1024x600 Display",
-        "subtitle": "Real-time HTTP video mirror of the physical front panel LCD touch screen",
+        "category": "TOOL 2: REMOTE CONSOLE • HDMI EXTENSION",
+        "title": "Remote Screen Viewer: HDMI Extension Display (Read-Only)",
+        "subtitle": "Network HDMI video mirror of the 7-inch LCD — strict read-only observation with zero control capability",
         "image": "web_screen_viewer.png",
-        "caption": "REMOTE SCREEN: DIRECT FRAMEBUFFER STREAM OF THE 7-INCH FRONT PANEL LCD DISPLAY",
+        "caption": "HDMI NETWORK EXTENSION: STRICT READ-ONLY FRONT PANEL MIRROR (CANNOT MODIFY AMPLIFIER STATE)",
         "scroll": False,
-        "narration": "Directly behind the Health Monitor, look at the Remote Screen Viewer on screen. This tool grabs the physical framebuffer of the amplifier's seven-inch front panel display and mirrors it live over H T T P at ten twenty-four by six hundred resolution. You see the physical front panel touchscreen update in real time from any browser across your station network, allowing complete remote control without sitting in front of the amplifier."
+        "narration": "Directly behind the Health Monitor, look at the Remote Screen Viewer on screen. This tool functions strictly as an H D M I extension across your station network. It captures the physical framebuffer of the amplifier's seven-inch front panel display and mirrors it live over H T T P at ten twenty-four by six hundred resolution. Crucially, this display is entirely read-only. It provides pure visual monitoring so you can observe frequency, meters, and status from any room or operating desk without any ability to modify settings or change amplifier state from the remote screen."
     },
     # -------------------------------------------------------------
     # SLIDE 11: WEB TOOL 3 - ANTENNA MATRIX & TUNER BODE PLOT (SCROLLING)
@@ -359,10 +359,23 @@ SLIDES = [
         "image": "slide_logs_main.png",
         "caption": "CENTRAL LOG TERMINAL: MONITORS CONTROLLER EVENTS, DAEMONS & FAULT TRIPS WITH TIMESTAMPS",
         "scroll": False,
-        "narration": "Here is the Centralized Diagnostic Log Viewer. On screen, the dropdown allows you to inspect the core R F kit G U I log, the rolling telemetry log, S D backup records, and first-boot migration history with millisecond timestamps. Fault alerts and trip triggers are logged with exact system time, while technical documentation and operating manuals are stored locally for instant offline reference."
+        "narration": "Here is the Centralized Diagnostic Log Viewer. On screen, the dropdown allows you to inspect the core R F kit G U I log, the rolling telemetry log, S D backup records, and first-boot migration history with millisecond timestamps. Fault alerts, protection triggers, and Simple R P C events are recorded with high-resolution timestamps, giving you a comprehensive audit trail for operational peace of mind."
     },
     # -------------------------------------------------------------
-    # SLIDE 14: RESOURCES, SUPPORT & LIABILITY DISCLAIMER
+    # SLIDE 14: WEB TOOL 6 - INTEGRATED DOCUMENTATION PORTAL
+    # -------------------------------------------------------------
+    {
+        "part": "PART 3: WEB TOOLS",
+        "category": "TOOL 6: DOCUMENTATION • OFFLINE LIBRARY",
+        "title": "Documentation Portal: Integrated Technical Manuals",
+        "subtitle": "Offline technical documentation, operating manuals, and B26 quick-reference guides",
+        "image": "slide_docs_main.png",
+        "caption": "INTEGRATED DOCUMENTATION: LOCAL REPOSITORY OF TECHNICAL MANUALS & BUILD GUIDES (PORT 8088)",
+        "scroll": False,
+        "narration": "Completing the web tools suite is the Integrated Documentation Portal. Served locally on port eighty eighty-eight, this viewer provides instant, searchable access to complete amplifier operating manuals, technical setup documentation, and the station cookbook from any browser across your network, without requiring an external internet connection."
+    },
+    # -------------------------------------------------------------
+    # SLIDE 15: RESOURCES, SUPPORT & LIABILITY DISCLAIMER
     # -------------------------------------------------------------
     {
         "part": "PART 4: RESOURCES",
@@ -588,6 +601,23 @@ async def generate_slides_and_audio():
         height: 100%;
         border: none;
         display: none;
+        pointer-events: none;
+    }}
+    .slide-select {{
+        background: #0f2d55;
+        color: #7dd3fc;
+        border: 1px solid #38bdf8;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        outline: none;
+    }}
+    .slide-select option {{
+        background: #091a2e;
+        color: #ffffff;
     }}
     .player-footer {{
         height: 60px;
@@ -664,7 +694,10 @@ async def generate_slides_and_audio():
             <span>JRFK 64-Bit Modernization Suite • Technical Presentation Player</span>
             <span class="player-callsign">K7BIT</span>
         </div>
-        <div class="slide-indicator" id="slideIndicator">Slide 1 of {total_slides}</div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <select id="slideSelect" class="slide-select" title="Jump to Slide"></select>
+            <div class="slide-indicator" id="slideIndicator">Slide 1 of {total_slides}</div>
+        </div>
     </div>
 
     <div class="player-main">
@@ -699,12 +732,24 @@ async def generate_slides_and_audio():
         const img = document.getElementById('currentSlideImg');
         const iframe = document.getElementById('slideIframe');
         const indicator = document.getElementById('slideIndicator');
+        const slideSelect = document.getElementById('slideSelect');
         const narration = document.getElementById('narrationText');
         const btnPlayPause = document.getElementById('btnPlayPause');
         const btnPrev = document.getElementById('btnPrev');
         const btnNext = document.getElementById('btnNext');
         const btnRestart = document.getElementById('btnRestart');
         const progressBar = document.getElementById('progressBar');
+
+        // Populate slide jump dropdown
+        slides.forEach((s, idx) => {{
+            const opt = document.createElement('option');
+            opt.value = idx;
+            opt.textContent = `Slide ${{s.id}}: ${{s.title}}`;
+            slideSelect.appendChild(opt);
+        }});
+        slideSelect.addEventListener('change', (e) => {{
+            loadSlide(parseInt(e.target.value), isPlaying);
+        }});
 
         function loadSlide(index, autoPlay = false) {{
             if (index < 0) index = 0;
@@ -714,6 +759,7 @@ async def generate_slides_and_audio():
             const s = slides[currentIndex];
             audio.src = s.audio;
             indicator.textContent = `Slide ${{s.id}} of ${{slides.length}}: ${{s.title}}`;
+            slideSelect.value = currentIndex;
             narration.textContent = s.narration;
             progressBar.style.width = '0%';
 
@@ -792,6 +838,21 @@ async def generate_slides_and_audio():
 
         btnRestart.addEventListener('click', () => {{
             loadSlide(0, true);
+        }});
+
+        // Slide viewport click navigation
+        const viewport = document.querySelector('.slide-viewport');
+        viewport.style.cursor = 'pointer';
+        viewport.addEventListener('click', (e) => {{
+            const rect = viewport.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            if (clickX > rect.width * 0.75) {{
+                btnNext.click();
+            }} else if (clickX < rect.width * 0.25) {{
+                btnPrev.click();
+            }} else {{
+                btnPlayPause.click();
+            }}
         }});
 
         window.addEventListener('keydown', (e) => {{

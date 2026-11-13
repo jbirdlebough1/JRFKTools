@@ -2,7 +2,7 @@
 
 **Voice Model:** Australian English Male (`en-AU-WilliamMultilingualNeural`)
 **Callsign:** K7BIT
-**Total Slides:** 14
+**Total Slides:** 15
 
 ---
 
@@ -69,36 +69,43 @@
 
 ---
 
-## [SLIDE 10: REMOTE SCREEN VIEWER: LIVE 1024X600 DISPLAY]
-**File:** `slide_10.png` | **Audio:** `slide_10.mp3` (23.40s) | **Timestamp:** 308.59s - 331.99s
+## [SLIDE 10: REMOTE SCREEN VIEWER: HDMI EXTENSION DISPLAY (READ-ONLY)]
+**File:** `slide_10.png` | **Audio:** `slide_10.mp3` (32.81s) | **Timestamp:** 308.59s - 341.40s
 
-> "Directly behind the Health Monitor, look at the Remote Screen Viewer on screen. This tool grabs the physical framebuffer of the amplifier's seven-inch front panel display and mirrors it live over H T T P at ten twenty-four by six hundred resolution. You see the physical front panel touchscreen update in real time from any browser across your station network, allowing complete remote control without sitting in front of the amplifier."
+> "Directly behind the Health Monitor, look at the Remote Screen Viewer on screen. This tool functions strictly as an H D M I extension across your station network. It captures the physical framebuffer of the amplifier's seven-inch front panel display and mirrors it live over H T T P at ten twenty-four by six hundred resolution. Crucially, this display is entirely read-only. It provides pure visual monitoring so you can observe frequency, meters, and status from any room or operating desk without any ability to modify settings or change amplifier state from the remote screen."
 
 ---
 
 ## [SLIDE 11: ANTENNA MATRIX & ATU: AUTO SEGMENT TUNING]
-**File:** `slide_11.png` | **Audio:** `slide_11.mp3` (31.85s) | **Timestamp:** 332.99s - 364.84s
+**File:** `slide_11.png` | **Audio:** `slide_11.mp3` (31.85s) | **Timestamp:** 342.40s - 374.25s
 
 > "Looking at the Antenna Mapper and Tuner Matrix screen. Across the top are the four antenna ports covering one sixty through six meters, which switch automatically via C A T control. Scrolling down into the B twenty-six A T U matching network, the R F kit tuner uses relay and P I N diode switching to engage discrete physical inductors and capacitors for each frequency segment. Down below, the Bode plot displays S W R across the band and lists the exact physical inductance in nanohenries and capacitance in picofarads selected for that segment."
 
 ---
 
 ## [SLIDE 12: SD BACKUP MANAGER: AUTOMATED MEDIA CLONING & CRON]
-**File:** `slide_12.png` | **Audio:** `slide_12.mp3` (33.72s) | **Timestamp:** 365.84s - 399.56s
+**File:** `slide_12.png` | **Audio:** `slide_12.mp3` (33.72s) | **Timestamp:** 375.25s - 408.97s
 
 > "Examining the S D Backup and Disaster Recovery tool on screen. To establish disaster recovery, you simply plug a standard U S B S D card reader with a spare card into an available Raspberry Pi U S B port on the amplifier. When initiated, the tool performs a complete block-level clone in approximately fifteen minutes while you continue operating on the air. In addition, an automated cron job runs in the background on schedule to perform system updates, software upgrades, and automated standby backups, ensuring a highly available amplifier that never suffers unrecoverable media failure."
 
 ---
 
 ## [SLIDE 13: DIAGNOSTIC LOGS: CENTRALIZED EVENT TERMINAL]
-**File:** `slide_13.png` | **Audio:** `slide_13.mp3` (22.97s) | **Timestamp:** 400.56s - 423.53s
+**File:** `slide_13.png` | **Audio:** `slide_13.mp3` (23.69s) | **Timestamp:** 409.97s - 433.66s
 
-> "Here is the Centralized Diagnostic Log Viewer. On screen, the dropdown allows you to inspect the core R F kit G U I log, the rolling telemetry log, S D backup records, and first-boot migration history with millisecond timestamps. Fault alerts and trip triggers are logged with exact system time, while technical documentation and operating manuals are stored locally for instant offline reference."
+> "Here is the Centralized Diagnostic Log Viewer. On screen, the dropdown allows you to inspect the core R F kit G U I log, the rolling telemetry log, S D backup records, and first-boot migration history with millisecond timestamps. Fault alerts, protection triggers, and Simple R P C events are recorded with high-resolution timestamps, giving you a comprehensive audit trail for operational peace of mind."
 
 ---
 
-## [SLIDE 14: RESOURCES, COMMUNITY SUPPORT & PROJECT LINKS]
-**File:** `slide_14.png` | **Audio:** `slide_14.mp3` (36.84s) | **Timestamp:** 424.53s - 461.37s
+## [SLIDE 14: DOCUMENTATION PORTAL: INTEGRATED TECHNICAL MANUALS]
+**File:** `slide_14.png` | **Audio:** `slide_14.mp3` (19.01s) | **Timestamp:** 434.66s - 453.66s
+
+> "Completing the web tools suite is the Integrated Documentation Portal. Served locally on port eighty eighty-eight, this viewer provides instant, searchable access to complete amplifier operating manuals, technical setup documentation, and the station cookbook from any browser across your network, without requiring an external internet connection."
+
+---
+
+## [SLIDE 15: RESOURCES, COMMUNITY SUPPORT & PROJECT LINKS]
+**File:** `slide_15.png` | **Audio:** `slide_15.mp3` (36.84s) | **Timestamp:** 454.66s - 491.50s
 
 > "In summary, the J R F K Modernization Suite delivers rock-solid operations, comprehensive engineering supervision, and verified disaster recovery for R F kit amplifiers. All source code, pre-compiled Windows migrator executables, and technical releases are available on GitHub at github dot com slash jbirdlebough one slash J R F K Tools. For discussions and technical support, connect with the community on the R F kit groups dot I O reflector. Please note the experimental research disclaimer: all software is provided as-is with all risks accepted by the user. Seventy-three's K seven B I T."
 

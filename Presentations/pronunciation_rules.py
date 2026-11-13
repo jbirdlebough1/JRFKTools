@@ -86,7 +86,9 @@ def clean_for_speech(text):
     t = t.replace('4-way', 'four-way')
     t = t.replace('7-screen', 'seven-screen')
     t = t.replace('5-point', 'five-point')
-    t = t.replace('port 8088', 'port eighty eighty-eight')
+    t = re.sub(r'\bport 8088\b', 'port eighty eighty-eight', t, flags=re.IGNORECASE)
+    t = re.sub(r'\bHDMI\b', 'H D M I', t)
+    t = re.sub(r'\bHTTP\b', 'H T T P', t)
     t = re.sub(r'\bPC\b', 'P C', t)
     
     return t

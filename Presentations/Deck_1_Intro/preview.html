@@ -73,6 +73,23 @@
         height: 100%;
         border: none;
         display: none;
+        pointer-events: none;
+    }
+    .slide-select {
+        background: #0f2d55;
+        color: #7dd3fc;
+        border: 1px solid #38bdf8;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        outline: none;
+    }
+    .slide-select option {
+        background: #091a2e;
+        color: #ffffff;
     }
     .player-footer {
         height: 60px;
@@ -149,7 +166,10 @@
             <span>JRFK 64-Bit Modernization Suite • Technical Presentation Player</span>
             <span class="player-callsign">K7BIT</span>
         </div>
-        <div class="slide-indicator" id="slideIndicator">Slide 1 of 14</div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <select id="slideSelect" class="slide-select" title="Jump to Slide"></select>
+            <div class="slide-indicator" id="slideIndicator">Slide 1 of 15</div>
+        </div>
     </div>
 
     <div class="player-main">
@@ -279,13 +299,13 @@
   {
     "id": 10,
     "num": "10",
-    "title": "Remote Screen Viewer: Live 1024x600 Display",
+    "title": "Remote Screen Viewer: HDMI Extension Display (Read-Only)",
     "img": "slide_10.png",
     "html": "slide_10.html",
     "audio": "slide_10.mp3",
-    "duration": 23.4,
+    "duration": 32.808,
     "scroll": false,
-    "narration": "Directly behind the Health Monitor, look at the Remote Screen Viewer on screen. This tool grabs the physical framebuffer of the amplifier's seven-inch front panel display and mirrors it live over H T T P at ten twenty-four by six hundred resolution. You see the physical front panel touchscreen update in real time from any browser across your station network, allowing complete remote control without sitting in front of the amplifier."
+    "narration": "Directly behind the Health Monitor, look at the Remote Screen Viewer on screen. This tool functions strictly as an H D M I extension across your station network. It captures the physical framebuffer of the amplifier's seven-inch front panel display and mirrors it live over H T T P at ten twenty-four by six hundred resolution. Crucially, this display is entirely read-only. It provides pure visual monitoring so you can observe frequency, meters, and status from any room or operating desk without any ability to modify settings or change amplifier state from the remote screen."
   },
   {
     "id": 11,
@@ -316,17 +336,28 @@
     "img": "slide_13.png",
     "html": "slide_13.html",
     "audio": "slide_13.mp3",
-    "duration": 22.968,
+    "duration": 23.688,
     "scroll": false,
-    "narration": "Here is the Centralized Diagnostic Log Viewer. On screen, the dropdown allows you to inspect the core R F kit G U I log, the rolling telemetry log, S D backup records, and first-boot migration history with millisecond timestamps. Fault alerts and trip triggers are logged with exact system time, while technical documentation and operating manuals are stored locally for instant offline reference."
+    "narration": "Here is the Centralized Diagnostic Log Viewer. On screen, the dropdown allows you to inspect the core R F kit G U I log, the rolling telemetry log, S D backup records, and first-boot migration history with millisecond timestamps. Fault alerts, protection triggers, and Simple R P C events are recorded with high-resolution timestamps, giving you a comprehensive audit trail for operational peace of mind."
   },
   {
     "id": 14,
     "num": "14",
-    "title": "Resources, Community Support & Project Links",
+    "title": "Documentation Portal: Integrated Technical Manuals",
     "img": "slide_14.png",
     "html": "slide_14.html",
     "audio": "slide_14.mp3",
+    "duration": 19.008,
+    "scroll": false,
+    "narration": "Completing the web tools suite is the Integrated Documentation Portal. Served locally on port eighty eighty-eight, this viewer provides instant, searchable access to complete amplifier operating manuals, technical setup documentation, and the station cookbook from any browser across your network, without requiring an external internet connection."
+  },
+  {
+    "id": 15,
+    "num": "15",
+    "title": "Resources, Community Support & Project Links",
+    "img": "slide_15.png",
+    "html": "slide_15.html",
+    "audio": "slide_15.mp3",
     "duration": 36.84,
     "scroll": false,
     "narration": "In summary, the J R F K Modernization Suite delivers rock-solid operations, comprehensive engineering supervision, and verified disaster recovery for R F kit amplifiers. All source code, pre-compiled Windows migrator executables, and technical releases are available on GitHub at github dot com slash jbirdlebough one slash J R F K Tools. For discussions and technical support, connect with the community on the R F kit groups dot I O reflector. Please note the experimental research disclaimer: all software is provided as-is with all risks accepted by the user. Seventy-three's K seven B I T."
@@ -339,12 +370,24 @@
         const img = document.getElementById('currentSlideImg');
         const iframe = document.getElementById('slideIframe');
         const indicator = document.getElementById('slideIndicator');
+        const slideSelect = document.getElementById('slideSelect');
         const narration = document.getElementById('narrationText');
         const btnPlayPause = document.getElementById('btnPlayPause');
         const btnPrev = document.getElementById('btnPrev');
         const btnNext = document.getElementById('btnNext');
         const btnRestart = document.getElementById('btnRestart');
         const progressBar = document.getElementById('progressBar');
+
+        // Populate slide jump dropdown
+        slides.forEach((s, idx) => {
+            const opt = document.createElement('option');
+            opt.value = idx;
+            opt.textContent = `Slide ${s.id}: ${s.title}`;
+            slideSelect.appendChild(opt);
+        });
+        slideSelect.addEventListener('change', (e) => {
+            loadSlide(parseInt(e.target.value), isPlaying);
+        });
 
         function loadSlide(index, autoPlay = false) {
             if (index < 0) index = 0;
@@ -354,6 +397,7 @@
             const s = slides[currentIndex];
             audio.src = s.audio;
             indicator.textContent = `Slide ${s.id} of ${slides.length}: ${s.title}`;
+            slideSelect.value = currentIndex;
             narration.textContent = s.narration;
             progressBar.style.width = '0%';
 
@@ -432,6 +476,21 @@
 
         btnRestart.addEventListener('click', () => {
             loadSlide(0, true);
+        });
+
+        // Slide viewport click navigation
+        const viewport = document.querySelector('.slide-viewport');
+        viewport.style.cursor = 'pointer';
+        viewport.addEventListener('click', (e) => {
+            const rect = viewport.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            if (clickX > rect.width * 0.75) {
+                btnNext.click();
+            } else if (clickX < rect.width * 0.25) {
+                btnPrev.click();
+            } else {
+                btnPlayPause.click();
+            }
         });
 
         window.addEventListener('keydown', (e) => {
