@@ -164,16 +164,16 @@ TEMPLATE_FULLSCREEN = """<!DOCTYPE html>
 # Last slide: Resources & Contact Info
 SLIDES = [
     # -------------------------------------------------------------
-    # SLIDE 1: INTRO (PC MIGRATION OVERVIEW)
+    # SLIDE 1: INTRO (PC MIGRATION OVERVIEW & JRFK.EXE WINDOW)
     # -------------------------------------------------------------
     {
         "part": "PART 1: PC MIGRATOR",
         "category": "SUITE OVERVIEW • WINDOWS PC APP",
         "title": "JRFK 64-Bit Appliance Builder & Migrator",
         "subtitle": "Standalone PC utility to create a 64-bit Raspberry Pi OS card with RFK & Web Tools",
-        "image": "migrator_step1_discovery.png",
-        "caption": "MIGRATOR RUNNING ON PC: CREATES 64-BIT TRIXIE OS WITH RFK CONTROLLER & WEB TOOLS",
-        "narration": "Thirty-two-bit Raspberry Pi O S is obsolete, leaving R F kit amplifier owners at risk from unmaintained kernels and S D card failures. On screen is the J R F K Migrator running on your Windows P C. Its purpose is to prepare a complete sixty-four-bit Raspberry Pi operating system containing all original R F kit calibrations, user data, and the J R F K Web Tools suite for your amplifier. Over the next four slides, we look at the P C migration process, and then we will explore each of the on-amplifier web tools."
+        "image": "slide_jrfk_exe_window.png",
+        "caption": "JRFK.EXE RUNNING ON PC: ELEVATED WINDOWS UTILITY WITH LOCALHOST WEB ENGINE & DRIVE GUARD",
+        "narration": "Thirty-two-bit Raspberry Pi O S is obsolete, leaving R F kit amplifier owners at risk from unmaintained kernels and S D card failures. On screen is the J R F K dot E X E migration tool running on your Windows P C. It launches as a standalone elevated executable that manages Drive Guard protection and local web services. Its purpose is to prepare a complete sixty-four-bit Raspberry Pi operating system containing all original R F kit calibrations, user data, and the J R F K Web Tools suite for your amplifier. Over the next four slides, we look at the P C migration process, and then we will explore each of the on-amplifier web tools."
     },
     # -------------------------------------------------------------
     # SLIDE 2: MIGRATOR OPTION A (GOLD TO PROD)
