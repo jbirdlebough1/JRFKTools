@@ -249,71 +249,23 @@ TEMPLATE = """<!DOCTYPE html>
 # 20 Complete Slides Structure
 SLIDES = [
     # ==========================================
-    # SECTION 1: INTRO (SLIDES 1 TO 4)
+    # SECTION 1: INTRO (SLIDE 1 - EXACT 4 TOPICS)
     # ==========================================
     {
         "id": 1,
         "part": "PART 1: SYSTEM INTRO",
-        "category": "ARCHITECTURAL OBSOLESCENCE • LINUX KERNEL STATUS",
-        "title": "32-Bit Raspberry Pi OS is Obsolete",
-        "subtitle": "Legacy ARMv7 operating systems are at end-of-life across Linux distributions",
+        "category": "JRFK MODERNIZATION SUITE • SYSTEM ARCHITECTURE",
+        "title": "JRFK 32-to-64 Bit Migration & Web Tools",
+        "subtitle": "Modernizing RFK Linear Amplifiers to Current 64-Bit Debian Trixie on RPi 4 & 5",
         "bullets": [
-            ("Upstream Deprecation", "Debian and Raspberry Pi OS have discontinued active upstream development for 32-bit armhf kernels."),
-            ("Kernel Memory Bottlenecks", "32-bit address space restricts userspace processes to 3 gigabytes, starving modern networking and telemetry stacks."),
-            ("Hardware Mismatch", "Modern Raspberry Pi 4 and 5 compute modules feature 64-bit ARM Cortex-A72 and A76 cores running in legacy 32-bit mode."),
-            ("Missing Toolchains", "Modern C# runtimes, container engines, and low-latency network drivers now require 64-bit aarch64 binaries.")
-        ],
-        "image": "migrator_main.png",
-        "caption": "JRFK MIGRATOR: REPLACING OBSOLETE 32-BIT ARMHF WITH MODERN 64-BIT ARCHITECTURE",
-        "narration": "Topic one. Thirty-two-bit Raspberry Pi O S is obsolete. Upstream Linux distributions and Raspberry Pi foundation have phased out active development for legacy armhf systems. Running thirty-two-bit binaries on modern Raspberry Pi four and five hardware leaves the sixty-four-bit hardware architecture throttled and limits userspace memory access."
-    },
-    {
-        "id": 2,
-        "part": "PART 1: SYSTEM INTRO",
-        "category": "HIGH-POWER OPERATIONAL RISKS • RF AMPLIFIER SAFETY",
-        "title": "RFK Amplifier Owners Are Left at Risk",
-        "subtitle": "Deprecation freezes security updates, driver support, and hardware reliability",
-        "bullets": [
-            ("Unpatched Kernel Bugs", "Legacy systems no longer receive essential Linux security patches and USB serial driver updates."),
-            ("Missing Thermal Telemetry", "Legacy stacks lack high-speed remote monitoring for L-D moss junction temperatures and rail currents."),
-            ("Bricking from OS Corruption", "Sudden power loss on older ext4 setups frequently corrupts the single MicroSD card, halting amplifier operation."),
-            ("Zero Remote Oversight", "Operators are tethered to the local touch display without remote browser access or fault alarms.")
-        ],
-        "image": "tool4_report_hardware.png",
-        "caption": "SYSTEM DIAGNOSTICS: RUNNING UNPATCHED 32-BIT KERNELS POSES OPERATIONAL RISKS",
-        "narration": "Topic two. This leaves R F kit amplifier owners at risk. Legacy firmware builds no longer receive essential kernel patches or driver updates. MicroSD card corruption during power loss can halt linear amplifier operation entirely, while the lack of network telemetry leaves operators blind to thermal and S W R events when operating remotely."
-    },
-    {
-        "id": 3,
-        "part": "PART 1: SYSTEM INTRO",
-        "category": "THE MODERNIZATION SOLUTION • DEBIAN TRIXIE 64-BIT",
-        "title": "JRFK 32-Bit to 64-Bit Migration & Web Tools",
-        "subtitle": "Migrating legacy installations to modern 64-bit Debian Trixie on RPi 4 and 5",
-        "bullets": [
-            ("Pure 64-Bit Trixie", "Upgrades the controller operating system to current 64-bit Debian Trixie on Raspberry Pi 4 and 5."),
-            ("Preserves All Calibrations", "Extracts factory ADC coefficients, band offsets, and hardware configurations without manual re-entry."),
-            ("Zero Soldering or Rework", "Software and image migration performed cleanly via MicroSD or USB boot media."),
-            ("Engineered for K7BIT", "Delivers professional broadcast reliability and remote management for amateur radio operators.")
-        ],
-        "image": "migrator_main.png",
-        "caption": "JRFK MIGRATOR WORKFLOW: ONE-CLICK AUTOMATED DEBIAN TRIXIE UPGRADE",
-        "narration": "Topic three. The J R F K thirty-two-bit to sixty-four-bit Migration and J R F K Web Tools suite enables operators to migrate from obsolete installations to the current sixty-four-bit Debian Trixie release on Raspberry Pi four or five. The migration preserves all factory calibration matrices and hardware settings automatically."
-    },
-    {
-        "id": 4,
-        "part": "PART 1: SYSTEM INTRO",
-        "category": "CONCURRENT RUNTIME ARCHITECTURE • ZERO HARDWARE CONFLICTS",
-        "title": "Concurrent Execution on Any Web Platform",
-        "subtitle": "JRFK Web Tools operate simultaneously alongside the native RFK controller",
-        "bullets": [
-            ("Concurrent Architecture", "Web daemon operates seamlessly in parallel with the native RFK front panel controller application."),
-            ("Zero Hardware Locking", "Accesses telemetry through shared IPC and kernel memory without blocking physical SPI or I2C busses."),
-            ("Universal Browser Support", "Access the complete control suite from any PC, tablet, iPad, or mobile phone via port eighty eighty-eight."),
-            ("Real-Time WebSocket Link", "Meters, SWR curves, and thermal diagnostics update dynamically at thirty frames per second.")
+            ("Topic 1: 32-Bit RPi OS Obsolete", "Thirty-two-bit Raspberry Pi OS is obsolete, unmaintained, and reaches end-of-life."),
+            ("Topic 2: RFK Amp Owners at Risk", "Leaves RFK amplifier owners at serious risk from unpatched bugs, security gaps, and SD card failure."),
+            ("Topic 3: 64-Bit Trixie Migration", "JRFK 32-bit to 64-bit Migration & Web Tools enable seamless migration to current 64-bit Raspberry Pi 4 or 5 Debian Trixie."),
+            ("Topic 4: Concurrent Web Tools", "JRFK Web Tools run concurrently on any web-capable platform with the original RFK application via port 8088.")
         ],
         "image": "tool0_portal_main.png",
-        "caption": "JRFK WEB TOOLS PORTAL: SERVING RESPONSIVE BLUEPRINT DASHBOARDS ON PORT 8088",
-        "narration": "Topic four. J R F K Web Tools run concurrently on any web capable platform alongside the original R F kit application. The background web daemon communicates via shared inter-process memory without interrupting the local touch screen, allowing full remote monitoring from any browser on your network."
+        "caption": "JRFK MODERNIZATION SUITE: CONCURRENT 64-BIT ARCHITECTURE & BLUEPRINT WEB TOOLS",
+        "narration": "Topic one: thirty-two-bit Raspberry Pi O S is obsolete. Topic two: this leaves R F kit amplifier owners at risk. Topic three: the J R F K thirty-two-bit to sixty-four-bit Migration and J R F K Web Tools enable users to migrate from obsolete systems to current sixty-four-bit Raspberry Pi four or five Debian Trixie. Topic four: J R F K Web Tools run concurrently on any web capable platform with the original R F kit application."
     },
 
     # ==========================================
@@ -589,6 +541,10 @@ SLIDES = [
 ]
 
 async def generate_slides_and_audio():
+    # Renumber slides 1..N sequentially
+    for idx, s in enumerate(SLIDES):
+        s["id"] = idx + 1
+        
     print(f"Starting generation for {len(SLIDES)} slides...")
     total_slides = len(SLIDES)
     
