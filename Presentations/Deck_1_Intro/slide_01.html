@@ -23,7 +23,7 @@
     }
     .master-header {
         width: 100%;
-        height: 44px;
+        height: 42px;
         border-bottom: 2px solid #93c5fd;
         display: flex;
         justify-content: space-between;
@@ -32,42 +32,62 @@
         padding: 0 10px;
         flex-shrink: 0;
     }
-    .header-left { display: flex; align-items: baseline; gap: 12px; }
+    .header-left {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        overflow: hidden;
+        white-space: nowrap;
+        flex: 1;
+        min-width: 0;
+    }
     .header-tagline {
         font-family: "Consolas", monospace;
-        font-size: 12px;
-        letter-spacing: 1.5px;
+        font-size: 11px;
+        letter-spacing: 1.2px;
         color: #93c5fd;
         text-transform: uppercase;
         font-weight: 700;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
     .header-title {
-        font-size: 24px;
-        font-weight: 900;
-        letter-spacing: -0.5px;
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
         color: #ffffff;
         text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+        white-space: nowrap;
+        flex-shrink: 0;
     }
-    .header-subtitle { font-size: 13.5px; color: #bfdbfe; font-weight: 500; }
+    .header-subtitle {
+        font-size: 12px;
+        color: #bfdbfe;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
     .header-right {
         display: flex;
-        gap: 10px;
+        gap: 8px;
         align-items: center;
         font-family: "Consolas", monospace;
-        font-size: 12px;
+        font-size: 11.5px;
         color: #ffffff;
-        letter-spacing: 1.5px;
+        letter-spacing: 1px;
         font-weight: bold;
+        flex-shrink: 0;
     }
     .badge-callsign {
         background: #0284c7;
-        padding: 3px 8px;
+        padding: 2px 7px;
         border-radius: 4px;
         border: 1px solid #93c5fd;
     }
     .badge-slide {
         background: rgba(15, 45, 85, 0.95);
-        padding: 3px 8px;
+        padding: 2px 7px;
         border-radius: 4px;
         border: 1px solid #60a5fa;
         color: #7dd3fc;
@@ -105,31 +125,31 @@
     }
     .master-footer {
         width: 100%;
-        height: 24px;
+        height: 22px;
         border-top: 1px solid #93c5fd;
         display: flex;
         justify-content: space-between;
         align-items: center;
         font-family: "Consolas", monospace;
-        font-size: 11px;
+        font-size: 10.5px;
         color: #bfdbfe;
         background: rgba(26, 86, 149, 0.96);
         padding: 0 10px;
         flex-shrink: 0;
     }
-    .footer-left { color: #93c5fd; font-weight: 700; }
+    .footer-left { color: #93c5fd; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80%; }
 </style>
 </head>
 <body>
     <div class="master-header">
         <div class="header-left">
-            <div class="header-tagline">PART 1: SYSTEM ARCHITECTURE • MODERNIZATION OVERVIEW • 64-BIT TRANSITION</div>
+            <div class="header-tagline">PART 1: ARCHITECTURE • SUITE OVERVIEW • WINDOWS PC APP</div>
             <div class="header-title">Modernizing the RF-KIT Linear Amplifier</div>
             <div class="header-subtitle">The 64-Bit Leap: Standalone PC Migrator & On-Amplifier Web Tools Suite</div>
         </div>
         <div class="header-right">
             <div class="badge-callsign">K7BIT</div>
-            <div class="badge-slide">SLIDE 1 OF 13</div>
+            <div class="badge-slide">SLIDE 1 OF 14</div>
         </div>
     </div>
     <div class="master-body-fullscreen">

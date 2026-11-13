@@ -16,63 +16,95 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     color: #ffffff;
     display: flex; flex-direction: column; justify-content: center; align-items: center;
-    padding: 60px 100px;
+    padding: 30px 60px;
   }
   .box {
-    width: 1720px;
-    background: rgba(10, 30, 60, 0.95);
+    width: 1800px;
+    background: rgba(10, 30, 60, 0.96);
     border: 3px solid #93c5fd;
     border-radius: 12px;
-    padding: 50px 70px;
+    padding: 35px 55px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.7);
   }
-  h1 { font-size: 42px; font-weight: 900; color: #ffffff; margin-bottom: 8px; border-bottom: 3px solid #38bdf8; padding-bottom: 16px; }
-  .subtitle { font-size: 20px; color: #93c5fd; margin-bottom: 40px; font-family: monospace; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  h1 { font-size: 34px; font-weight: 900; color: #ffffff; margin-bottom: 6px; border-bottom: 3px solid #38bdf8; padding-bottom: 12px; }
+  .subtitle { font-size: 16px; color: #93c5fd; margin-bottom: 25px; font-family: monospace; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .card {
     background: rgba(15, 45, 85, 0.9);
     border: 2px solid #38bdf8;
     border-radius: 8px;
-    padding: 28px;
+    padding: 20px 24px;
   }
-  .card-title { font-size: 22px; font-weight: 800; color: #7dd3fc; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
-  .item { margin-bottom: 14px; font-size: 16px; line-height: 1.5; color: #e0f2fe; }
+  .card-title { font-size: 18px; font-weight: 800; color: #7dd3fc; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .item { margin-bottom: 8px; font-size: 14px; line-height: 1.45; color: #e0f2fe; }
   .item strong { color: #ffffff; }
-  .badge { background: #0284c7; color: white; padding: 4px 12px; border-radius: 4px; font-family: monospace; font-size: 14px; }
+  .disclaimer-box {
+    margin-top: 20px;
+    padding: 12px 18px;
+    background: rgba(220, 38, 38, 0.15);
+    border: 1px solid #ef4444;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #fca5a5;
+  }
+  .disclaimer-box strong { color: #ffffff; }
+  .footer-row {
+    margin-top: 18px;
+    border-top: 2px solid #38bdf8;
+    padding-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .signoff {
+    font-family: monospace;
+    font-size: 26px;
+    font-weight: bold;
+    color: #38bdf8;
+    letter-spacing: 2px;
+  }
 </style>
 </head>
 <body>
   <div class="box">
-    <h1>JRFK 64-Bit Modernization Suite: Resources & Support</h1>
+    <h1>JRFK 64-Bit Modernization Suite: Resources &amp; Support</h1>
     <div class="subtitle">HIGH-POWER AMATEUR RADIO • RF-KIT LINEAR AMPLIFIERS • CALLSIGN: K7BIT</div>
     <div class="grid">
       <div class="card">
         <div class="card-title">📁 Source Code &amp; Releases</div>
         <div class="item"><strong>GitHub Repository:</strong> github.com/jbirdlebough1/JRFKTools</div>
-        <div class="item"><strong>Releases:</strong> Standalone JRFK Migrator executable for Windows 10 & 11</div>
+        <div class="item"><strong>Windows App:</strong> Standalone JRFK Migrator executable (JRFK.exe) for Windows 10 &amp; 11</div>
         <div class="item"><strong>License:</strong> Open-source amateur radio modernization tooling</div>
       </div>
       <div class="card">
         <div class="card-title">👥 Community &amp; Technical Support</div>
         <div class="item"><strong>RF-KIT Groups.io:</strong> groups.io/g/rf-kit</div>
         <div class="item"><strong>Station Callsign:</strong> K7BIT</div>
-        <div class="item"><strong>Bug Reports &amp; Pull Requests:</strong> Submit via GitHub Issues on JRFKTools</div>
+        <div class="item"><strong>Community Collaboration:</strong> Issues and pull requests welcome on GitHub</div>
       </div>
       <div class="card">
-        <div class="card-title">📖 Onboard Engineering Documentation</div>
+        <div class="card-title">📖 Onboard Technical Documentation</div>
         <div class="item"><strong>Operator Manual:</strong> Built-in vector PDF and HTML via port 8088 (/docs)</div>
-        <div class="item"><strong>Engineering Guide:</strong> 56-page B26 controller & hardware schematic references</div>
+        <div class="item"><strong>Technical Reference:</strong> Comprehensive B26 controller &amp; hardware theory reference manual</div>
         <div class="item"><strong>Local Web Server:</strong> Direct browser access at http://&lt;amplifier-ip&gt;:8088</div>
       </div>
       <div class="card">
         <div class="card-title">⚡ Key Value Architecture</div>
-        <div class="item"><strong>Operations:</strong> Real-time RF power metering & antenna matrix switching</div>
-        <div class="item"><strong>Engineering:</strong> Full 64-bit Debian Trixie kernel, systemd supervision & diagnostics</div>
-        <div class="item"><strong>Disaster Recovery:</strong> 3-minute live USB cloning & factory calibration preservation</div>
+        <div class="item"><strong>Operations:</strong> Real-time Peak Envelope Power metering &amp; antenna matrix routing</div>
+        <div class="item"><strong>Engineering:</strong> Pure 64-bit Raspberry Pi OS, systemd supervision &amp; diagnostics</div>
+        <div class="item"><strong>Disaster Recovery:</strong> 15-minute live USB cloning &amp; scheduled auto-backup cron</div>
       </div>
     </div>
-    <div style="margin-top: 35px; border-top: 2px solid #38bdf8; padding-top: 18px; text-align: right; font-family: monospace; font-size: 26px; font-weight: bold; color: #38bdf8; letter-spacing: 2px;">
-      73's K7BIT
+
+    <!-- Liability Disclaimer matching EM -->
+    <div class="disclaimer-box">
+      <strong>RESEARCH EXPERIMENTATION &amp; LIABILITY DISCLAIMER:</strong> This software and documentation is purely research experimentation and is provided strictly <strong>"AS IS"</strong>. It communicates directly with high-voltage RF power amplifier hardware and high-current DC power supply subsystems (53.5 VDC @ 55 A). It may damage your amplifier, power supply, LDMOS transistors, exciter/transceiver, antenna system, or computer. Users accept all risks and agree to hold authors, contributors, and developers completely harmless regardless of outcome. <strong>USE AT YOUR OWN RISK.</strong>
+    </div>
+
+    <div class="footer-row">
+      <div style="font-size: 13px; color: #93c5fd; font-family: monospace;">JRFK 64-BIT MODERNIZATION SUITE • RF-KIT RF2K+ / RF2K-S</div>
+      <div class="signoff">73's K7BIT</div>
     </div>
   </div>
 </body>

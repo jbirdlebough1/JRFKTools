@@ -4,30 +4,30 @@ import re
 def clean_for_speech(text):
     t = text
     
-    # 1. PEP: NEVER pronounce as word "pep"! Explicitly "P, E, P," (PEE EEE PEE)
-    # When 1500 Watts PEP appears: "fifteen hundred Watts, P, E, P,"
-    t = re.sub(r'1500\s*(?:W|watts?)?\s*PEP', 'fifteen hundred Watts, P, E, P,', t, flags=re.IGNORECASE)
-    t = t.replace('fifteen hundred watts, P-E-P,', 'fifteen hundred Watts, P, E, P,')
-    t = t.replace('fifteen hundred watts peak envelope power', 'fifteen hundred Watts, P, E, P,')
-    t = t.replace('fifteen hundred ... Watts, P, E, P,', 'fifteen hundred Watts, P, E, P,')
-    t = re.sub(r'\bPEP\b', 'P, E, P,', t)
-    t = re.sub(r'\bP-E-P\b', 'P, E, P,', t)
-    t = re.sub(r'\bpep\b', 'P, E, P,', t)
+    # 1. PEP: Explicitly "Peak Envelope Power"
+    t = re.sub(r'1500\s*(?:W|watts?)?\s*PEP', 'fifteen hundred Watts Peak Envelope Power,', t, flags=re.IGNORECASE)
+    t = t.replace('fifteen hundred watts, P-E-P,', 'fifteen hundred Watts Peak Envelope Power,')
+    t = t.replace('fifteen hundred Watts, P, E, P,', 'fifteen hundred Watts Peak Envelope Power,')
+    t = t.replace('P, E, P,', 'Peak Envelope Power')
+    t = re.sub(r'\bPEP\b', 'Peak Envelope Power', t)
+    t = re.sub(r'\bP-E-P\b', 'Peak Envelope Power', t)
+    t = re.sub(r'\bpep\b', 'Peak Envelope Power', t)
     
-    # 2. Operating System: Pure 64-Bit Debian Trixie (Debian 13) / Raspberry Pi OS current (ZERO Bookworm)
-    t = re.sub(r'\bBookworm\b', 'Trixie', t, flags=re.IGNORECASE)
-    t = re.sub(r'\bDebian Bookworm\b', 'Debian Trixie', t, flags=re.IGNORECASE)
+    # 2. Operating System: NEVER use Debian reference! Strictly Raspberry Pi OS / RPI OS
+    t = re.sub(r'\bDebian 13 Trixie\b', 'sixty-four-bit Raspberry Pi O S', t, flags=re.IGNORECASE)
+    t = re.sub(r'\bDebian Trixie\b', 'Raspberry Pi O S', t, flags=re.IGNORECASE)
+    t = re.sub(r'\bDebian 13\b', 'Raspberry Pi O S', t, flags=re.IGNORECASE)
+    t = re.sub(r'\bDebian\b', 'Raspberry Pi O S', t, flags=re.IGNORECASE)
+    t = re.sub(r'\bBookworm\b', 'Raspberry Pi O S', t, flags=re.IGNORECASE)
+    t = re.sub(r'\bRPI OS\b', 'Raspberry Pi O S', t, flags=re.IGNORECASE)
     
-    # 3. Callsign & Station: NEVER use the word "station", NEVER use "John", ALWAYS use "K7BIT"
-    t = re.sub(r'\bfrom station K7BIT\b', 'from K seven B I T', t, flags=re.IGNORECASE)
-    t = re.sub(r'\bfrom the station\b', 'from K seven B I T', t, flags=re.IGNORECASE)
-    t = re.sub(r'\bat the station\b', 'at K seven B I T', t, flags=re.IGNORECASE)
-    t = re.sub(r'\bat station K7BIT\b', 'at K seven B I T', t, flags=re.IGNORECASE)
-    t = re.sub(r'\bthe station\b', 'K seven B I T', t, flags=re.IGNORECASE)
-    t = re.sub(r'\bstation\b', 'K seven B I T', t, flags=re.IGNORECASE)
+    # 3. Callsign & Names: Never use "John". Do NOT replace "station" with K7BIT.
+    # Do not use "K7BIT Master"
+    t = re.sub(r'\bK7BIT Master\b', 'Station Reference', t, flags=re.IGNORECASE)
     t = t.replace("John K7BIT's", "K seven B I T's")
     t = t.replace("John K7BIT", "K seven B I T")
-    t = re.sub(r'\bJohn\b', 'K seven B I T', t)
+    t = re.sub(r'\bJohn\b', '', t)
+    # When K7BIT appears literally, pronounce it as K seven B I T
     t = re.sub(r'\bK7BIT\b', 'K seven B I T', t)
     
     # 4. Terminology: NEVER say "web cockpit", ALWAYS say "JRFK Web Tools"
