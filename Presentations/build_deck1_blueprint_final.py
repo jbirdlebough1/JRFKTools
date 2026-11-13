@@ -381,11 +381,11 @@ SLIDES = [
         "part": "PART 4: RESOURCES",
         "category": "OPEN SOURCE & COMMUNITY • GETTING STARTED",
         "title": "Resources, Community Support & Project Links",
-        "subtitle": "GitHub repository, releases, community group, and station contact info",
+        "subtitle": "Direct links to GitHub repository, standalone Windows executables, and Groups.io community",
         "image": "slide_resources_main.png",
         "caption": "PROJECT RESOURCES: GITHUB REPOSITORY, STANDALONE EXECUTABLE, GROUPS.IO & 73's K7BIT",
         "scroll": False,
-        "narration": "In summary, the J R F K Modernization Suite delivers rock-solid operations, comprehensive engineering supervision, and verified disaster recovery for R F kit amplifiers. All source code, pre-compiled Windows migrator executables, and technical releases are available on GitHub at github dot com slash jbirdlebough one slash J R F K Tools. For discussions and technical support, connect with the community on the R F kit groups dot I O reflector. Please note the experimental research disclaimer: all software is provided as-is with all risks accepted by the user. Seventy-three's K seven B I T."
+        "narration": "In summary, the J R F K Modernization Suite delivers rock-solid operations, comprehensive engineering supervision, and verified disaster recovery for R F kit amplifiers. Look at the direct links section on screen. All source code, pre-compiled Windows migrator executables, and technical releases are available on GitHub at github dot com slash jbirdlebough one slash J R F K Tools. For active discussions and technical support, connect with the community on the R F kit groups dot I O reflector at groups dot I O slash g slash r f dash kit. Please note the experimental research disclaimer: all software is provided as-is with all risks accepted by the user. Seventy-three's K seven B I T."
     }
 ]
 
@@ -760,7 +760,11 @@ async def generate_slides_and_audio():
             audio.src = s.audio;
             indicator.textContent = `Slide ${{s.id}} of ${{slides.length}}: ${{s.title}}`;
             slideSelect.value = currentIndex;
-            narration.textContent = s.narration;
+            if (currentIndex === slides.length - 1) {{
+                narration.innerHTML = s.narration + ' <div style="margin-top: 4px; display: flex; gap: 16px; font-weight: bold;"><a href="https://github.com/jbirdlebough1/JRFKTools" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: underline;">🔗 GitHub: github.com/jbirdlebough1/JRFKTools</a> <a href="https://groups.io/g/rf-kit" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: underline;">👥 Groups.io: groups.io/g/rf-kit</a></div>';
+            }} else {{
+                narration.textContent = s.narration;
+            }}
             progressBar.style.width = '0%';
 
             btnPrev.disabled = (currentIndex === 0);

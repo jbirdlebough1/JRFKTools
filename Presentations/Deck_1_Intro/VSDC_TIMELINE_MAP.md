@@ -105,9 +105,9 @@
 ---
 
 ## [SLIDE 15: RESOURCES, COMMUNITY SUPPORT & PROJECT LINKS]
-**File:** `slide_15.png` | **Audio:** `slide_15.mp3` (36.84s) | **Timestamp:** 454.66s - 491.50s
+**File:** `slide_15.png` | **Audio:** `slide_15.mp3` (42.38s) | **Timestamp:** 454.66s - 497.05s
 
-> "In summary, the J R F K Modernization Suite delivers rock-solid operations, comprehensive engineering supervision, and verified disaster recovery for R F kit amplifiers. All source code, pre-compiled Windows migrator executables, and technical releases are available on GitHub at github dot com slash jbirdlebough one slash J R F K Tools. For discussions and technical support, connect with the community on the R F kit groups dot I O reflector. Please note the experimental research disclaimer: all software is provided as-is with all risks accepted by the user. Seventy-three's K seven B I T."
+> "In summary, the J R F K Modernization Suite delivers rock-solid operations, comprehensive engineering supervision, and verified disaster recovery for R F kit amplifiers. Look at the direct links section on screen. All source code, pre-compiled Windows migrator executables, and technical releases are available on GitHub at github dot com slash jbirdlebough one slash J R F K Tools. For active discussions and technical support, connect with the community on the R F kit groups dot I O reflector at groups dot I O slash g slash r f dash kit. Please note the experimental research disclaimer: all software is provided as-is with all risks accepted by the user. Seventy-three's K seven B I T."
 
 ---
 
