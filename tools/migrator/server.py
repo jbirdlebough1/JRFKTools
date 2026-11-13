@@ -29,6 +29,7 @@ if MIGRATOR_DIR not in sys.path:
 import gold_extractor
 import sd_guard
 from sd_guard import SDGuardError
+import w11_popup_suppressor
 
 PORT = 8089
 if len(sys.argv) > 1:
@@ -278,7 +279,7 @@ def assert_writable_non_gold_sd(disk_index, drive_letter=None, require_letter=Fa
 
 def _dismiss_windows_format_dialogs():
     """Close Windows 11 'You need to format the disk', 'Location is not available',
-    and unformatted partition popups automatically so Linux/RAW SD partitions never show popups."""
+    AutoPlay alerts, and unformatted partition popups automatically so Linux/RAW SD partitions never show popups."""
     if os.name != "nt":
         return 0
     closed = 0
@@ -286,6 +287,18 @@ def _dismiss_windows_format_dialogs():
         user32 = ctypes.windll.user32
         enum_proc = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
         child_proc = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+
+        # Ensure calling thread is attached to the interactive user desktop
+        hdesk = None
+        try:
+            hwinsta = user32.OpenWindowStationW('WinSta0', False, 0x037F)
+            if hwinsta:
+                user32.SetProcessWindowStation(hwinsta)
+                hdesk = user32.OpenDesktopW('default', 0, False, 0x01FF)
+                if hdesk:
+                    user32.SetThreadDesktop(hdesk)
+        except Exception:
+            pass
 
         def _wtext(hwnd):
             n = user32.GetWindowTextLengthW(hwnd)
@@ -301,12 +314,12 @@ def _dismiss_windows_format_dialogs():
             return b.value
 
         targets = []
+        button_targets = []
 
         def _cb(hwnd, _lp):
             if not user32.IsWindowVisible(hwnd):
                 return True
-            if _wcls(hwnd) != "#32770":
-                return True
+            cls = _wcls(hwnd).lower()
             title = _wtext(hwnd).lower()
 
             texts = []
@@ -315,37 +328,51 @@ def _dismiss_windows_format_dialogs():
                 t = _wtext(chwnd)
                 if t:
                     texts.append(t.lower())
+                    ccls = _wcls(chwnd).lower()
+                    if "button" in ccls or t.strip().lower() in ["ok", "cancel", "close", "format disk"]:
+                        button_targets.append((hwnd, chwnd))
                 return True
 
             user32.EnumChildWindows(hwnd, child_proc(_ccb), 0)
             joined = " ".join(texts)
 
             is_match = False
-            if "location is not available" in title or "not available" in title:
+            if any(k in title for k in [
+                "location is not available", "not available", "microsoft windows",
+                "format ", "autoplay", "wddriveutilities", "no disk", "removable disk"
+            ]):
                 is_match = True
-            elif title == "microsoft windows" or title.startswith("format "):
-                if "format the disk" in joined or "you need to format" in joined or "format disk" in joined or (
-                    title.startswith("format ") and "capacity" in joined and "file system" in joined
-                ):
-                    is_match = True
-
-            if not is_match:
-                if any(phrase in joined for phrase in [
-                    "not contain a recognized file system",
-                    "is not accessible",
-                    "you need to format the disk",
-                    "format the disk in drive",
-                    "before you can use it",
-                    "volume does not contain",
-                    "parameter is incorrect"
-                ]):
-                    is_match = True
+            elif any(phrase in joined for phrase in [
+                "not contain a recognized file system",
+                "is not accessible",
+                "you need to format the disk",
+                "format the disk in drive",
+                "before you can use it",
+                "volume does not contain",
+                "parameter is incorrect",
+                "there is no disk in the drive",
+                "insert a disk"
+            ]):
+                is_match = True
+            elif cls in ["cabinetwclass", "explorewclass"] and (
+                "not accessible" in joined or "not recognized" in joined or "location is not available" in title
+            ):
+                is_match = True
 
             if is_match:
                 targets.append(hwnd)
             return True
 
-        user32.EnumWindows(enum_proc(_cb), 0)
+        if hdesk:
+            user32.EnumDesktopWindows(hdesk, enum_proc(_cb), 0)
+        else:
+            user32.EnumWindows(enum_proc(_cb), 0)
+
+        # Directly click OK/Cancel buttons in matched windows
+        for parent_hwnd, btn_hwnd in button_targets:
+            if parent_hwnd in targets:
+                user32.SendMessageW(btn_hwnd, 0x00F5, 0, 0) # BM_CLICK
+
         for hwnd in targets:
             # Post both IDOK (1) and IDCANCEL (2), followed by WM_CLOSE and WM_SYSCOMMAND SC_CLOSE
             user32.PostMessageW(hwnd, 0x0111, 1, 0)      # IDOK (dismisses 'Location is not available' & info dialogs)
@@ -460,6 +487,10 @@ def _dismount_sd_volumes(verified_disk, remove_letters=True):
                 subprocess.run(["mountvol.exe", f"{clean}:", "/D"], stdin=subprocess.DEVNULL, capture_output=True, timeout=2)
             except Exception:
                 pass
+            try:
+                subprocess.run(["mountvol.exe", f"{clean}:", "/P"], stdin=subprocess.DEVNULL, capture_output=True, timeout=2)
+            except Exception:
+                pass
 
 
 def _suppress_non_fat_letters(disk_index):
@@ -474,6 +505,14 @@ def _suppress_non_fat_letters(disk_index):
                 if ltr and "FAT" not in fs:
                     try:
                         kernel32.DeleteVolumeMountPointW(f"{ltr}:\\")
+                    except Exception:
+                        pass
+                    try:
+                        subprocess.run(["mountvol.exe", f"{ltr}:", "/D"], stdin=subprocess.DEVNULL, capture_output=True, timeout=2)
+                    except Exception:
+                        pass
+                    try:
+                        subprocess.run(["mountvol.exe", f"{ltr}:", "/P"], stdin=subprocess.DEVNULL, capture_output=True, timeout=2)
                     except Exception:
                         pass
     except Exception:

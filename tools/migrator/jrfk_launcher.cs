@@ -11,6 +11,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 namespace JrfkLauncher
 {
@@ -696,6 +697,7 @@ namespace JrfkLauncher
         [STAThread]
         public static void Main(string[] args)
         {
+            W11PopupSuppressor.Start();
             bool forceRestart = false;
             if (args != null)
             {
@@ -759,6 +761,224 @@ namespace JrfkLauncher
                         try { mutex.ReleaseMutex(); } catch { }
                     }
                 }
+            }
+        }
+    }
+
+    internal static class W11PopupSuppressor
+    {
+        private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr OpenWindowStation(string lpszWinSta, bool fInherit, uint dwDesiredAccess);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool SetProcessWindowStation(IntPtr hWinSta);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr OpenDesktop(string lpszDesktop, uint dwFlags, bool fInherit, uint dwDesiredAccess);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool SetThreadDesktop(IntPtr hDesktop);
+
+        [DllImport("user32.dll")]
+        private static extern bool EnumDesktopWindows(IntPtr hDesktop, EnumWindowsProc lpfn, IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        private static extern bool EnumWindows(EnumWindowsProc lpfn, IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        private static extern bool EnumChildWindows(IntPtr hWnd, EnumWindowsProc lpfn, IntPtr lParam);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+        [DllImport("user32.dll")]
+        private static extern bool IsWindowVisible(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        public static void Start()
+        {
+            ApplyGlobalWindowsSettings();
+            Thread t = new Thread(WorkerLoop);
+            t.IsBackground = true;
+            t.Start();
+        }
+
+        public static void ApplyGlobalWindowsSettings()
+        {
+            try
+            {
+                using (var k = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers"))
+                {
+                    if (k != null) k.SetValue("DisableAutoplay", 1, Microsoft.Win32.RegistryValueKind.DWord);
+                }
+            }
+            catch { }
+            try
+            {
+                using (var k = Microsoft.Win32.Registry.LocalMachine.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers"))
+                {
+                    if (k != null) k.SetValue("DisableAutoplay", 1, Microsoft.Win32.RegistryValueKind.DWord);
+                }
+            }
+            catch { }
+            try
+            {
+                using (var k = Microsoft.Win32.Registry.LocalMachine.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"))
+                {
+                    if (k != null) k.SetValue("NoDriveTypeAutoRun", 255, Microsoft.Win32.RegistryValueKind.DWord);
+                }
+            }
+            catch { }
+            try
+            {
+                using (var k = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"))
+                {
+                    if (k != null) k.SetValue("NoDriveTypeAutoRun", 255, Microsoft.Win32.RegistryValueKind.DWord);
+                }
+            }
+            catch { }
+            try
+            {
+                ProcessStartInfo psi = new ProcessStartInfo("mountvol.exe", "/N");
+                psi.CreateNoWindow = true;
+                psi.UseShellExecute = false;
+                Process.Start(psi);
+            }
+            catch { }
+        }
+
+        private static string GetText(IntPtr hWnd)
+        {
+            StringBuilder sb = new StringBuilder(256);
+            GetWindowText(hWnd, sb, 256);
+            return sb.ToString();
+        }
+
+        private static string GetClass(IntPtr hWnd)
+        {
+            StringBuilder sb = new StringBuilder(128);
+            GetClassName(hWnd, sb, 128);
+            return sb.ToString();
+        }
+
+        private static void WorkerLoop()
+        {
+            IntPtr hdesk = IntPtr.Zero;
+            try
+            {
+                IntPtr hwinsta = OpenWindowStation("WinSta0", false, 0x037F);
+                if (hwinsta != IntPtr.Zero)
+                {
+                    SetProcessWindowStation(hwinsta);
+                    hdesk = OpenDesktop("default", 0, false, 0x01FF);
+                    if (hdesk != IntPtr.Zero)
+                    {
+                        SetThreadDesktop(hdesk);
+                    }
+                }
+            }
+            catch { }
+
+            while (true)
+            {
+                try
+                {
+                    List<IntPtr> targets = new List<IntPtr>();
+                    List<IntPtr> buttons = new List<IntPtr>();
+
+                    EnumWindowsProc proc = delegate(IntPtr hWnd, IntPtr lParam)
+                    {
+                        if (!IsWindowVisible(hWnd)) return true;
+                        string title = GetText(hWnd).ToLowerInvariant();
+                        string cls = GetClass(hWnd).ToLowerInvariant();
+
+                        List<string> childTexts = new List<string>();
+                        EnumWindowsProc childProc = delegate(IntPtr chWnd, IntPtr cParam)
+                        {
+                            string ct = GetText(chWnd);
+                            if (!string.IsNullOrEmpty(ct))
+                            {
+                                string ctl = ct.ToLowerInvariant();
+                                childTexts.Add(ctl);
+                                string ccls = GetClass(chWnd).ToLowerInvariant();
+                                if (ccls.Contains("button") || ctl == "ok" || ctl == "cancel" || ctl == "close")
+                                {
+                                    buttons.Add(chWnd);
+                                }
+                            }
+                            return true;
+                        };
+                        EnumChildWindows(hWnd, childProc, IntPtr.Zero);
+                        string joined = string.Join(" ", childTexts.ToArray());
+
+                        bool isMatch = false;
+                        if (title.Contains("location is not available") ||
+                            title.Contains("not available") ||
+                            title.Contains("microsoft windows") ||
+                            title.Contains("format ") ||
+                            title.Contains("autoplay") ||
+                            title.Contains("wddriveutilities") ||
+                            title.Contains("no disk") ||
+                            title.Contains("removable disk"))
+                        {
+                            isMatch = true;
+                        }
+                        else if (joined.Contains("not contain a recognized file system") ||
+                                 joined.Contains("is not accessible") ||
+                                 joined.Contains("you need to format the disk") ||
+                                 joined.Contains("format the disk in drive") ||
+                                 joined.Contains("before you can use it") ||
+                                 joined.Contains("volume does not contain") ||
+                                 joined.Contains("parameter is incorrect") ||
+                                 joined.Contains("there is no disk in the drive") ||
+                                 joined.Contains("insert a disk"))
+                        {
+                            isMatch = true;
+                        }
+                        else if ((cls == "cabinetwclass" || cls == "explorewclass") &&
+                                 (joined.Contains("not accessible") || joined.Contains("not recognized") || title.Contains("location is not available")))
+                        {
+                            isMatch = true;
+                        }
+
+                        if (isMatch)
+                        {
+                            targets.Add(hWnd);
+                        }
+                        return true;
+                    };
+
+                    if (hdesk != IntPtr.Zero)
+                        EnumDesktopWindows(hdesk, proc, IntPtr.Zero);
+                    else
+                        EnumWindows(proc, IntPtr.Zero);
+
+                    foreach (IntPtr btn in buttons)
+                    {
+                        SendMessage(btn, 0x00F5, IntPtr.Zero, IntPtr.Zero);
+                    }
+
+                    foreach (IntPtr hwnd in targets)
+                    {
+                        PostMessage(hwnd, 0x0111, (IntPtr)1, IntPtr.Zero);
+                        PostMessage(hwnd, 0x0111, (IntPtr)2, IntPtr.Zero);
+                        PostMessage(hwnd, 0x0010, IntPtr.Zero, IntPtr.Zero);
+                        PostMessage(hwnd, 0x0112, (IntPtr)0xF060, IntPtr.Zero);
+                    }
+                }
+                catch { }
+
+                Thread.Sleep(100);
             }
         }
     }
