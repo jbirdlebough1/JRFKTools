@@ -316,8 +316,8 @@ SLIDES = [
         "title": "Resources, Community Support & Project Links",
         "subtitle": "GitHub repository, releases, community group, and station contact info",
         "image": "slide_resources_main.png",
-        "caption": "PROJECT RESOURCES: GITHUB REPOSITORY, STANDALONE EXECUTABLE, GROUPS.IO & CONTACT",
-        "narration": "In summary, the J R F K Modernization Suite delivers rock-solid operations, comprehensive engineering supervision, and verified disaster recovery for R F kit amplifiers. All source code, pre-compiled Windows migrator executables, and technical releases are available on GitHub at github dot com slash jbirdlebough one slash J R F K Tools. For discussions and technical support, connect with the community on the R F kit groups dot I O reflector. Thank you from K seven B I T."
+        "caption": "PROJECT RESOURCES: GITHUB REPOSITORY, STANDALONE EXECUTABLE, GROUPS.IO & 73's K7BIT",
+        "narration": "In summary, the J R F K Modernization Suite delivers rock-solid operations, comprehensive engineering supervision, and verified disaster recovery for R F kit amplifiers. All source code, pre-compiled Windows migrator executables, and technical releases are available on GitHub at github dot com slash jbirdlebough one slash J R F K Tools. For discussions and technical support, connect with the community on the R F kit groups dot I O reflector. Seventy-three's K seven B I T."
     }
 ]
 
