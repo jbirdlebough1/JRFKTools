@@ -18,7 +18,7 @@
     }
     .player-header {
         height: 44px;
-        background: #0f2d4f;
+        background: #0c2340;
         border-bottom: 2px solid #38bdf8;
         display: flex;
         align-items: center;
@@ -26,24 +26,32 @@
         padding: 0 16px;
         flex-shrink: 0;
     }
-    .player-title { font-size: 15px; font-weight: 800; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
+    .player-title {
+        font-weight: 800;
+        font-size: 14px;
+        color: #e0f2fe;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
     .player-callsign {
         background: #0284c7;
         color: white;
-        padding: 2px 10px;
+        padding: 2px 8px;
         border-radius: 4px;
         font-family: monospace;
-        font-weight: bold;
         font-size: 12px;
+        font-weight: bold;
     }
     .player-main {
         flex: 1 1 auto;
         min-height: 0;
+        width: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 4px 8px;
-        background: #061524;
+        background: #000000;
+        padding: 4px;
         overflow: hidden;
     }
     .slide-viewport {
@@ -52,21 +60,23 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        overflow: hidden;
+        position: relative;
     }
     .slide-img {
-        max-width: 100%;
-        max-height: 100%;
-        width: auto;
-        height: auto;
+        width: 100%;
+        height: 100%;
         object-fit: contain;
-        border-radius: 4px;
-        box-shadow: 0 6px 25px rgba(0,0,0,0.8);
-        border: 2px solid #1e3a5f;
+        display: block;
+    }
+    .slide-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: none;
     }
     .player-footer {
-        height: 64px;
-        background: #0f2d4f;
+        height: 60px;
+        background: #0c2340;
         border-top: 2px solid #38bdf8;
         display: flex;
         flex-direction: column;
@@ -145,6 +155,7 @@
     <div class="player-main">
         <div class="slide-viewport">
             <img id="currentSlideImg" class="slide-img" src="slide_01.png" alt="Current Slide">
+            <iframe id="slideIframe" class="slide-iframe" src="about:blank"></iframe>
         </div>
     </div>
 
@@ -169,116 +180,129 @@
   {
     "id": 1,
     "num": "01",
-    "title": "JRFK 64-Bit Appliance Builder & Migrator",
+    "title": "Modernizing the RF-KIT Linear Amplifier",
     "img": "slide_01.png",
+    "html": "slide_01.html",
     "audio": "slide_01.mp3",
-    "duration": 38.688,
-    "narration": "Thirty-two-bit Raspberry Pi O S is obsolete, leaving R F kit amplifier owners at risk from unmaintained kernels and S D card failures. On screen is the J R F K dot E X E migration tool running on your Windows P C. It launches as a standalone elevated executable that manages Drive Guard protection and local web services. Its purpose is to prepare a complete sixty-four-bit Raspberry Pi operating system containing all original R F kit calibrations, user data, and the J R F K Web Tools suite for your amplifier. Over the next four slides, we look at the P C migration process, and then we will explore each of the on-amplifier web tools."
+    "duration": 32.352,
+    "narration": "Thirty-two-bit Raspberry Pi O S is obsolete, leaving R F kit amplifier owners at risk from unmaintained kernels and S D card failures. On screen is the J R F K dot E X E modernization suite running on your Windows P C. It launches as a standalone elevated executable that manages Drive Guard protection and local web services. Over the first four slides, we look at the software obsolescence and why this upgrade is essential, and then beginning on slide five, we dive into the P C migration process, followed by the on-amplifier web tools."
   },
   {
     "id": 2,
     "num": "02",
-    "title": "Migrator Option A: Gold to Production",
+    "title": "Why Legacy 32-Bit Raspberry Pi OS Must Go",
     "img": "slide_02.png",
+    "html": "slide_02.html",
     "audio": "slide_02.mp3",
-    "duration": 32.28,
-    "narration": "Examining the primary migration path, Option A: Gold to Production. Look at the upper selector tile on screen. In this mode, you take your existing working S D card from the amplifier and plug it into a U S B reader on your P C. The tool reads your card in read-only safety mode, extracting one hundred percent of your calibration files, directional coupler offsets, and station settings. Once extracted, you remove your original card and insert a new card, which the tool flashes with the complete sixty-four-bit Debian Trixie system."
+    "duration": 28.536,
+    "narration": "Examining why the legacy thirty-two-bit operating system must be retired. Upstream Debian and Raspberry Pi O S have completely deprecated thirty-two-bit builds, freezing security fixes and controller patches. Furthermore, unbuffered S D card operations leave your station vulnerable to permanent file corruption during dirty shutdowns or power drops. Socket starvation on the controller interface introduces latency, and the legacy stack cannot run modern concurrent telemetry daemons."
   },
   {
     "id": 3,
     "num": "03",
-    "title": "Migrator Option B: Clean Install to Production",
+    "title": "64-Bit Modernization Architecture & Benefits",
     "img": "slide_03.png",
+    "html": "slide_03.html",
     "audio": "slide_03.mp3",
-    "duration": 29.016,
-    "narration": "Now look at Option B on screen: Clean Install to Production. This option is used when you are starting fresh with a brand new card or building a spare backup without reading an original card first. On this screen, you directly configure your Raspberry Pi username, system password, hostname, and station Wi-Fi credentials. The tool formats the new target card, installs sixty-four-bit Debian Trixie, and provisions the native R F kit controller alongside the J R F K Web Tools suite."
+    "duration": 28.92,
+    "narration": "Now looking at the sixty-four-bit architecture payoff. By moving to pure sixty-four-bit Debian thirteen Trixie on kernel six point twelve, your amplifier gains modern sixty-four-bit memory addressing and long-term security maintenance. Hardware-accelerated Full K M S direct rendering eliminates touch latency and coordinate drift on the front panel L C D. At the same time, high-priority SimpleRPC communications run on dev rfk controller with zero socket warnings, enabling concurrent web daemons."
   },
   {
     "id": 4,
     "num": "04",
-    "title": "PC Migrator: Directional Coupler & ADC Calibration",
+    "title": "System Diagnostics: Calibration Archive & ATU Matrix",
     "img": "slide_04.png",
+    "html": "slide_04.html",
     "audio": "slide_04.mp3",
-    "duration": 24.024,
-    "narration": "This screen shows the exact calibration data recovered by the P C migrator from your original card. Listed here are the factory directional coupler forward and reflected power A D C lookup tables, attenuator step values, and P T T relay timings. The migrator transfers these exact matrices into the new sixty-four-bit operating system, ensuring that your amplifier retains its factory RF metering precision."
+    "duration": 55.296,
+    "narration": "Examining the complete station system report and calibration archive. Starting across the top row, the report verifies your station callsign K7BIT, pure sixty-four-bit Debian Trixie operating system, and CAT decoding to the ICOM IC seventy-six ten, alongside root partition health and wear leveling. Scrolling down to the middle row, the RF detector calibration tables confirm factory forward and reflected null voltages, power scaling factor calibrated for fifteen hundred Watts, P, E, P, and the fifty-ohm bridge null, while network and display settings verify your station IP and pure KMS ten twenty-four by six hundred timing. Scrolling down to the end of the report, the ATU matrix maps all eleven amateur bands from one sixty through six meters, detailing assigned antenna ports, segment counts, and the exact discrete physical inductance in nanohenries and capacitance in picofarads engaged by the switched relays."
   },
   {
     "id": 5,
     "num": "05",
-    "title": "Amplifier Deployment: Two-Boot Production Verification",
+    "title": "Migrator Option A: Gold to Production",
     "img": "slide_05.png",
+    "html": "slide_05.html",
     "audio": "slide_05.mp3",
-    "duration": 22.224,
-    "narration": "Once flashing finishes on your P C, you insert the new card into your amplifier's Raspberry Pi four or five. On the first boot, automated scripts expand the Linux root partition to fill the full card and configure controller devices. On the second boot, your amplifier enters full production service running pure sixty-four-bit Debian Trixie with the native front panel app and all Web Tools active."
+    "duration": 35.688,
+    "narration": "Slide five marks the start of the migration process. Examining the primary migration path, Option A: Gold to Production. Look at the upper selector tile on screen. In this mode, you take your existing working S D card from the amplifier and plug it into a U S B reader on your P C. The tool reads your card in read-only safety mode, extracting one hundred percent of your calibration files, directional coupler offsets, and station settings. Once extracted, you remove your original card and insert a new card, which the tool flashes with the complete sixty-four-bit Debian Trixie system."
   },
   {
     "id": 6,
     "num": "06",
-    "title": "JRFK Web Tools: Unified Station Dashboard",
+    "title": "Migrator Option B: Clean Install to Production",
     "img": "slide_06.png",
+    "html": "slide_06.html",
     "audio": "slide_06.mp3",
-    "duration": 22.992,
-    "narration": "Now we move to the J R F K Web Tools running live on the amplifier. On screen is the master blueprint portal accessed via any browser on port eighty eighty-eight. It runs simultaneously alongside the native R F kit application using shared memory, giving you direct access to the Health Guard, Antenna Matrix, S D Backup Manager, System Diagnostics, Event Logs, and live Screen Streamer."
+    "duration": 29.016,
+    "narration": "Now look at Option B on screen: Clean Install to Production. This option is used when you are starting fresh with a brand new card or building a spare backup without reading an original card first. On this screen, you directly configure your Raspberry Pi username, system password, hostname, and station Wi-Fi credentials. The tool formats the new target card, installs sixty-four-bit Debian Trixie, and provisions the native R F kit controller alongside the J R F K Web Tools suite."
   },
   {
     "id": 7,
     "num": "07",
-    "title": "Health Guard: Real-Time RF Telemetry & Safety Ceiling",
+    "title": "Two-Boot Production Verification Process",
     "img": "slide_07.png",
+    "html": "slide_07.html",
     "audio": "slide_07.mp3",
-    "duration": 25.416,
-    "narration": "Examining the Health and Thermal Guard on screen. At the top of the page, the thermal safety banner supervises the P A heatsink temperature against the sixty degree ceiling, unkeying the amplifier into standby if cooling limits are reached. Down below, the instruments display instantaneous forward power up to fifteen hundred Watts, P, E, P, reflected power in Watts, and the fifty-three point five volt D C power supply rail status."
+    "duration": 38.736,
+    "narration": "Once flashing finishes on your P C, you insert the new card into your amplifier's Raspberry Pi four or five. Look at the two-boot verification process on screen. On Boot One, automated scripts detect the hardware, expand the Linux root partition to fill the full media capacity, apply the native full KMS display timings for the front panel, and execute an automated soft reboot in under twenty seconds. On Boot Two, the amplifier performs a fast cold start in under twelve seconds, opens the SimpleRPC controller link on dev rfk controller, reconnects to your station Wi-Fi, and brings all JRFK Web Tools live on port eighty eighty-eight."
   },
   {
     "id": 8,
     "num": "08",
-    "title": "Antenna Matrix & ATU: Auto Segment Tuning",
+    "title": "JRFK Web Tools: Unified Station Dashboard",
     "img": "slide_08.png",
+    "html": "slide_08.html",
     "audio": "slide_08.mp3",
-    "duration": 31.416,
-    "narration": "Looking at the Antenna Mapper and Tuner Matrix screen. At the top are the four antenna ports covering one sixty through six meters, which switch automatically via C A T control. Below is the B twenty-six A T U matching network. The R F kit tuner uses relay and P I N diode switching to engage discrete physical inductors and capacitors for each frequency segment. The Bode plot displays S W R across the band and lists the exact physical inductance in nanohenries and capacitance in picofarads selected for that segment."
+    "duration": 23.808,
+    "narration": "Now we move to the J R F K Web Tools running live on the amplifier. On screen is the master station dashboard accessed via any browser on port eighty eighty-eight. It runs simultaneously alongside the native R F kit application using shared memory, giving you direct access to the Health Guard, Antenna Matrix, S D Backup Manager, System Diagnostics, Event Logs, and live Screen Streamer."
   },
   {
     "id": 9,
     "num": "09",
-    "title": "SD Backup Manager: Automated Cloning & Recovery",
+    "title": "Health Guard: Real-Time RF Telemetry & Safety Ceiling",
     "img": "slide_09.png",
+    "html": "slide_09.html",
     "audio": "slide_09.mp3",
-    "duration": 22.728,
-    "narration": "Examining the S D Backup and Disaster Recovery tool on screen. The top status panel verifies the active boot card, while the storage selector identifies connected U S B target drives. In under three minutes, this tool writes a complete, bootable clone of your operating system to secondary storage in the background while you remain on the air, keeping a verified standby card ready in case of media failure."
+    "duration": 25.416,
+    "narration": "Examining the Health and Thermal Guard on screen. At the top of the page, the thermal safety banner supervises the P A heatsink temperature against the sixty degree ceiling, unkeying the amplifier into standby if cooling limits are reached. Down below, the instruments display instantaneous forward power up to fifteen hundred Watts, P, E, P, reflected power in Watts, and the fifty-three point five volt D C power supply rail status."
   },
   {
     "id": 10,
     "num": "10",
-    "title": "System Report: Complete Calibration Archive",
+    "title": "Antenna Matrix & ATU: Auto Segment Tuning",
     "img": "slide_10.png",
+    "html": "slide_10.html",
     "audio": "slide_10.mp3",
-    "duration": 19.944,
-    "narration": "On screen is the Complete System Report and Calibration Archive. The upper cards display station identity, operating system version, and storage utilization across the root and U S B partitions. Below, full hardware calibration tables can be reviewed on screen and downloaded as a single compressed archive for off-site backup."
+    "duration": 31.416,
+    "narration": "Looking at the Antenna Mapper and Tuner Matrix screen. At the top are the four antenna ports covering one sixty through six meters, which switch automatically via C A T control. Below is the B twenty-six A T U matching network. The R F kit tuner uses relay and P I N diode switching to engage discrete physical inductors and capacitors for each frequency segment. The Bode plot displays S W R across the band and lists the exact physical inductance in nanohenries and capacitance in picofarads selected for that segment."
   },
   {
     "id": 11,
     "num": "11",
-    "title": "Diagnostic Logs: Centralized Event Terminal",
+    "title": "SD Backup Manager: Automated Cloning & Recovery",
     "img": "slide_11.png",
+    "html": "slide_11.html",
     "audio": "slide_11.mp3",
-    "duration": 20.184,
-    "narration": "Here is the Centralized Diagnostic Log Viewer. On screen, the dropdown allows you to inspect the core R F kit G U I log, the rolling telemetry log, S D backup records, and first-boot migration automation output. System D daemon events and amplifier trip alerts are captured with exact millisecond timestamps for instant diagnosis."
+    "duration": 22.728,
+    "narration": "Examining the S D Backup and Disaster Recovery tool on screen. The top status panel verifies the active boot card, while the storage selector identifies connected U S B target drives. In under three minutes, this tool writes a complete, bootable clone of your operating system to secondary storage in the background while you remain on the air, keeping a verified standby card ready in case of media failure."
   },
   {
     "id": 12,
     "num": "12",
-    "title": "Remote Screen Viewer: Live 1024x600 Display",
+    "title": "Diagnostic Logs & Remote Screen Streamer",
     "img": "slide_12.png",
+    "html": "slide_12.html",
     "audio": "slide_12.mp3",
-    "duration": 23.544,
-    "narration": "On screen is the Remote Screen Viewer. This web tool grabs the physical X eleven framebuffer of the amplifier's seven-inch front panel display and mirrors it live over H T T P at ten twenty-four by six hundred resolution. You see the physical front panel display update in real time from any browser on your network. Technical documentation and schematics are also stored locally on the Pi for offline reference."
+    "duration": 28.032,
+    "narration": "Here is the Centralized Diagnostic Log Viewer and Remote Screen Streamer. On screen, the dropdown allows you to inspect the core R F kit G U I log, the rolling telemetry log, S D backup records, and first-boot migration history with millisecond timestamps. Alongside the logs, the remote screen tool grabs the amplifier's front panel display and streams it live over H T T P at ten twenty-four by six hundred resolution, while engineering schematics are stored locally for instant reference."
   },
   {
     "id": 13,
     "num": "13",
     "title": "Resources, Community Support & Project Links",
     "img": "slide_13.png",
+    "html": "slide_13.html",
     "audio": "slide_13.mp3",
     "duration": 29.976,
     "narration": "In summary, the J R F K Modernization Suite delivers rock-solid operations, comprehensive engineering supervision, and verified disaster recovery for R F kit amplifiers. All source code, pre-compiled Windows migrator executables, and technical releases are available on GitHub at github dot com slash jbirdlebough one slash J R F K Tools. For discussions and technical support, connect with the community on the R F kit groups dot I O reflector. Seventy-three's K seven B I T."
@@ -289,6 +313,7 @@
 
         const audio = document.getElementById('slideAudio');
         const img = document.getElementById('currentSlideImg');
+        const iframe = document.getElementById('slideIframe');
         const indicator = document.getElementById('slideIndicator');
         const narration = document.getElementById('narrationText');
         const btnPlayPause = document.getElementById('btnPlayPause');
@@ -303,7 +328,6 @@
             currentIndex = index;
 
             const s = slides[currentIndex];
-            img.src = s.img;
             audio.src = s.audio;
             indicator.textContent = `Slide ${s.id} of ${slides.length}: ${s.title}`;
             narration.textContent = s.narration;
@@ -311,6 +335,17 @@
 
             btnPrev.disabled = (currentIndex === 0);
             btnNext.disabled = (currentIndex === slides.length - 1);
+
+            // Slide 4 uses interactive iframe for smooth vertical scrolling
+            if (s.id === 4) {
+                img.style.display = 'none';
+                iframe.style.display = 'block';
+                iframe.src = s.html;
+            } else {
+                iframe.style.display = 'none';
+                img.style.display = 'block';
+                img.src = s.img;
+            }
 
             if (autoPlay) {
                 audio.play().then(() => {
@@ -339,8 +374,13 @@
 
         audio.addEventListener('timeupdate', () => {
             if (audio.duration) {
-                const pct = (audio.currentTime / audio.duration) * 100;
-                progressBar.style.width = pct + '%';
+                const norm = audio.currentTime / audio.duration;
+                progressBar.style.width = (norm * 100) + '%';
+                
+                // If on Slide 4, communicate scroll progress to iframe
+                if (slides[currentIndex].id === 4 && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage({ type: 'scroll', norm: norm }, '*');
+                }
             }
         });
 

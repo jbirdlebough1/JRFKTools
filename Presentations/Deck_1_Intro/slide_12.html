@@ -61,7 +61,7 @@
     }
     .badge-callsign {
         background: #0284c7;
-        padding: 3px 10px;
+        padding: 3px 8px;
         border-radius: 4px;
         border: 1px solid #93c5fd;
     }
@@ -94,6 +94,7 @@
         align-items: center;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
         overflow: hidden;
+        position: relative;
     }
     .graphic-frame-full img {
         width: 100%;
@@ -122,9 +123,9 @@
 <body>
     <div class="master-header">
         <div class="header-left">
-            <div class="header-tagline">PART 2: ON-AMPLIFIER WEB TOOLS • TOOL 6: REMOTE SCREEN • LIVE CONSOLE MIRROR</div>
-            <div class="header-title">Remote Screen Viewer: Live 1024x600 Display</div>
-            <div class="header-subtitle">Real-time HTTP video mirror of the physical front panel LCD touch screen</div>
+            <div class="header-tagline">PART 3: ON-AMPLIFIER WEB TOOLS • TOOL 4 & 5: DIAGNOSTICS • EVENT LOGS & REMOTE SCREEN</div>
+            <div class="header-title">Diagnostic Logs & Remote Screen Streamer</div>
+            <div class="header-subtitle">Millisecond event terminal and live 1024x600 framebuffer stream of front panel LCD</div>
         </div>
         <div class="header-right">
             <div class="badge-callsign">K7BIT</div>
@@ -133,12 +134,13 @@
     </div>
     <div class="master-body-fullscreen">
         <div class="graphic-frame-full">
-            <img src="real_screenshots/slide_screen_main.png" alt="Remote Screen Viewer: Live 1024x600 Display">
+            <img id="mainSlideImg" src="real_screenshots/slide_logs_main.png" alt="Diagnostic Logs & Remote Screen Streamer" >
         </div>
     </div>
     <div class="master-footer">
-        <div class="footer-left">REMOTE SCREEN: DIRECT FRAMEBUFFER STREAM OF THE 7-INCH FRONT PANEL LCD DISPLAY</div>
+        <div class="footer-left">CENTRAL LOG TERMINAL & REMOTE CONSOLE: MONITORS CONTROLLER EVENTS & REPLICATES 7-INCH LCD</div>
         <div class="footer-right">JRFK 64-BIT MODERNIZATION SUITE • K7BIT</div>
     </div>
+    
 </body>
 </html>

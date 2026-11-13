@@ -61,7 +61,7 @@
     }
     .badge-callsign {
         background: #0284c7;
-        padding: 3px 10px;
+        padding: 3px 8px;
         border-radius: 4px;
         border: 1px solid #93c5fd;
     }
@@ -94,6 +94,7 @@
         align-items: center;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
         overflow: hidden;
+        position: relative;
     }
     .graphic-frame-full img {
         width: 100%;
@@ -122,9 +123,9 @@
 <body>
     <div class="master-header">
         <div class="header-left">
-            <div class="header-tagline">PART 2: ON-AMPLIFIER WEB TOOLS • TOOL 1: HEALTH MONITOR • LIVE RF & THERMAL STATUS</div>
-            <div class="header-title">Health Guard: Real-Time RF Telemetry & Safety Ceiling</div>
-            <div class="header-subtitle">Forward power up to 1500 Watts P, E, P, reflected power, and 60°C thermal protection</div>
+            <div class="header-tagline">PART 2: PC MIGRATOR • DEPLOYMENT PIPELINE • AMPLIFIER INITIALIZATION</div>
+            <div class="header-title">Two-Boot Production Verification Process</div>
+            <div class="header-subtitle">Automated partition expansion on Boot 1 followed by production launch on Boot 2</div>
         </div>
         <div class="header-right">
             <div class="badge-callsign">K7BIT</div>
@@ -133,12 +134,13 @@
     </div>
     <div class="master-body-fullscreen">
         <div class="graphic-frame-full">
-            <img src="real_screenshots/slide_health_main.png" alt="Health Guard: Real-Time RF Telemetry & Safety Ceiling">
+            <img id="mainSlideImg" src="real_screenshots/slide_two_boot_process.png" alt="Two-Boot Production Verification Process" >
         </div>
     </div>
     <div class="master-footer">
-        <div class="footer-left">HEALTH MONITOR: LIVE RF POWER METERS, 53.5V SUPPLY SHUNTS & 60°C THERMAL SAFETY TRIP</div>
+        <div class="footer-left">TWO-BOOT VERIFICATION: FIRST INITIALIZATION EXPANDS PARTITIONS; SECOND BOOT ENTERS PRODUCTION</div>
         <div class="footer-right">JRFK 64-BIT MODERNIZATION SUITE • K7BIT</div>
     </div>
+    
 </body>
 </html>

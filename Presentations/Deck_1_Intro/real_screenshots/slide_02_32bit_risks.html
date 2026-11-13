@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background-color: #1a5695;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+        linear-gradient(rgba(147, 197, 253, 0.35) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(147, 197, 253, 0.35) 2px, transparent 2px);
+    background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 50px;
+  }
+  .blueprint-card {
+    width: 1820px;
+    background: rgba(10, 30, 60, 0.96);
+    border: 3px solid #93c5fd;
+    border-radius: 12px;
+    padding: 35px 45px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 3px solid #ef4444;
+    padding-bottom: 18px;
+    margin-bottom: 25px;
+  }
+  .title-group h1 {
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+    margin-bottom: 4px;
+  }
+  .title-group .subtitle {
+    font-size: 17px;
+    color: #93c5fd;
+    font-family: monospace;
+  }
+  .badge-container { display: flex; gap: 10px; }
+  .badge {
+    background: #dc2626;
+    color: white;
+    padding: 5px 14px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 14px;
+    border: 1px solid #fca5a5;
+  }
+  .grid-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+  .risk-box {
+    background: rgba(15, 45, 85, 0.95);
+    border: 2px solid #38bdf8;
+    border-radius: 8px;
+    padding: 22px 24px;
+    border-left: 6px solid #ef4444;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  }
+  .risk-tag {
+    font-family: monospace;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #f87171;
+    margin-bottom: 6px;
+  }
+  .risk-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .risk-desc {
+    font-size: 15px;
+    line-height: 1.5;
+    color: #dbeafe;
+  }
+  .risk-desc strong { color: #ffffff; }
+  .status-strip {
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 2px solid rgba(56, 189, 248, 0.4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: monospace;
+    font-size: 13px;
+    color: #bae6fd;
+  }
+  .strip-highlight { color: #f87171; font-weight: bold; }
+</style>
+</head>
+<body>
+  <div class="blueprint-card">
+    <div class="card-header">
+      <div class="title-group">
+        <h1>Why Legacy 32-Bit Raspberry Pi OS Must Go</h1>
+        <div class="subtitle">OBSOLESCENCE AUDIT • UNMAINTAINED UPSTREAM KERNEL & FLASH STORAGE RISKS</div>
+      </div>
+      <div class="badge-container">
+        <span class="badge">VULNERABILITY WARNING</span>
+        <span class="badge" style="background:#0284c7; border-color:#93c5fd;">RFK CONTROLLER INTEGRITY</span>
+      </div>
+    </div>
+
+    <div class="grid-cards">
+      <div class="risk-box">
+        <div class="risk-tag">RISK 1: UPSTREAM SOFTWARE END-OF-LIFE</div>
+        <div class="risk-title">⚠️ Unmaintained 32-Bit Linux Kernel</div>
+        <div class="risk-desc">
+          Upstream Debian and Raspberry Pi OS have deprecated 32-bit architectures. Critical security fixes, controller driver patches, and repository dependencies are completely frozen, leaving aging installations open to software regressions without vendor support.
+        </div>
+      </div>
+
+      <div class="risk-box">
+        <div class="risk-tag">RISK 2: FLASH MEDIA FATIGUE & CRASHES</div>
+        <div class="risk-title">💾 Unbuffered SD Card Corruption</div>
+        <div class="risk-desc">
+          Legacy 32-bit deployments lack wear-leveling monitoring, read-only flash overlays, and automated backup hooks. A sudden station power drop or dirty shutdown during amplifier operation risks permanent corruption of the master filesystem and factory calibration matrices.
+        </div>
+      </div>
+
+      <div class="risk-box">
+        <div class="risk-tag">RISK 3: SERIAL COMMUNICATIONS JITTER</div>
+        <div class="risk-title">⚡ SimpleRPC Socket Timeouts & Drift</div>
+        <div class="risk-desc">
+          Legacy 32-bit userland stacks suffer from socket starvation and thread priority jitter on the controller interface. Under high RF environments or heavy CAT decoding loads, communication lockups can blind the GUI to instantaneous amplifier telemetry.
+        </div>
+      </div>
+
+      <div class="risk-box">
+        <div class="risk-tag">RISK 4: AMPLIFIER SAFETY LOCKS</div>
+        <div class="risk-title">🛑 Inability to Run Concurrent Supervision</div>
+        <div class="risk-desc">
+          32-bit OS constraints prevent running simultaneous remote telemetry daemons alongside the front panel application. Shack operators have zero independent browser-based access to the 60°C thermal trips, reflected power alarms, or live antenna matrix while operating.
+        </div>
+      </div>
+    </div>
+
+    <div class="status-strip">
+      <div>ASSESSMENT: <span class="strip-highlight">32-BIT MUST BE REPLACED BEFORE MEDIA FAILURE CAUSES LOSS OF FACTORY CALIBRATION</span></div>
+      <div>STATION: K7BIT • JRFK MODERNIZATION SUITE</div>
+    </div>
+  </div>
+</body>
+</html>

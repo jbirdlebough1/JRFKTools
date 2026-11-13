@@ -61,7 +61,7 @@
     }
     .badge-callsign {
         background: #0284c7;
-        padding: 3px 10px;
+        padding: 3px 8px;
         border-radius: 4px;
         border: 1px solid #93c5fd;
     }
@@ -94,6 +94,7 @@
         align-items: center;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
         overflow: hidden;
+        position: relative;
     }
     .graphic-frame-full img {
         width: 100%;
@@ -122,9 +123,9 @@
 <body>
     <div class="master-header">
         <div class="header-left">
-            <div class="header-tagline">PART 2: ON-AMPLIFIER WEB TOOLS • TOOL 2: ANTENNA MATRIX & ATU • RELAY SWITCHED MATCHING</div>
-            <div class="header-title">Antenna Matrix & ATU: Auto Segment Tuning</div>
-            <div class="header-subtitle">4-way band routing and B26-ATU switched relay/PIN diode matching network</div>
+            <div class="header-tagline">PART 3: ON-AMPLIFIER WEB TOOLS • SUITE PORTAL • BROWSER-BASED MANAGEMENT</div>
+            <div class="header-title">JRFK Web Tools: Unified Station Dashboard</div>
+            <div class="header-subtitle">Concurrent remote management served directly by the amplifier on port 8088</div>
         </div>
         <div class="header-right">
             <div class="badge-callsign">K7BIT</div>
@@ -133,12 +134,13 @@
     </div>
     <div class="master-body-fullscreen">
         <div class="graphic-frame-full">
-            <img src="real_screenshots/slide_antenna_main.png" alt="Antenna Matrix & ATU: Auto Segment Tuning">
+            <img id="mainSlideImg" src="real_screenshots/intro_portal_overview.png" alt="JRFK Web Tools: Unified Station Dashboard" >
         </div>
     </div>
     <div class="master-footer">
-        <div class="footer-left">ANTENNA & ATU MATRIX: 4-WAY SELECTION & B26-ATU SWITCHED COMPONENT TUNING BODE PLOT</div>
+        <div class="footer-left">STATION DASHBOARD ON PORT 8088: HEALTH GUARD, ANTENNA MATRIX, SD BACKUP, LOGS & DOCS</div>
         <div class="footer-right">JRFK 64-BIT MODERNIZATION SUITE • K7BIT</div>
     </div>
+    
 </body>
 </html>

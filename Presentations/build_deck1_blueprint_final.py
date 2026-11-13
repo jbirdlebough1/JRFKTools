@@ -75,7 +75,7 @@ TEMPLATE_FULLSCREEN = """<!DOCTYPE html>
     }
     .badge-callsign {
         background: #0284c7;
-        padding: 3px 10px;
+        padding: 3px 8px;
         border-radius: 4px;
         border: 1px solid #93c5fd;
     }
@@ -108,6 +108,7 @@ TEMPLATE_FULLSCREEN = """<!DOCTYPE html>
         align-items: center;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
         overflow: hidden;
+        position: relative;
     }
     .graphic-frame-full img {
         width: 100%;
@@ -147,52 +148,90 @@ TEMPLATE_FULLSCREEN = """<!DOCTYPE html>
     </div>
     <div class="master-body-fullscreen">
         <div class="graphic-frame-full">
-            <img src="{{IMAGE_SRC}}" alt="{{TITLE}}">
+            <img id="mainSlideImg" src="{{IMAGE_SRC}}" alt="{{TITLE}}" {{IMG_EXTRA_STYLE}}>
         </div>
     </div>
     <div class="master-footer">
         <div class="footer-left">{{CAPTION}}</div>
         <div class="footer-right">JRFK 64-BIT MODERNIZATION SUITE • K7BIT</div>
     </div>
+    {{EXTRA_SCRIPT}}
 </body>
 </html>
 """
 
-# 13 TECHNICAL SLIDES
-# Focus: Operations, Engineering, Disaster Recovery
-# Cookbook de-emphasized to brief reference
-# Last slide: Resources & Contact Info
+# EXACT 13 TECHNICAL SLIDES (NO BULLETS, FULL SCREEN WALKTHROUGH)
+# Block 1: Architecture & Obsolescence (Slides 1-4)
+# Block 2: Migration Starts (Slides 5-7, with Option A GOLD on Slide 5)
+# Block 3: On-Amplifier Web Tools (Slides 8-12)
+# Block 4: Resources & Support (Slide 13)
 SLIDES = [
     # -------------------------------------------------------------
     # SLIDE 1: INTRO (PC MIGRATION OVERVIEW & JRFK.EXE WINDOW)
     # -------------------------------------------------------------
     {
-        "part": "PART 1: PC MIGRATOR",
-        "category": "SUITE OVERVIEW • WINDOWS PC APP",
-        "title": "JRFK 64-Bit Appliance Builder & Migrator",
-        "subtitle": "Standalone PC utility to create a 64-bit Raspberry Pi OS card with RFK & Web Tools",
+        "part": "PART 1: SYSTEM ARCHITECTURE",
+        "category": "MODERNIZATION OVERVIEW • 64-BIT TRANSITION",
+        "title": "Modernizing the RF-KIT Linear Amplifier",
+        "subtitle": "The 64-Bit Leap: Standalone PC Migrator & On-Amplifier Web Tools Suite",
         "image": "slide_jrfk_exe_window.png",
-        "caption": "JRFK.EXE RUNNING ON PC: ELEVATED WINDOWS UTILITY WITH LOCALHOST WEB ENGINE & DRIVE GUARD",
-        "narration": "Thirty-two-bit Raspberry Pi O S is obsolete, leaving R F kit amplifier owners at risk from unmaintained kernels and S D card failures. On screen is the J R F K dot E X E migration tool running on your Windows P C. It launches as a standalone elevated executable that manages Drive Guard protection and local web services. Its purpose is to prepare a complete sixty-four-bit Raspberry Pi operating system containing all original R F kit calibrations, user data, and the J R F K Web Tools suite for your amplifier. Over the next four slides, we look at the P C migration process, and then we will explore each of the on-amplifier web tools."
+        "caption": "JRFK MODERNIZATION SUITE: STANDALONE PC MIGRATOR WITH DRIVE GUARD & ON-AMPLIFIER WEB TOOLS",
+        "narration": "Thirty-two-bit Raspberry Pi O S is obsolete, leaving R F kit amplifier owners at risk from unmaintained kernels and S D card failures. On screen is the J R F K dot E X E modernization suite running on your Windows P C. It launches as a standalone elevated executable that manages Drive Guard protection and local web services. Over the first four slides, we look at the software obsolescence and why this upgrade is essential, and then beginning on slide five, we dive into the P C migration process, followed by the on-amplifier web tools."
     },
     # -------------------------------------------------------------
-    # SLIDE 2: MIGRATOR OPTION A (GOLD TO PROD)
+    # SLIDE 2: WHY 32-BIT MUST GO (VULNERABILITIES & RISKS)
     # -------------------------------------------------------------
     {
-        "part": "PART 1: PC MIGRATOR",
-        "category": "BUILD OPTION A • GOLDEN MASTER MIGRATION",
+        "part": "PART 1: SYSTEM ARCHITECTURE",
+        "category": "ARCHITECTURAL OBSOLESCENCE • 32-BIT LEGACY RISKS",
+        "title": "Why Legacy 32-Bit Raspberry Pi OS Must Go",
+        "subtitle": "End-of-life kernel maintenance, flash storage vulnerabilities, and amplifier protection risks",
+        "image": "slide_02_32bit_risks.png",
+        "caption": "LEGACY VULNERABILITIES: FROZEN SECURITY REPOSITORIES, UNBUFFERED MEDIA CORRUPTION & SOCKET DRIFT",
+        "narration": "Examining why the legacy thirty-two-bit operating system must be retired. Upstream Debian and Raspberry Pi O S have completely deprecated thirty-two-bit builds, freezing security fixes and controller patches. Furthermore, unbuffered S D card operations leave your station vulnerable to permanent file corruption during dirty shutdowns or power drops. Socket starvation on the controller interface introduces latency, and the legacy stack cannot run modern concurrent telemetry daemons."
+    },
+    # -------------------------------------------------------------
+    # SLIDE 3: 64-BIT MODERNIZATION ARCHITECTURE & BENEFITS
+    # -------------------------------------------------------------
+    {
+        "part": "PART 1: SYSTEM ARCHITECTURE",
+        "category": "MODERNIZATION ARCHITECTURE • 64-BIT TECHNICAL PAYOFF",
+        "title": "64-Bit Modernization Architecture & Benefits",
+        "subtitle": "Pure aarch64 Debian 13 Trixie kernel, Full KMS direct rendering, and dual-service pipeline",
+        "image": "slide_03_64bit_arch.png",
+        "caption": "64-BIT ADVANTAGES: DEBIAN 13 TRIXIE KERNEL 6.12, FULL KMS DISPLAY, AND CONCURRENT WEB DAEMON",
+        "narration": "Now looking at the sixty-four-bit architecture payoff. By moving to pure sixty-four-bit Debian thirteen Trixie on kernel six point twelve, your amplifier gains modern sixty-four-bit memory addressing and long-term security maintenance. Hardware-accelerated Full K M S direct rendering eliminates touch latency and coordinate drift on the front panel L C D. At the same time, high-priority SimpleRPC communications run on dev rfk controller with zero socket warnings, enabling concurrent web daemons."
+    },
+    # -------------------------------------------------------------
+    # SLIDE 4: SYSTEM DIAGNOSTICS & CALIBRATION MATRIX (SCROLLING)
+    # -------------------------------------------------------------
+    {
+        "part": "PART 1: SYSTEM ARCHITECTURE",
+        "category": "SYSTEM DIAGNOSTICS • COMPLETE CALIBRATION ARCHIVE",
+        "title": "System Diagnostics: Calibration Archive & ATU Matrix",
+        "subtitle": "Full ext4 audit: forward/reflected power nulls, 1500W scaling factor, and 11-band ATU presets",
+        "image": "report_full_scroll.png",
+        "caption": "SYSTEM CALIBRATION REPORT: SCROLLING FROM STATION PROFILE DOWN THROUGH FULL 11-BAND ATU MATRIX",
+        "narration": "Examining the complete station system report and calibration archive. Starting across the top row, the report verifies your station callsign K7BIT, pure sixty-four-bit Debian Trixie operating system, and CAT decoding to the ICOM IC seventy-six ten, alongside root partition health and wear leveling. Scrolling down to the middle row, the RF detector calibration tables confirm factory forward and reflected null voltages, power scaling factor calibrated for fifteen hundred Watts, P, E, P, and the fifty-ohm bridge null, while network and display settings verify your station IP and pure KMS ten twenty-four by six hundred timing. Scrolling down to the end of the report, the ATU matrix maps all eleven amateur bands from one sixty through six meters, detailing assigned antenna ports, segment counts, and the exact discrete physical inductance in nanohenries and capacitance in picofarads engaged by the switched relays."
+    },
+    # -------------------------------------------------------------
+    # SLIDE 5: MIGRATION STARTS - OPTION A (GOLD TO PROD)
+    # -------------------------------------------------------------
+    {
+        "part": "PART 2: PC MIGRATOR",
+        "category": "MIGRATION OPTION A • GOLDEN MASTER EXTRACTION",
         "title": "Migrator Option A: Gold to Production",
         "subtitle": "Extracts 100% of calibration.json, ADC offsets & Wi-Fi from your existing working card",
         "image": "migrator_optA_gold_to_prod.png",
         "caption": "OPTION A: EXTRACTS 100% OF CALIBRATIONS FROM WORKING AMPLIFIER CARD, THEN WRITES 64-BIT OS",
-        "narration": "Examining the primary migration path, Option A: Gold to Production. Look at the upper selector tile on screen. In this mode, you take your existing working S D card from the amplifier and plug it into a U S B reader on your P C. The tool reads your card in read-only safety mode, extracting one hundred percent of your calibration files, directional coupler offsets, and station settings. Once extracted, you remove your original card and insert a new card, which the tool flashes with the complete sixty-four-bit Debian Trixie system."
+        "narration": "Slide five marks the start of the migration process. Examining the primary migration path, Option A: Gold to Production. Look at the upper selector tile on screen. In this mode, you take your existing working S D card from the amplifier and plug it into a U S B reader on your P C. The tool reads your card in read-only safety mode, extracting one hundred percent of your calibration files, directional coupler offsets, and station settings. Once extracted, you remove your original card and insert a new card, which the tool flashes with the complete sixty-four-bit Debian Trixie system."
     },
     # -------------------------------------------------------------
-    # SLIDE 3: MIGRATOR OPTION B (NEW TO PROD / CLEAN INSTALL)
+    # SLIDE 6: MIGRATOR OPTION B (CLEAN PRODUCTION INSTALL)
     # -------------------------------------------------------------
     {
-        "part": "PART 1: PC MIGRATOR",
-        "category": "BUILD OPTION B • CLEAN PRODUCTION INSTALL",
+        "part": "PART 2: PC MIGRATOR",
+        "category": "MIGRATION OPTION B • CLEAN PRODUCTION INSTALL",
         "title": "Migrator Option B: Clean Install to Production",
         "subtitle": "Builds a fresh 64-bit card with user credentials, station Wi-Fi, and default profiles",
         "image": "migrator_optB_new_to_prod.png",
@@ -200,46 +239,34 @@ SLIDES = [
         "narration": "Now look at Option B on screen: Clean Install to Production. This option is used when you are starting fresh with a brand new card or building a spare backup without reading an original card first. On this screen, you directly configure your Raspberry Pi username, system password, hostname, and station Wi-Fi credentials. The tool formats the new target card, installs sixty-four-bit Debian Trixie, and provisions the native R F kit controller alongside the J R F K Web Tools suite."
     },
     # -------------------------------------------------------------
-    # SLIDE 4: MIGRATOR CALIBRATION EXTRACTION DETAILS
+    # SLIDE 7: TWO-BOOT PRODUCTION VERIFICATION PROCESS
     # -------------------------------------------------------------
     {
-        "part": "PART 1: PC MIGRATOR",
-        "category": "CALIBRATION RECOVERY • ADC OFFSET PRESERVATION",
-        "title": "PC Migrator: Directional Coupler & ADC Calibration",
-        "subtitle": "Raw ext4 inspection of factory forward/reflected power tables and relay timing",
-        "image": "report_calibrations.png",
-        "caption": "CALIBRATION ARCHIVE: ADC POWER MATRICES, ATTENUATOR STEPS, AND RELAY TIMING CONSTANTS",
-        "narration": "This screen shows the exact calibration data recovered by the P C migrator from your original card. Listed here are the factory directional coupler forward and reflected power A D C lookup tables, attenuator step values, and P T T relay timings. The migrator transfers these exact matrices into the new sixty-four-bit operating system, ensuring that your amplifier retains its factory RF metering precision."
+        "part": "PART 2: PC MIGRATOR",
+        "category": "DEPLOYMENT PIPELINE • AMPLIFIER INITIALIZATION",
+        "title": "Two-Boot Production Verification Process",
+        "subtitle": "Automated partition expansion on Boot 1 followed by production launch on Boot 2",
+        "image": "slide_two_boot_process.png",
+        "caption": "TWO-BOOT VERIFICATION: FIRST INITIALIZATION EXPANDS PARTITIONS; SECOND BOOT ENTERS PRODUCTION",
+        "narration": "Once flashing finishes on your P C, you insert the new card into your amplifier's Raspberry Pi four or five. Look at the two-boot verification process on screen. On Boot One, automated scripts detect the hardware, expand the Linux root partition to fill the full media capacity, apply the native full KMS display timings for the front panel, and execute an automated soft reboot in under twenty seconds. On Boot Two, the amplifier performs a fast cold start in under twelve seconds, opens the SimpleRPC controller link on dev rfk controller, reconnects to your station Wi-Fi, and brings all JRFK Web Tools live on port eighty eighty-eight."
     },
     # -------------------------------------------------------------
-    # SLIDE 5: AMPLIFIER TWO-BOOT DEPLOYMENT
+    # SLIDE 8: WEB TOOLS INTRO: UNIFIED STATION DASHBOARD
     # -------------------------------------------------------------
     {
-        "part": "PART 1: PC MIGRATOR",
-        "category": "DEPLOYMENT COMPLETE • AMPLIFIER INITIALIZATION",
-        "title": "Amplifier Deployment: Two-Boot Production Verification",
-        "subtitle": "Boot 1: Automated partition expansion • Boot 2: Production service on Debian Trixie",
-        "image": "tool4_report_hardware.png",
-        "caption": "SYSTEM VERIFICATION: 64-BIT DEBIAN TRIXIE KERNEL 6.12 ACTIVE ON AMPLIFIER RASPBERRY PI",
-        "narration": "Once flashing finishes on your P C, you insert the new card into your amplifier's Raspberry Pi four or five. On the first boot, automated scripts expand the Linux root partition to fill the full card and configure controller devices. On the second boot, your amplifier enters full production service running pure sixty-four-bit Debian Trixie with the native front panel app and all Web Tools active."
-    },
-    # -------------------------------------------------------------
-    # SLIDE 6: WEB TOOLS INTRO: PORTAL OVERVIEW
-    # -------------------------------------------------------------
-    {
-        "part": "PART 2: ON-AMPLIFIER WEB TOOLS",
+        "part": "PART 3: ON-AMPLIFIER WEB TOOLS",
         "category": "SUITE PORTAL • BROWSER-BASED MANAGEMENT",
         "title": "JRFK Web Tools: Unified Station Dashboard",
         "subtitle": "Concurrent remote management served directly by the amplifier on port 8088",
         "image": "intro_portal_overview.png",
-        "caption": "BLUEPRINT PORTAL ON PORT 8088: ACCESS HEALTH, ANTENNA MATRIX, BACKUPS, LOGS & DOCS",
-        "narration": "Now we move to the J R F K Web Tools running live on the amplifier. On screen is the master blueprint portal accessed via any browser on port eighty eighty-eight. It runs simultaneously alongside the native R F kit application using shared memory, giving you direct access to the Health Guard, Antenna Matrix, S D Backup Manager, System Diagnostics, Event Logs, and live Screen Streamer."
+        "caption": "STATION DASHBOARD ON PORT 8088: HEALTH GUARD, ANTENNA MATRIX, SD BACKUP, LOGS & DOCS",
+        "narration": "Now we move to the J R F K Web Tools running live on the amplifier. On screen is the master station dashboard accessed via any browser on port eighty eighty-eight. It runs simultaneously alongside the native R F kit application using shared memory, giving you direct access to the Health Guard, Antenna Matrix, S D Backup Manager, System Diagnostics, Event Logs, and live Screen Streamer."
     },
     # -------------------------------------------------------------
-    # SLIDE 7: WEB TOOL 1 - HEALTH RF METERS & THERMALS
+    # SLIDE 9: WEB TOOL 1 - HEALTH RF METERS & THERMALS
     # -------------------------------------------------------------
     {
-        "part": "PART 2: ON-AMPLIFIER WEB TOOLS",
+        "part": "PART 3: ON-AMPLIFIER WEB TOOLS",
         "category": "TOOL 1: HEALTH MONITOR • LIVE RF & THERMAL STATUS",
         "title": "Health Guard: Real-Time RF Telemetry & Safety Ceiling",
         "subtitle": "Forward power up to 1500 Watts P, E, P, reflected power, and 60°C thermal protection",
@@ -248,10 +275,10 @@ SLIDES = [
         "narration": "Examining the Health and Thermal Guard on screen. At the top of the page, the thermal safety banner supervises the P A heatsink temperature against the sixty degree ceiling, unkeying the amplifier into standby if cooling limits are reached. Down below, the instruments display instantaneous forward power up to fifteen hundred Watts, P, E, P, reflected power in Watts, and the fifty-three point five volt D C power supply rail status."
     },
     # -------------------------------------------------------------
-    # SLIDE 8: WEB TOOL 2 - ANTENNA MATRIX & TUNER BODE PLOT
+    # SLIDE 10: WEB TOOL 2 - ANTENNA MATRIX & TUNER BODE PLOT
     # -------------------------------------------------------------
     {
-        "part": "PART 2: ON-AMPLIFIER WEB TOOLS",
+        "part": "PART 3: ON-AMPLIFIER WEB TOOLS",
         "category": "TOOL 2: ANTENNA MATRIX & ATU • RELAY SWITCHED MATCHING",
         "title": "Antenna Matrix & ATU: Auto Segment Tuning",
         "subtitle": "4-way band routing and B26-ATU switched relay/PIN diode matching network",
@@ -260,10 +287,10 @@ SLIDES = [
         "narration": "Looking at the Antenna Mapper and Tuner Matrix screen. At the top are the four antenna ports covering one sixty through six meters, which switch automatically via C A T control. Below is the B twenty-six A T U matching network. The R F kit tuner uses relay and P I N diode switching to engage discrete physical inductors and capacitors for each frequency segment. The Bode plot displays S W R across the band and lists the exact physical inductance in nanohenries and capacitance in picofarads selected for that segment."
     },
     # -------------------------------------------------------------
-    # SLIDE 9: WEB TOOL 3 - SD BACKUP & DISASTER RECOVERY
+    # SLIDE 11: WEB TOOL 3 - SD BACKUP & DISASTER RECOVERY
     # -------------------------------------------------------------
     {
-        "part": "PART 2: ON-AMPLIFIER WEB TOOLS",
+        "part": "PART 3: ON-AMPLIFIER WEB TOOLS",
         "category": "TOOL 3: SD BACKUP • DUAL-SD RECOVERY PIPELINE",
         "title": "SD Backup Manager: Automated Cloning & Recovery",
         "subtitle": "Three-minute background clone to secondary USB storage while operating",
@@ -272,46 +299,22 @@ SLIDES = [
         "narration": "Examining the S D Backup and Disaster Recovery tool on screen. The top status panel verifies the active boot card, while the storage selector identifies connected U S B target drives. In under three minutes, this tool writes a complete, bootable clone of your operating system to secondary storage in the background while you remain on the air, keeping a verified standby card ready in case of media failure."
     },
     # -------------------------------------------------------------
-    # SLIDE 10: WEB TOOL 4 - SYSTEM REPORT & ENGINEERING ARCHIVE
+    # SLIDE 12: WEB TOOL 4 & 5 - DIAGNOSTIC LOGS & REMOTE SCREEN
     # -------------------------------------------------------------
     {
-        "part": "PART 2: ON-AMPLIFIER WEB TOOLS",
-        "category": "TOOL 4: SYSTEM REPORT • ARCHIVE & HARDWARE",
-        "title": "System Report: Complete Calibration Archive",
-        "subtitle": "Firmware profile, storage utilization, and downloadable calibration archive",
-        "image": "slide_report_main.png",
-        "caption": "SYSTEM REPORT: HARDWARE PROFILE, STORAGE UTILIZATION, AND CALIBRATION DATA EXPORT",
-        "narration": "On screen is the Complete System Report and Calibration Archive. The upper cards display station identity, operating system version, and storage utilization across the root and U S B partitions. Below, full hardware calibration tables can be reviewed on screen and downloaded as a single compressed archive for off-site backup."
-    },
-    # -------------------------------------------------------------
-    # SLIDE 11: WEB TOOL 5 - DIAGNOSTIC LOG VIEWER
-    # -------------------------------------------------------------
-    {
-        "part": "PART 2: ON-AMPLIFIER WEB TOOLS",
-        "category": "TOOL 5: DIAGNOSTIC LOGS • CENTRAL EVENT TERMINAL",
-        "title": "Diagnostic Logs: Centralized Event Terminal",
-        "subtitle": "Live telemetry logs, GUI events, backup progress, and first-boot migration history",
+        "part": "PART 3: ON-AMPLIFIER WEB TOOLS",
+        "category": "TOOL 4 & 5: DIAGNOSTICS • EVENT LOGS & REMOTE SCREEN",
+        "title": "Diagnostic Logs & Remote Screen Streamer",
+        "subtitle": "Millisecond event terminal and live 1024x600 framebuffer stream of front panel LCD",
         "image": "slide_logs_main.png",
-        "caption": "DIAGNOSTIC LOGS: REAL-TIME EVENT STREAMING ACROSS SYSTEM SERVICES & CONTROLLER INTERFACES",
-        "narration": "Here is the Centralized Diagnostic Log Viewer. On screen, the dropdown allows you to inspect the core R F kit G U I log, the rolling telemetry log, S D backup records, and first-boot migration automation output. System D daemon events and amplifier trip alerts are captured with exact millisecond timestamps for instant diagnosis."
-    },
-    # -------------------------------------------------------------
-    # SLIDE 12: WEB TOOL 6 - REMOTE SCREEN VIEWER & REFERENCE
-    # -------------------------------------------------------------
-    {
-        "part": "PART 2: ON-AMPLIFIER WEB TOOLS",
-        "category": "TOOL 6: REMOTE SCREEN • LIVE CONSOLE MIRROR",
-        "title": "Remote Screen Viewer: Live 1024x600 Display",
-        "subtitle": "Real-time HTTP video mirror of the physical front panel LCD touch screen",
-        "image": "slide_screen_main.png",
-        "caption": "REMOTE SCREEN: DIRECT FRAMEBUFFER STREAM OF THE 7-INCH FRONT PANEL LCD DISPLAY",
-        "narration": "On screen is the Remote Screen Viewer. This web tool grabs the physical X eleven framebuffer of the amplifier's seven-inch front panel display and mirrors it live over H T T P at ten twenty-four by six hundred resolution. You see the physical front panel display update in real time from any browser on your network. Technical documentation and schematics are also stored locally on the Pi for offline reference."
+        "caption": "CENTRAL LOG TERMINAL & REMOTE CONSOLE: MONITORS CONTROLLER EVENTS & REPLICATES 7-INCH LCD",
+        "narration": "Here is the Centralized Diagnostic Log Viewer and Remote Screen Streamer. On screen, the dropdown allows you to inspect the core R F kit G U I log, the rolling telemetry log, S D backup records, and first-boot migration history with millisecond timestamps. Alongside the logs, the remote screen tool grabs the amplifier's front panel display and streams it live over H T T P at ten twenty-four by six hundred resolution, while engineering schematics are stored locally for instant reference."
     },
     # -------------------------------------------------------------
     # SLIDE 13: RESOURCES & SUPPORT
     # -------------------------------------------------------------
     {
-        "part": "PART 3: RESOURCES & SUPPORT",
+        "part": "PART 4: RESOURCES & SUPPORT",
         "category": "OPEN SOURCE & COMMUNITY • GETTING STARTED",
         "title": "Resources, Community Support & Project Links",
         "subtitle": "GitHub repository, releases, community group, and station contact info",
@@ -328,7 +331,7 @@ async def generate_slides_and_audio():
     for idx, s in enumerate(SLIDES):
         s["id"] = idx + 1
 
-    # 1. Generate HTML slides (Zero bullets, full-bleed screen)
+    # 1. Generate HTML slides
     for s in SLIDES:
         slide_id = s["id"]
         slide_num_str = f"{slide_id:02d}"
@@ -342,6 +345,32 @@ async def generate_slides_and_audio():
         html_content = html_content.replace("{{TOTAL_SLIDES}}", str(total_slides))
         html_content = html_content.replace("{{IMAGE_SRC}}", img_rel_path)
         html_content = html_content.replace("{{CAPTION}}", s["caption"])
+        
+        # Slide 4 has custom vertical scroll support
+        if slide_id == 4:
+            html_content = html_content.replace("{{IMG_EXTRA_STYLE}}", 'style="width: 100%; height: auto; position: absolute; top: 0; left: 0; object-fit: fill; transition: transform 0.1s linear;"')
+            extra_script = """<script>
+            window.addEventListener('message', (e) => {
+                if (e.data && e.data.type === 'scroll') {
+                    const norm = e.data.norm;
+                    const maxScroll = 380;
+                    let scrollY = 0;
+                    if (norm <= 0.18) {
+                        scrollY = 0;
+                    } else if (norm >= 0.88) {
+                        scrollY = maxScroll;
+                    } else {
+                        scrollY = ((norm - 0.18) / (0.88 - 0.18)) * maxScroll;
+                    }
+                    const img = document.getElementById('mainSlideImg');
+                    if (img) img.style.transform = `translateY(-${scrollY}px)`;
+                }
+            });
+            </script>"""
+            html_content = html_content.replace("{{EXTRA_SCRIPT}}", extra_script)
+        else:
+            html_content = html_content.replace("{{IMG_EXTRA_STYLE}}", '')
+            html_content = html_content.replace("{{EXTRA_SCRIPT}}", '')
             
         html_path = os.path.join(DECK_DIR, f"slide_{slide_num_str}.html")
         with open(html_path, "w", encoding="utf-8") as f:
@@ -420,6 +449,7 @@ async def generate_slides_and_audio():
             "num": s_num,
             "title": e["title"],
             "img": f"slide_{s_num}.png",
+            "html": f"slide_{s_num}.html",
             "audio": f"slide_{s_num}.mp3",
             "duration": e["duration_sec"],
             "narration": e["narration"]
@@ -448,7 +478,7 @@ async def generate_slides_and_audio():
     }}
     .player-header {{
         height: 44px;
-        background: #0f2d4f;
+        background: #0c2340;
         border-bottom: 2px solid #38bdf8;
         display: flex;
         align-items: center;
@@ -456,24 +486,32 @@ async def generate_slides_and_audio():
         padding: 0 16px;
         flex-shrink: 0;
     }}
-    .player-title {{ font-size: 15px; font-weight: 800; color: #38bdf8; display: flex; align-items: center; gap: 8px; }}
+    .player-title {{
+        font-weight: 800;
+        font-size: 14px;
+        color: #e0f2fe;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }}
     .player-callsign {{
         background: #0284c7;
         color: white;
-        padding: 2px 10px;
+        padding: 2px 8px;
         border-radius: 4px;
         font-family: monospace;
-        font-weight: bold;
         font-size: 12px;
+        font-weight: bold;
     }}
     .player-main {{
         flex: 1 1 auto;
         min-height: 0;
+        width: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 4px 8px;
-        background: #061524;
+        background: #000000;
+        padding: 4px;
         overflow: hidden;
     }}
     .slide-viewport {{
@@ -482,21 +520,23 @@ async def generate_slides_and_audio():
         display: flex;
         justify-content: center;
         align-items: center;
-        overflow: hidden;
+        position: relative;
     }}
     .slide-img {{
-        max-width: 100%;
-        max-height: 100%;
-        width: auto;
-        height: auto;
+        width: 100%;
+        height: 100%;
         object-fit: contain;
-        border-radius: 4px;
-        box-shadow: 0 6px 25px rgba(0,0,0,0.8);
-        border: 2px solid #1e3a5f;
+        display: block;
+    }}
+    .slide-iframe {{
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: none;
     }}
     .player-footer {{
-        height: 64px;
-        background: #0f2d4f;
+        height: 60px;
+        background: #0c2340;
         border-top: 2px solid #38bdf8;
         display: flex;
         flex-direction: column;
@@ -575,6 +615,7 @@ async def generate_slides_and_audio():
     <div class="player-main">
         <div class="slide-viewport">
             <img id="currentSlideImg" class="slide-img" src="slide_01.png" alt="Current Slide">
+            <iframe id="slideIframe" class="slide-iframe" src="about:blank"></iframe>
         </div>
     </div>
 
@@ -601,6 +642,7 @@ async def generate_slides_and_audio():
 
         const audio = document.getElementById('slideAudio');
         const img = document.getElementById('currentSlideImg');
+        const iframe = document.getElementById('slideIframe');
         const indicator = document.getElementById('slideIndicator');
         const narration = document.getElementById('narrationText');
         const btnPlayPause = document.getElementById('btnPlayPause');
@@ -615,7 +657,6 @@ async def generate_slides_and_audio():
             currentIndex = index;
 
             const s = slides[currentIndex];
-            img.src = s.img;
             audio.src = s.audio;
             indicator.textContent = `Slide ${{s.id}} of ${{slides.length}}: ${{s.title}}`;
             narration.textContent = s.narration;
@@ -623,6 +664,17 @@ async def generate_slides_and_audio():
 
             btnPrev.disabled = (currentIndex === 0);
             btnNext.disabled = (currentIndex === slides.length - 1);
+
+            // Slide 4 uses interactive iframe for smooth vertical scrolling
+            if (s.id === 4) {{
+                img.style.display = 'none';
+                iframe.style.display = 'block';
+                iframe.src = s.html;
+            }} else {{
+                iframe.style.display = 'none';
+                img.style.display = 'block';
+                img.src = s.img;
+            }}
 
             if (autoPlay) {{
                 audio.play().then(() => {{
@@ -651,8 +703,13 @@ async def generate_slides_and_audio():
 
         audio.addEventListener('timeupdate', () => {{
             if (audio.duration) {{
-                const pct = (audio.currentTime / audio.duration) * 100;
-                progressBar.style.width = pct + '%';
+                const norm = audio.currentTime / audio.duration;
+                progressBar.style.width = (norm * 100) + '%';
+                
+                // If on Slide 4, communicate scroll progress to iframe
+                if (slides[currentIndex].id === 4 && iframe.contentWindow) {{
+                    iframe.contentWindow.postMessage({{ type: 'scroll', norm: norm }}, '*');
+                }}
             }}
         }});
 
