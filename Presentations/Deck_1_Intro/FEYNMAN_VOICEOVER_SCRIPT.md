@@ -28,7 +28,7 @@
 **Visual:** `slide_4.png`
 
 > **Feynman Avatar (Spoken Audio):**
-> "Now, for the builders who love getting solder on their fingers: we've included John K7BIT's legendary 193-page cookbook in the portal. It's an older reference now, but it has every wire, bolt, and schematic diagram you'll ever need. Plus our complete modern 4-volume engineering manuals!"
+> "Now, for the builders who love getting solder on their fingers: we've included K7BIT's legendary 193-page cookbook in the portal. It's an older reference now, but it has every wire, bolt, and schematic diagram you'll ever need. Plus our complete modern 4-volume engineering manuals!"
 
 ---
 

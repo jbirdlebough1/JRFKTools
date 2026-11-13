@@ -92,7 +92,7 @@
 **Visual:** `slide_12.png` | **Audio:** `slide_12.mp3` | **Duration:** `27.14s`
 
 > **Technical Narration:**
-> "Tool 4 is the Master Documentation Portal. The portal hosts our complete 4-volume engineering library covering station operation, remote telemetry, and architecture. Furthermore, John K7BIT's authentic 193-page B26 cookbook is integrated directly into the portal, providing operators and builders with instant, searchable access to original schematics and wiring diagrams from any browser."
+> "Tool 4 is the Master Documentation Portal. The portal hosts our complete 4-volume engineering library covering station operation, remote telemetry, and architecture. Furthermore, K7BIT's authentic 193-page B26 cookbook is integrated directly into the portal, providing operators and builders with instant, searchable access to original schematics and wiring diagrams from any browser."
 
 ---
 
