@@ -45,7 +45,7 @@
         .cover-header {
             border-bottom: 4px solid var(--bp-blue);
             padding-bottom: 25px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         .doc-badge {
             display: inline-block;
@@ -85,12 +85,12 @@
             border-left: 4px solid var(--bp-blue);
         }
 
-        /* Quick-Access Banner (Front Matter) */
+        /* Front Matter: Quick Web Access */
         .front-matter-banner {
             background: #081d33;
             border: 2px solid var(--bp-blue);
             color: #ffffff;
-            padding: 18px 24px;
+            padding: 20px 26px;
             border-radius: 6px;
             margin: 25px 0 35px 0;
             display: flex;
@@ -102,25 +102,27 @@
         .front-matter-text h3 {
             color: var(--bp-cyan);
             margin: 0 0 6px 0;
-            font-size: 17px;
+            font-size: 18px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         .front-matter-text p {
             margin: 0;
-            font-size: 13px;
+            font-size: 13.5px;
             color: #dbeafe;
+            line-height: 1.5;
         }
         .url-pill {
             background: #1e3a8a;
             border: 1px solid var(--bp-cyan);
             color: #ffffff;
             font-family: 'Consolas', monospace;
-            font-size: 16px;
+            font-size: 17px;
             font-weight: bold;
-            padding: 8px 18px;
+            padding: 10px 20px;
             border-radius: 4px;
             white-space: nowrap;
+            box-shadow: 0 0 12px rgba(103, 232, 249, 0.3);
         }
 
         /* Section Headings */
@@ -219,6 +221,23 @@
             border-radius: 3px;
         }
 
+        /* Screen walkthrough feature box */
+        .screen-feature-box {
+            border: 1px solid #93c5fd;
+            border-radius: 6px;
+            background: #f0f7ff;
+            padding: 16px 20px;
+            margin: 15px 0 25px 0;
+        }
+        .screen-feature-box h4 {
+            margin: 0 0 8px 0;
+            color: var(--bp-blue);
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         /* Data Tables */
         table {
             width: 100%;
@@ -240,36 +259,13 @@
             background: #f8fafc;
         }
 
-        /* Screen Mockups */
-        .screen-mockup {
-            border: 2px solid #1e3a8a;
-            background: #0f2c4d;
-            color: #f8fafc;
-            border-radius: 6px;
-            overflow: hidden;
-            margin: 20px 0;
-            font-family: 'Consolas', monospace;
-        }
-        .screen-mockup-titlebar {
-            background: #1a5695;
-            padding: 8px 14px;
-            font-size: 12px;
-            display: flex;
-            justify-content: space-between;
-            color: #ffffff;
-            border-bottom: 1px solid #93c5fd;
-        }
-        .screen-mockup-body {
-            padding: 20px;
-        }
-
         /* Print formatting */
         @media print {
             body { background: #ffffff !important; }
             .manual-container { padding: 0 !important; box-shadow: none !important; width: 100% !important; max-width: 100% !important; }
             h2 { page-break-before: always; }
             h2:first-of-type { page-break-before: avoid; }
-            .step-block, .blueprint-card, .screen-mockup, table, .front-matter-banner { page-break-inside: avoid; }
+            .step-block, .blueprint-card, .screen-feature-box, table, .front-matter-banner { page-break-inside: avoid; }
         }
     </style>
 </head>
@@ -281,20 +277,21 @@
     <div class="cover-header">
         <span class="doc-badge">OFFICIAL USER &amp; OPERATOR'S MANUAL</span>
         <h1>RF-KIT Linear Amplifier: 32-Bit to 64-Bit OS Migration, Disaster Recovery &amp; Operator's Guide</h1>
-        <div class="subtitle">Turnkey Migration, Golden Master Preservation, 3-Boot Walkthrough, System Report, Log Viewer &amp; Blueprint Diagnostic Suite</div>
+        <div class="subtitle">Turnkey Migration, Golden Master Preservation, Port 8088 Blueprint Suite, 3-Boot Walkthrough, System Report &amp; Automated Patching</div>
         <div class="meta-grid">
-            <div><strong>Document ID:</strong> JRFK-UG-2026-V2.0</div>
+            <div><strong>Document ID:</strong> JRFK-UG-2026-V2.1</div>
             <div><strong>Author:</strong> John Birdlebough (K7BIT)</div>
             <div><strong>Target Platforms:</strong> RF-KIT RF2K-S / RF2K+</div>
             <div><strong>Operating System:</strong> 64-Bit Debian Trixie (aarch64)</div>
         </div>
     </div>
 
-    <!-- Front Matter: Quick Web Access -->
+    <!-- Front Matter: Quick Web Access & Port 8088 Connection -->
     <div class="front-matter-banner">
         <div class="front-matter-text">
             <h3>🌐 Shack Web Suite: Instant Browser Connection (:8088)</h3>
             <p>Access the 24/7 amplifier diagnostic console from any PC, tablet, or smartphone on your local network:</p>
+            <p style="margin-top: 5px; font-size: 12.5px; color: #93c5fd;">Enter your amplifier's IP address or mDNS hostname followed by port <code>:8088</code></p>
         </div>
         <div class="url-pill">http://&lt;amplifier-ip&gt;:8088/</div>
     </div>
@@ -302,10 +299,18 @@
     <!-- Section 1: Introduction to JRFK.exe and Dual-Architecture -->
     <h2><span class="sec-num">01</span> System Architecture &amp; Introduction to JRFK.exe</h2>
 
-    <p>The <strong>JRFK 32-to-64-Bit Migration &amp; Diagnostic Suite</strong> provides a bulletproof upgrade path for the RF-KIT RF2K-S and RF2K+ amateur radio power amplifiers. Over years of broadcast and contest operation, legacy 32-bit Raspberry Pi operating systems suffer from lack of upstream security patches, driver deprecation, and slow single-core telemetry polling. JRFK upgrades your amplifier to a high-performance, 64-bit Debian Trixie (<code>aarch64</code>) appliance while guaranteeing <strong>zero data loss</strong> and total preservation of all factory calibrations.</p>
+    <p>The <strong>JRFK 32-to-64-Bit Migration &amp; Diagnostic Suite</strong> provides a comprehensive, zero-risk upgrade path for RF-KIT RF2K-S and RF2K+ linear power amplifiers. Over years of broadcast, DX, and contest operation, legacy 32-bit Raspberry Pi operating systems suffer from lack of upstream security patches, driver deprecation, and slow single-core telemetry polling. JRFK upgrades your amplifier to a high-performance, 64-bit Debian Trixie (<code>aarch64</code>) appliance while guaranteeing <strong>zero data loss</strong> and total preservation of all factory calibrations.</p>
 
-    <h3>The Dual-Architecture Model: PC vs. Amplifier Separation</h3>
-    <p>To avoid confusion, the JRFK ecosystem is split into two completely separate, decoupled components:</p>
+    <h3>The Purpose of JRFK.exe</h3>
+    <p><code>JRFK.exe</code> is a dedicated, self-contained Windows utility engineered to safely transition your amplifier storage. It solves three critical operational challenges:</p>
+    <ul>
+        <li><strong>Golden Master Data Extraction:</strong> Safely mounts the 32-bit ext4 Linux filesystem on Windows in strict read-only mode, validating station callsign, Wi-Fi credentials, ATU relay solutions, and detector null calibration offsets before anything is altered.</li>
+        <li><strong>Turnkey 64-Bit Provisioning:</strong> Wipes and partitions target high-endurance MicroSD media, writes the verified ~6.28 GB 64-bit Debian Trixie operating system image, and injects all preserved station parameters into the exact target paths required for plug-and-play operation.</li>
+        <li><strong>System Recovery &amp; Cloning:</strong> Provides the software engine to generate redundant field spares, rebuild lost media from scratch, and create verified backups without needing complex Linux commands.</li>
+    </ul>
+
+    <h3>The Dual-Architecture Model: Strict PC vs. Amplifier Separation</h3>
+    <p>To eliminate operational confusion, the JRFK ecosystem is split into two completely separate, decoupled components that run on different hardware hosts:</p>
 
     <table>
         <thead>
@@ -320,11 +325,11 @@
             <tr>
                 <td><strong>PC Migration Utility (<code>JRFK.exe</code>)</strong></td>
                 <td>Windows PC (Host)</td>
-                <td>Port 8089 (Local)</td>
+                <td>Port 8089 (Localhost)</td>
                 <td><strong>One-time offline SD card migration.</strong> Reads 32-bit GOLD SD, verifies safety signatures, wipes and partitions target MicroSD, writes the ~6.28 GB 64-bit OS image, stages factory calibrations, Wi-Fi credentials, and sets up turnkey firstboot. Has NO runtime web sub-pages.</td>
             </tr>
             <tr>
-                <td><strong>Amplifier Appliance Suite</strong></td>
+                <td><strong>Amplifier Appliance Suite (<code>rfk_tools_suite</code>)</strong></td>
                 <td>Raspberry Pi (Inside Amp)</td>
                 <td>Port 8088 (LAN)</td>
                 <td><strong>24/7 operational station diagnostics.</strong> Natively hosts the Technical Blueprint web interface: Antenna Mapper, Health Monitor with 60°C emergency thermal trip, Remote Screen mirror, automated weekly backups, System Report, and Log Viewer.</td>
@@ -398,80 +403,159 @@
         </tbody>
     </table>
 
-    <!-- Section 3: The 7 Post-Migration Web Utilities -->
-    <h2><span class="sec-num">03</span> Post-Migration Web Diagnostics Suite (Port 8088)</h2>
+    <!-- Section 3: Setting Up and Connecting to Port 8088 -->
+    <h2><span class="sec-num">03</span> Connecting to the Port 8088 Web Suite</h2>
 
-    <p>Once your amplifier is booted into 64-bit, navigate to <code>http://&lt;amplifier-ip&gt;:8088/</code>. The top navigation bar provides instant access to seven unified tools:</p>
+    <p>The 64-bit appliance runs an embedded, asynchronous Python web server (<code>rfk_tools_suite</code>) listening on TCP port <strong>8088</strong>. This diagnostic console is completely standalone from the RF-KIT touch GUI, allowing simultaneous local touchscreen control and remote browser monitoring.</p>
 
-    <h3>1. 🗺️ Antenna Mapper &amp; Tuner Bode Plot (<code>/antenna</code>)</h3>
-    <p>Directly reads your amplifier's <code>config.json</code> and renders your active relay state across the 4 coaxial antenna ports:</p>
-    <ul>
-        <li><strong>Active 4-Port Relay Matrix:</strong> Displays four physical port cards (<code>ANT 1</code>, <code>ANT 2</code>, <code>ANT 3</code>, <code>ANT 4</code>). The currently energized relay glows green with <code>● ACTIVE RELAY</code> while the remaining three show <code>STANDBY</code>.</li>
-        <li><strong>Dynamic Band Routing:</strong> As you switch bands (e.g. 160m &rarr; 20m &rarr; 6m) either on the transceiver, via CAT, or clicking the on-screen band ribbon, the antenna port cards instantly update to reflect your amplifier's actual relay matrix.</li>
-        <li><strong>Bode Plot &amp; Physical Values:</strong> Displays the ATU SWR matching curve across all segment boundaries (marked with <strong>|</strong>). Clicking any segment displays the physical Inductance in nanohenries ($L$ in nH / $\mu$H) and Capacitance in picofarads ($C$ in pF).</li>
-    </ul>
-
-    <h3>2. 📈 Health Monitor &amp; 60°C Thermal Guard (<code>/health</code>)</h3>
-    <p>Provides mission-critical telemetry monitoring designed to protect your LDMOS transistors under heavy contest duty cycles:</p>
-    <ul>
-        <li><strong>5 Real-Time Telemetry Gauges:</strong> Heatsink Temperature (°C), Forward Output Power (W), Reflected Power &amp; SWR, 53.5V DC Rail Voltage, and Drain Current (A).</li>
-        <li><strong>3 Real-Time Canvas Charts:</strong> Historical charts tracking PA temperature trends, RF envelope power, and DC rail stability under high-current load.</li>
-        <li><strong>Multi-Tier Thermal Safety System:</strong>
-            <ul>
-                <li><code>Nominal</code> (&le; 50°C): Normal operation. Front/rear fans engage automatically above 42°C.</li>
-                <li><code>Warning</code> (&gt; 50°C): High duty-cycle warning displayed on web banner.</li>
-                <li><code>Red Alert</code> (&gt; 55°C): Approaching safety ceiling; warning logged.</li>
-                <li><code>Emergency Thermal Trip</code> (&gt; 60°C): <strong>Automatic unkey protection!</strong> The suite triggers an emergency RPC command to force the amplifier into Standby, activates a 300-second live cooldown countdown modal overlay, and locks out re-enabling until the heatsink cools below <strong>50.0°C</strong>.</li>
-            </ul>
+    <h3>Network Address Resolution</h3>
+    <p>To connect from any device in your shack (desktop PC, laptop, iPad, or Android phone):</p>
+    <ol>
+        <li><strong>By IP Address:</strong> If your router assigns the amplifier IP <code>192.168.1.150</code>, enter:
+            <div style="background:#0f2c4d; color:#67e8f9; padding:8px 14px; font-family:Consolas, monospace; border-radius:4px; margin:6px 0;">http://192.168.1.150:8088/</div>
         </li>
-    </ul>
+        <li><strong>By mDNS Hostname:</strong> The appliance broadcasts its hostname via Zeroconf/Avahi. If your station callsign is configured as <code>k7bit</code>, enter:
+            <div style="background:#0f2c4d; color:#67e8f9; padding:8px 14px; font-family:Consolas, monospace; border-radius:4px; margin:6px 0;">http://k7bit.local:8088/</div>
+        </li>
+    </ol>
 
-    <h3>3. 📺 Remote Screen Console (<code>/screen</code>)</h3>
-    <p>Streams a crisp, real-time mirror of the physical 1024x600 amplifier screen directly into your browser:</p>
-    <ul>
-        <li>Operates via the Raspberry Pi's secondary display pipeline as a virtual HDMI monitor.</li>
-        <li>Strictly <strong>READ-ONLY</strong>, preventing accidental touches or parameter changes.</li>
-        <li>Ideal for propping up an iPad, tablet, or smartphone beside your logging computer during a contest.</li>
-    </ul>
+    <div class="alert alert-info">
+        <strong>Browser Compatibility:</strong> The Port 8088 suite is fully responsive and rendered in classic Blueprint technical styling. It is tested and verified on Google Chrome, Mozilla Firefox, Apple Safari (iOS/macOS), and Microsoft Edge. No browser plugins or extensions are required.
+    </div>
 
-    <h3>4. 💾 Disaster Recovery &amp; SD Backup Manager (<code>/backup</code>)</h3>
-    <p>Manages automated and on-demand cloning of your active production storage:</p>
-    <ul>
-        <li><strong>Secondary SD Architecture:</strong> A secondary 32GB MicroSD card is placed in a small USB 2.0 reader plugged into the Raspberry Pi rear USB port (labeled <code>BACKUP-AUTO</code>).</li>
-        <li><strong>Weekly Automated Cron:</strong> Every Sunday at 04:00 GMT, the system generates a compressed binary raw disk image (<code>dd | xz</code>) saved to <code>/home/pi/backups/</code>.</li>
-        <li><strong>On-Demand Backups:</strong> Click <em>"⚡ Run Full SD Backup Now"</em> anytime before performing firmware modifications or shack rewiring.</li>
-    </ul>
+    <!-- Section 4: Detailed Walkthrough of All 7 Screens -->
+    <h2><span class="sec-num">04</span> Exhaustive Walkthrough of the 7 Blueprint Screens</h2>
 
-    <h3>5. ⚙️ Automated RPi OS Autopatching (Sunday Cron)</h3>
-    <p>Keeping an embedded Linux system secure and stable normally requires manual terminal access. JRFK automates this safely:</p>
-    <ul>
-        <li>Immediately after the weekly raw image backup completes on Sunday morning, the cron executes <code>sudo apt update &amp;&amp; sudo apt upgrade -y</code>.</li>
-        <li>Benefits: Keeps the 64-bit kernel, hardware drivers, OpenSSH, and security packages permanently updated without operator intervention.</li>
-        <li>Fail-Safe Protection: Because a complete compressed backup image was written minutes prior, you can instantly roll back if an upstream Debian package ever introduces an issue.</li>
-    </ul>
+    <p>The top navigation header provides instant, one-click access across all seven operational screens. Below is the complete operating guide for each screen:</p>
 
-    <h3>6. 📋 System Report (<code>/report</code>)</h3>
-    <p>An exhaustive, publication-grade technical report covering all hardware and software subsystems:</p>
-    <ul>
-        <li><strong>Host Hardware:</strong> CPU clock rates, SoC silicon temperature, memory allocation, and undervoltage/throttling register flags.</li>
-        <li><strong>Storage Health:</strong> Root filesystem usage, wear-leveling indicator (A2 high-endurance rating), and interface bus speed.</li>
-        <li><strong>Network &amp; CAT:</strong> IP address, MAC address, Wi-Fi RSSI signal quality, active CAT rig, and UDP port bindings.</li>
-        <li><strong>Calibrations:</strong> Detector null voltage offsets (0.042V / 0.038V) and full 64-bit validation audit.</li>
-    </ul>
+    <!-- Screen 1: Station Docs -->
+    <div class="screen-feature-box">
+        <h4>1. 📖 Station Documentation Library (<code>/docs</code>)</h4>
+        <p><strong>Purpose:</strong> Serves as the central technical reference repository for the amplifier station, hosting four complete, publication-grade manuals in both interactive HTML and downloadable PDF formats.</p>
+        <p><strong>How to Read It:</strong> The screen displays four unified document cards across the top and an embedded high-resolution reading frame below. The active document is highlighted with a green border and labeled in the reader toolbar.</p>
+        <p><strong>How to Use It:</strong></p>
+        <ul>
+            <li>Click <strong>📖 View Document</strong> on any card to load that manual directly into the embedded viewport.</li>
+            <li>Click <strong>⬇️ Download PDF</strong> to download or open the print-ready, vectorized PDF file with zero formatting defects.</li>
+            <li>Use the toolbar controls: <strong>🔄 Reload</strong> refreshes the document; <strong>🌐 Open Full Window</strong> expands the document into a dedicated browser tab; <strong>🖨️ Print Document</strong> initiates direct local printing formatted cleanly without web navigation elements.</li>
+        </ul>
+    </div>
 
-    <h3>7. 📜 Log Viewer (<code>/logs</code>)</h3>
-    <p>Centralized real-time access to four diagnostic log streams:</p>
-    <ul>
-        <li><code>telemetry_rolling.log</code>: 10MB rotating circular log tracking typ, min, and max values for temperature, power, voltage, and current.</li>
-        <li><code>rfk_backup.log</code>: Audit log of weekly scheduled backups, compression times, image sizes, and apt package upgrades.</li>
-        <li><code>rfk_gui</code>: Live stdout/stderr log from the RF-KIT touch UI, SimpleRPC serial packets, and CAN bus commands.</li>
-        <li><code>systemd journal</code>: Kernel boot messages, USB serial device attachment (<code>/dev/ttyUSB_RFK</code>), and networking events.</li>
-    </ul>
+    <!-- Screen 2: Antenna Mapper -->
+    <div class="screen-feature-box">
+        <h4>2. 🗺️ Antenna Matrix Mapper &amp; Tuner Bode Plot (<code>/antenna</code>)</h4>
+        <p><strong>Purpose:</strong> Visualizes the amplifier's 4-port coaxial antenna relay matrix, active band selection, and per-band automatic tuner (ATU) LC solutions in real time.</p>
+        <p><strong>How to Read It:</strong></p>
+        <ul>
+            <li><strong>4 Coaxial Port Cards:</strong> Displays <code>ANT 1</code>, <code>ANT 2</code>, <code>ANT 3</code>, and <code>ANT 4</code>. The physically energized RF relay glows in vivid green with <code>● ACTIVE RELAY</code>. Standby ports remain in muted blueprint blue with <code>STANDBY</code>. Custom labels configured in <code>config.json</code> (e.g., "160M INVERTED L", "STEPPIR 20-6M") appear directly on the cards.</li>
+            <li><strong>Band Ribbon:</strong> An interactive ribbon displaying all supported amateur bands (160m, 80m, 60m, 40m, 30m, 20m, 17m, 15m, 12m, 10m, 6m).</li>
+            <li><strong>Interactive Tuner Bode Plot:</strong> Graphs the calculated SWR curve across the band. Frequency segment boundaries are clearly indicated with vertical dividers (<strong>|</strong>).</li>
+        </ul>
+        <p><strong>How to Use It:</strong></p>
+        <ul>
+            <li><strong>Telemetry Auto-Tracking:</strong> As you turn the transceiver VFO or switch bands via CAT, the antenna mapper automatically tracks the frequency, updating the active antenna card and tuning curve without user interaction.</li>
+            <li><strong>Component Inspection:</strong> Click on any band or segment boundary to inspect the exact physical LC network solution: Inductance (<i>L</i> in nanohenries / nH or microhenries / µH) and Capacitance (<i>C</i> in picofarads / pF). This allows rapid verification that the internal ATU relays are latching to the correct values.</li>
+        </ul>
+    </div>
 
-    <!-- Section 4: Hardware Prerequisites -->
-    <h2><span class="sec-num">04</span> Hardware Prerequisites &amp; The 6-Card Fleet</h2>
+    <!-- Screen 3: Health Monitor -->
+    <div class="screen-feature-box">
+        <h4>3. 📈 Amplifier Health Monitor &amp; 60°C Thermal Guard (<code>/health</code>)</h4>
+        <p><strong>Purpose:</strong> Continuous, high-precision monitoring of the amplifier's electrical operating points and heatsink thermal dissipation to protect the push-pull Ampleon BLF189 / BLF189XR LDMOS transistors.</p>
+        <p><strong>How to Read It:</strong></p>
+        <ul>
+            <li><strong>5 Real-Time Telemetry Gauges:</strong>
+                <ol>
+                    <li><em>Heatsink Temperature:</em> Current PA copper heat-spreader temperature in °C.</li>
+                    <li><em>Forward Output Power:</em> Real-time RF power delivery in Watts (0 to 2000 W).</li>
+                    <li><em>Reflected Power &amp; SWR:</em> Return loss and antenna SWR ratio (1.0:1 to 5.0:1).</li>
+                    <li><em>53.5V DC Rail Voltage:</em> Heiwoo main power supply rail voltage under static and key-down conditions.</li>
+                    <li><em>Drain Current (Id):</em> Total PA drain current in Amperes (0 to 55 A).</li>
+                </ol>
+            </li>
+            <li><strong>3 Real-Time Canvas Trend Charts:</strong> Continuously graph 15-minute rolling windows of Temperature trend, RF envelope power, and DC voltage sag during transmissions.</li>
+        </ul>
+        <p><strong>Multi-Tier Thermal Safety Guard:</strong></p>
+        <ul>
+            <li><code>Nominal State</code> (&le; 50°C): Normal operation. High-efficiency chassis cooling fans engage automatically above 42°C.</li>
+            <li><code>Warning State</code> (&gt; 50°C): Visual banner warning indicating heavy contest duty cycle.</li>
+            <li><code>Red Alert State</code> (&gt; 55°C): Critical warning indicating heatsink is approaching maximum thermal dissipation limits.</li>
+            <li><code>Emergency Thermal Trip</code> (&gt; 60°C): <strong>Automatic unkey protection!</strong> The health engine immediately transmits an autonomous SimpleRPC command to switch the amplifier into Standby mode, dropping PTT. An emergency modal dialog locks the web screen, initiates a <strong>300-second live cooldown countdown</strong>, and strictly locks out re-enabling until the heatsink cools below <strong>50.0°C</strong>.</li>
+        </ul>
+    </div>
 
-    <p>Before beginning the migration, ensure you have gathered the required hardware components and verified your amplifier firmware.</p>
+    <!-- Screen 4: Remote Screen -->
+    <div class="screen-feature-box">
+        <h4>4. 📺 Remote Screen Mirror (<code>/screen</code>)</h4>
+        <p><strong>Purpose:</strong> Delivers a real-time, low-latency, pixel-accurate stream of the physical 1024x600 front-panel touchscreen display to any remote browser.</p>
+        <p><strong>How to Read It:</strong> Exactly reproduces the front-panel cross-pointer meters, bar graphs, operating frequency, and amplifier status annunciators (OPERATE / STANDBY, BAND, ANT).</p>
+        <p><strong>How to Use It:</strong></p>
+        <ul>
+            <li>Operates via the Raspberry Pi's secondary Full KMS DRM display pipeline, capturing frames directly from the frame buffer without loading the CPU.</li>
+            <li><strong>Strictly Read-Only:</strong> Touch events and mouse clicks are deliberately disabled on the remote mirror. This guarantees that an accidental brush of a tablet or smartphone in the shack cannot alter amplifier settings, trip relays, or inadvertently key the amplifier.</li>
+            <li>Prop up an iPad or phone next to your logging computer or SDR console for instantaneous, heads-up status verification.</li>
+        </ul>
+    </div>
+
+    <!-- Screen 5: SD Backup -->
+    <div class="screen-feature-box">
+        <h4>5. 💾 Disaster Recovery &amp; SD Backup Manager (<code>/backup</code>)</h4>
+        <p><strong>Purpose:</strong> Manages raw, byte-level binary cloning of the active production MicroSD storage to provide instant failover in the event of storage failure.</p>
+        <p><strong>How to Read It:</strong> Displays primary storage health, secondary backup target device (<code>/dev/sda</code>, labeled <code>BACKUP-AUTO</code> in the rear USB reader), last completed backup timestamp, compressed image size, and cron scheduling status.</p>
+        <p><strong>How to Use It:</strong></p>
+        <ul>
+            <li><strong>On-Demand Instant Cloning:</strong> Click <strong>⚡ Run Full SD Backup Now</strong> before performing any station reconfigurations, firmware updates, or Shack electrical work.</li>
+            <li><strong>Automated Weekly Cron:</strong> Runs autonomously every Sunday morning at 04:00 GMT, writing a compressed <code>dd | xz</code> raw disk image to <code>/home/pi/backups/</code>.</li>
+            <li><strong>Emergency Hot-Swap:</strong> In the event of primary MicroSD failure during a contest, remove the card from the rear USB reader, insert it directly into the Raspberry Pi internal slot, and power on. Recovery takes under 3 minutes!</li>
+        </ul>
+    </div>
+
+    <!-- Automated OS Autopatching -->
+    <div class="screen-feature-box">
+        <h4>⚙️ Automated RPi OS Autopatching (Sunday Cron Engine)</h4>
+        <p><strong>Purpose:</strong> Keeps the Debian 13 Trixie 64-bit operating system, kernel security patches, hardware drivers, and network protocols fully up to date without manual sysadmin work.</p>
+        <p><strong>How It Operates:</strong></p>
+        <ul>
+            <li>Immediately after the weekly binary raw image backup completes on Sunday at 04:00 GMT, the system executes:
+                <div style="background:#0f2c4d; color:#67e8f9; padding:8px 14px; font-family:Consolas, monospace; border-radius:4px; margin:6px 0;">sudo apt update &amp;&amp; sudo apt upgrade -y</div>
+            </li>
+            <li><strong>Bulletproof Fail-Safe:</strong> Because a verified raw disk image was created minutes prior to executing <code>apt upgrade</code>, you are permanently protected against upstream Debian regressions. If an update ever creates an anomaly, you can immediately restore the Sunday pre-upgrade image.</li>
+        </ul>
+    </div>
+
+    <!-- Screen 6: System Report -->
+    <div class="screen-feature-box">
+        <h4>6. 📋 JRFK Complete Station System Report (<code>/report</code>)</h4>
+        <p><strong>Purpose:</strong> Generates an exhaustive, publication-grade diagnostic audit of the entire host compute platform, Linux kernel, storage subsystems, and RF-KIT hardware interfaces.</p>
+        <p><strong>How to Read It:</strong> Organized into clear, high-contrast blueprint diagnostic tables:
+            <ol>
+                <li><em>Compute Subsystem:</em> CPU architecture (<code>aarch64</code>), Broadcom BCM2711/2712 core clock frequencies, load averages, memory utilization, and ARM SoC silicon junction temperature.</li>
+                <li><em>MicroSD Storage Health:</em> Root filesystem mount options, remaining storage capacity, and wear-leveling endurance telemetry for Application Performance Class 2 (A2) high-endurance media.</li>
+                <li><em>Network &amp; CAT Subsystems:</em> Assigned IPv4 address, MAC address, Wi-Fi RSSI signal quality (dBm), transceiver CAT rig interface, and UDP port 50001 listener status.</li>
+                <li><em>RF-KIT Calibrations:</em> Forward and Reflected detector null voltage offsets (0.042V / 0.038V), SimpleRPC device link status (<code>/dev/ttyUSB_RFK</code>), and 64-bit calibration audit.</li>
+            </ol>
+        </p>
+        <p><strong>How to Use It:</strong> Run this report during routine station maintenance or pre-contest equipment checks to confirm that voltage rails, thermal margins, and storage endurance are optimal.</p>
+    </div>
+
+    <!-- Screen 7: Log Viewer -->
+    <div class="screen-feature-box">
+        <h4>7. 📜 Centralized Station Log Viewer (<code>/logs</code>)</h4>
+        <p><strong>Purpose:</strong> Provides a unified, real-time filtered inspection window across four distinct station log streams without requiring SSH terminal logins.</p>
+        <p><strong>How to Read &amp; Use the 4 Log Streams:</strong></p>
+        <ul>
+            <li><code>telemetry_rolling.log</code>: 10MB rotating circular log tracking continuous min, max, and typical values for PA temperature, forward power, 53.5V DC rail stability, and drain current. Use this to audit power supply rail sag under full CW key-down.</li>
+            <li><code>rfk_backup.log</code>: Audit log of weekly scheduled disk cloning, compression duration, image checksums, and Debian apt package upgrade histories.</li>
+            <li><code>rfk_gui</code>: Live stdout/stderr log stream from the RF-KIT touch GUI process, recording touchscreen interactions, band switch events, and SimpleRPC packet acknowledgments.</li>
+            <li><code>systemd journal</code>: Kernel-level messages, USB serial device attachment (<code>/dev/ttyUSB_RFK</code>), udev symlink generation, and Wi-Fi DHCP association events.</li>
+        </ul>
+        <p>Use the built-in level filters (<strong>ALL</strong>, <strong>WARN</strong>, <strong>ERROR</strong>) and the <strong>Auto-Refresh</strong> toggle to monitor live operations or diagnose anomalous behavior.</p>
+    </div>
+
+    <!-- Section 5: Hardware Prerequisites & Fleet Strategy -->
+    <h2><span class="sec-num">05</span> Hardware Prerequisites &amp; The 6-Card Fleet</h2>
+
+    <p>Before beginning the migration, ensure your amplifier firmware meets the minimum standard and prepare your MicroSD media fleet.</p>
 
     <div class="alert alert-warning">
         <strong>FIRMWARE PREREQUISITE:</strong> Your RF-KIT amplifier must run <strong>firmware version v199, v200, or later</strong> prior to starting the migration. Internal controller parameter schemas were updated in v199 to support 64-bit SimpleRPC protocol parity.
@@ -527,8 +611,8 @@
         </tbody>
     </table>
 
-    <!-- Section 5: The Golden Rule of Safety -->
-    <h2><span class="sec-num">05</span> The Golden Rule of Safety: Creating GOLD1 &amp; GOLD2</h2>
+    <!-- Section 6: The Golden Rule of Safety -->
+    <h2><span class="sec-num">06</span> The Golden Rule of Safety: Creating GOLD1 &amp; GOLD2</h2>
 
     <p>Before writing a single byte of 64-bit software, you will clone your existing 32-bit working system into two physical Golden Masters directly on the Raspberry Pi using the desktop <strong>SD Card Copier</strong> tool (<code>piclone</code>):</p>
 
@@ -542,11 +626,11 @@
     </ol>
 
     <div class="alert alert-success">
-        <strong>ZERO RISK ACHIEVED:</strong> You now possess two independent, bootable, exact physical copies of your factory 32-bit system. Even in the worst-case scenario, re-inserting GOLD1 returns your amplifier to 100% factory operation in under 60 seconds.
+        <strong>ZERO RISK GUARANTEED:</strong> You now possess two independent, bootable, exact physical copies of your factory 32-bit system. Even in the worst-case scenario, re-inserting GOLD1 returns your amplifier to 100% factory operation in under 60 seconds.
     </div>
 
-    <!-- Section 6: Option 1 Migration -->
-    <h2><span class="sec-num">06</span> Option 1: 64-Bit OS Migration with JRFK.exe</h2>
+    <!-- Section 7: Option 1 Migration -->
+    <h2><span class="sec-num">07</span> Option 1: 64-Bit OS Migration with JRFK.exe</h2>
 
     <p>With GOLD1 created, you can now generate your production 64-bit SD card (<strong>PROD-64</strong>) using the Windows PC utility:</p>
 
@@ -570,8 +654,8 @@
         <p>Click <strong>2. Provision SD (Migrate to 64-Bit)</strong>. JRFK wipes the card, flashes the verified 64-bit Debian Trixie image (~6.28 GB), and injects all your preserved calibrations, Wi-Fi network credentials, headless SSH keys, and custom 1024x600 display modelines.</p>
     </div>
 
-    <!-- Section 7: The 3-Boot Walkthrough -->
-    <h2><span class="sec-num">07</span> The 3-Boot Walkthrough: From Automation to Production</h2>
+    <!-- Section 8: The 3-Boot Walkthrough -->
+    <h2><span class="sec-num">08</span> The 3-Boot Walkthrough: From Automation to Production</h2>
 
     <p>Insert the newly created <strong>PROD-64</strong> card into your amplifier's Raspberry Pi and power on. The amplifier will perform an automated 3-boot initialization:</p>
 
@@ -581,8 +665,8 @@
         <li><strong>Boot 3 (Production Mode):</strong> Boots directly into the fullscreen 1024x600 RF-KIT touchscreen GUI. The Linux desktop is completely hidden. All RF-KIT meters, antenna ports, and menus are live.</li>
     </ul>
 
-    <!-- Section 8: Option 2 Virgin Setup -->
-    <h2><span class="sec-num">08</span> Option 2: Virgin Fresh 64-Bit Setup (Without GOLD Card)</h2>
+    <!-- Section 9: Option 2 Virgin Setup -->
+    <h2><span class="sec-num">09</span> Option 2: Virgin Fresh 64-Bit Setup (Without GOLD Card)</h2>
 
     <p>If your original 32-bit SD card was lost or corrupted, JRFK allows building a complete, clean 64-bit OS from scratch:</p>
     <ol>
@@ -591,8 +675,8 @@
         <li>Click <strong>Build Fresh 64-Bit SD</strong>. JRFK generates a turnkey 64-bit image populated with standard K7BIT cookbook tuning profiles ready for on-air alignment.</li>
     </ol>
 
-    <!-- Section 9: Disaster Recovery Procedure -->
-    <h2><span class="sec-num">09</span> Emergency Disaster Recovery &amp; Field Hot-Swap</h2>
+    <!-- Section 10: Disaster Recovery Procedure -->
+    <h2><span class="sec-num">10</span> Emergency Disaster Recovery &amp; Field Hot-Swap</h2>
 
     <p>If your primary production SD card ever experiences hardware degradation or read errors during a contest:</p>
 
@@ -606,8 +690,8 @@
         </ol>
     </div>
 
-    <!-- Section 10: Troubleshooting -->
-    <h2><span class="sec-num">10</span> Field Troubleshooting &amp; Diagnostics</h2>
+    <!-- Section 11: Troubleshooting -->
+    <h2><span class="sec-num">11</span> Field Troubleshooting &amp; Diagnostics</h2>
 
     <table>
         <thead>
@@ -631,7 +715,7 @@
             <tr>
                 <td>Thermal Alert modal appears on web interface</td>
                 <td>PA heatsink temperature exceeded 60°C safety ceiling</td>
-                <td>Amplifier was automatically unkeyed to prevent damage. Allow the 300-second countdown to complete. Verify fan operation. Amplifier will auto-reenable when $T &lt; 50.0^\circ	ext{C}$.</td>
+                <td>Amplifier was automatically unkeyed to prevent damage. Allow the 300-second countdown to complete. Verify fan operation. Amplifier will auto-reenable when <i>T</i> &lt; 50.0°C.</td>
             </tr>
         </tbody>
     </table>

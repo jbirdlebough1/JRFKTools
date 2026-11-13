@@ -1,9 +1,9 @@
-# RFK2K+ / RFK2K-S: 32-Bit to 64-Bit Raspberry Pi OS Migration & Tools Upgrade for RPi 4 or RPi 5 Manual
+# RF-KIT Linear Amplifier: JRFK Engineering Manual (32-Bit to 64-Bit Architecture, SimpleRPC & Hardware Reference)
 
 ### *Turnkey Appliance Migration, Zero-Loss Calibration Preservation, Automated Disaster Recovery & Station Diagnostics Suite*
 
 > **Document Identification:** JRFK-EM-2026-V2.0  
-> **Classification:** Engineering Specification, Hardware Cookbook & Diagnostic Reference  
+> **Classification:** Engineering Manual, Hardware Cookbook & Diagnostic Reference  
 > **Target Hardware Platforms:** RF-KIT RF2K-S / RF2K+ (B26-RF01 PA Controller V4 / Arduino Mega 2560 R3 & Updated Proprietary Controller)  
 > **Target Compute Engines:** Raspberry Pi 4 Model B (Broadcom BCM2711) & Raspberry Pi 5 (Broadcom BCM2712)  
 > **Operating Environment:** Debian 12 Bookworm / Debian 13 Trixie (`aarch64` Pure 64-Bit Appliance)  
@@ -68,7 +68,7 @@
    * 7.4 Low Pass Filter (LPF) Board: Toroidal Band Switching & Harmonic Suppression
    * 7.5 Automatic Antenna Tuner (ATU) Board: Binary Stepped L/C Matching Network
    * 7.6 4-Port Coaxial Antenna Switch Board: Isolation & RF Relay Dynamics
-   * 7.7 DC Power Supply Subsystem: Eltek Flatpack2 53.5V Rail & CAN Bus Control
+   * 7.7 DC Power Supply Subsystem: Heiwoo 53.5V Power Supply 53.5V Rail & CAN Bus Control
    * 7.8 Thermal Management Subsystem: Front & Rear Fans, Venturi Shroud & Pinouts
    * 7.9 AC Mains Power Switch Wiring & Safety Modifications
 8. [Transceiver Interfacing, CAT Control & CI-V Protocols](#8-transceiver-interfacing-cat-control--ci-v-protocols)
@@ -709,15 +709,15 @@ To assist repair technicians and builders, the following table lists the critica
 | **ATU Relays** | Miniature High-Power Relays | Song Chuan 899-1C-C / Schrack RP410 | Contact Rating 16 A @ 250 VAC | Low contact resistance (< 30 mΩ). |
 | **Antenna Relays** | Heavy-Duty Coaxial Relays | Finder 40.52 / Song Chuan 12VDC | 16 A Continuous, > 60 dB Isolation | Sealed construction prevents atmospheric oxidation. |
 | **Relay Drivers** | 8-Channel Darlington Arrays | Texas Instruments ULN2803A | 50 V, 500 mA Collector Current | Internal inductive suppression diodes. |
-| **DC Power Supply**| High-Efficiency Switched Supply| Eltek Flatpack2 48/3000 HE | 53.5 VDC @ 55 A (3000 W) | CAN bus controlled voltage setpoint (125 kbps). |
+| **DC Power Supply**| High-Efficiency Switched Supply| Heiwoo 53.5V Switching Power Supply | 53.5 VDC @ 55 A (3000 W) | Hardware AC line switching & discrete inhibit (CAN bus not used for power supply in production units). |
 | **Non-Volatile RAM**| Ferroelectric RAM (FRAM) | Cypress / Infineon FM24CL64B-G | 64 Kbit (8 K× 8), I2C 400 kHz | 10^14 read/write cycles, 10-year data retention. |
 
-### 7.8 DC Power Supply Subsystem: Eltek Flatpack2 53.5V Rail & CAN Bus Control
+### 7.8 DC Power Supply Subsystem: Heiwoo 53.5V Power Supply 53.5V Rail & CAN Bus Control
 
-The main DC power rail is energized by an industrial-grade **Eltek Flatpack2 48V/3000W HE (High Efficiency)** or **Mean Well** switched-mode power supply:
+The main DC power rail is energized by an industrial-grade **Heiwoo 53.5V Switching Power Supply** or **Mean Well** switched-mode power supply:
 * **DC Rail Voltage:** Adjusted via CAN bus or internal pot to **53.5 VDC**.
 * **Current Delivery:** Up to 55 A continuous (3000 W capacity).
-* **CAN Bus Communication Protocol:** The Eltek Flatpack2 communicates over CAN bus at 125 kbps using identifier `0x05004804`. The controller transmits periodic keep-alive and voltage target frames:
+* **CAN Bus Communication Protocol:** The Heiwoo 53.5V Power Supply communicates over CAN bus at 125 kbps using identifier `0x05004804`. The controller transmits periodic keep-alive and voltage target frames:
   `[0x05, 0x00, 0x48, 0x04, Data: 0x14, 0xE6, 0x00, 0x00]` setting rail voltage to 53.50 VDC.
 * **AC Mains Operating Window:** Universal 100–250 VAC. Note: When operated on 120 VAC residential circuits, output power must be limited to 1000 W to prevent tripping the 15 A wall breaker. 1500 W+ operation requires a dedicated 240 VAC line.
 
@@ -1013,9 +1013,9 @@ Using a fast digital storage oscilloscope, monitor transceiver RF output during 
   - *Test:* Measure DC voltage across GPIO Pin 2 (+5V) and Pin 6 (GND). Voltage must be between 4.95 V and 5.20 V.
   - *Fix:* Replace auxiliary buck converter or re-flash SD card using official Raspberry Pi Imager.
 * **Symptom: Main 53.5V DC rail does not energize.**
-  - *Cause:* Eltek Flatpack2 AC line disconnect or remote inhibit line asserted.
+  - *Cause:* Heiwoo 53.5V Power Supply AC line disconnect or remote inhibit line asserted.
   - *Test:* Verify 240VAC across rear IEC inlet; test continuity of internal AC fuses. Check CAN bus termination resistors (120 Ω).
-  - *Fix:* Reset AC breaker; ensure Flatpack2 CAN address is set correctly in firmware.
+  - *Fix:* Reset AC breaker; ensure Heiwoo 53.5V power supply connections are secure.
 
 ### 11.2 Microcontroller Communication & Serial Link Failures
 * **Symptom: GUI displays "Controller Offline / Check Serial".**
@@ -1307,7 +1307,7 @@ The Antenna Mapper provides deep visibility into the automatic tuner (ATU) calib
 ---
 
 ### 15.3 Amplifier Health Monitor & 3-Tier Thermal Safety Guard (`/health`)
-The Health Monitor incorporates an autonomous **Thermal Guard State Machine** engineered to protect the LDMOS transistors (2× MRFE6VP11KH or equivalent) against thermal runaway:
+The Health Monitor incorporates an autonomous **Thermal Guard State Machine** engineered to protect the LDMOS transistors (2× Ampleon BLF189 / BLF189XR or equivalent) against thermal runaway:
 
 ```
 [PA Heatsink Temp]

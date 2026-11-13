@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RF-KIT Linear Amplifier: K7BIT Hardware Alignment, Potentiometer Adjustments & Calibration Cookbook</title>
+    <style>
+        :root {
+            --bp-blue: #1a5695;          /* Classic medium blueprint cyanotype blue */
+            --bp-dark: #0f3661;
+            --bp-grid: rgba(255, 255, 255, 0.18);
+            --bp-border: #93c5fd;
+            --bp-cyan: #67e8f9;
+            --data-green: #16a34a;
+            --data-yellow: #d97706;
+            --data-red: #dc2626;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --bg-light: #f8fafc;
+            --card-border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .manual-container {
+            max-width: 980px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 45px 55px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        /* Publication Cover Header */
+        .cover-header {
+            border-bottom: 4px solid var(--bp-blue);
+            padding-bottom: 25px;
+            margin-bottom: 25px;
+        }
+        .doc-badge {
+            display: inline-block;
+            background: var(--bp-blue);
+            color: #ffffff;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        h1 {
+            color: var(--bp-blue);
+            font-size: 27px;
+            line-height: 1.25;
+            margin: 0 0 10px 0;
+            font-weight: 800;
+        }
+        .subtitle {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin: 0 0 15px 0;
+            font-weight: 500;
+        }
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+            background: #f1f5f9;
+            padding: 12px 16px;
+            border-radius: 6px;
+            border-left: 4px solid var(--bp-blue);
+        }
+
+        /* Section Headings */
+        h2 {
+            color: var(--bp-blue);
+            font-size: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h2 .sec-num {
+            background: var(--bp-blue);
+            color: #ffffff;
+            font-size: 13px;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-family: 'Consolas', monospace;
+        }
+        h3 {
+            color: #1e3a8a;
+            font-size: 16px;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        /* Callouts */
+        .alert {
+            padding: 14px 18px;
+            border-radius: 6px;
+            margin: 18px 0;
+            font-size: 14px;
+            line-height: 1.5;
+            border-left: 4px solid;
+        }
+        .alert-info { background: #eff6ff; border-color: #3b82f6; color: #1e40af; }
+        .alert-warning { background: #fffbeb; border-color: #f59e0b; color: #92400e; }
+        .alert-danger { background: #fef2f2; border-color: #ef4444; color: #991b1b; }
+        .alert-success { background: #f0fdf4; border-color: #22c55e; color: #166534; }
+
+        /* Classic Medium-Blue Blueprint Card */
+        .blueprint-card {
+            background: var(--bp-blue);
+            background-image: 
+                linear-gradient(var(--bp-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px);
+            background-size: 18px 18px;
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            box-shadow: 0 4px 15px rgba(26, 86, 149, 0.25);
+        }
+        .blueprint-card .bp-title {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+            padding-bottom: 6px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Step progression blocks */
+        .step-block {
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 18px 22px;
+            margin-bottom: 18px;
+            background: #ffffff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+        .step-block h4 {
+            margin: 0 0 10px 0;
+            font-size: 15px;
+            color: var(--bp-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .step-badge {
+            background: var(--bp-blue);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+
+        /* Potentiometer Item Card */
+        .pot-card {
+            border-left: 4px solid var(--bp-blue);
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            border-right: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 14px 18px;
+            margin-bottom: 14px;
+            border-radius: 0 6px 6px 0;
+        }
+        .pot-card h4 {
+            margin: 0 0 6px 0;
+            color: var(--bp-blue);
+            font-size: 15px;
+            font-family: 'Consolas', monospace;
+        }
+        .pot-card p {
+            margin: 0;
+            font-size: 13.5px;
+            color: var(--text-dark);
+        }
+
+        /* Data Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0 25px 0;
+            font-size: 13px;
+        }
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 9px 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: var(--bp-blue);
+            font-weight: 700;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        /* Print formatting */
+        @media print {
+            body { background: #ffffff !important; }
+            .manual-container { padding: 0 !important; box-shadow: none !important; width: 100% !important; max-width: 100% !important; }
+            h2 { page-break-before: always; }
+            h2:first-of-type { page-break-before: avoid; }
+            .step-block, .blueprint-card, .pot-card, table { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="manual-container">
+
+    <!-- Title & Executive Overview -->
+    <div class="cover-header">
+        <span class="doc-badge">HARDWARE ALIGNMENT &amp; CALIBRATION COOKBOOK</span>
+        <h1>RF-KIT Linear Amplifier: K7BIT Hardware Alignment, Potentiometer Adjustments &amp; Calibration Cookbook</h1>
+        <div class="subtitle">Bench Alignment Guide, 9-Potentiometer Calibration Matrix, 17-Step Precision Procedure &amp; 10-Part Characterization Suite</div>
+        <div class="meta-grid">
+            <div><strong>Document ID:</strong> JRFK-CB-2026-V2.1</div>
+            <div><strong>Author:</strong> John Birdlebough (K7BIT)</div>
+            <div><strong>Target Platforms:</strong> RF2K-S / RF2K+ (B26 Architecture)</div>
+            <div><strong>Hardware Specs:</strong> Heiwoo 53.5V PSU | BLF189 LDMOS</div>
+        </div>
+    </div>
+
+    <div class="alert alert-danger">
+        <strong>HIGH VOLTAGE &amp; RF POWER SAFETY WARNING:</strong> This amplifier operates at lethal DC voltages (53.5 VDC @ 55 A) and delivers hazardous RF power levels (1500W+ PEP/CW). Calibration must only be performed by experienced technical personnel using insulated alignment tools, a 50Ω 2kW dummy load, and calibrated laboratory test equipment. Never touch internal components while AC power is connected.
+    </div>
+
+    <!-- Section 1: Provenance & Controller Parity -->
+    <h2><span class="sec-num">01</span> Historical Provenance &amp; Controller Architectural Parity</h2>
+
+    <p>The alignment principles, detector calibration formulas, and potentiometer adjustment procedures documented in this Cookbook originate from John Birdlebough's (K7BIT) seminal work on the <strong>RF-KIT B26-RF2K+</strong> linear amplifier. Over successive production generations, two primary microcontroller backplane variants have been deployed:</p>
+
+    <ul>
+        <li><strong>First-Generation Backplane:</strong> Based on the standard <strong>Arduino Mega 2560 R3</strong> daughtercard plugged into the motherboard.</li>
+        <li><strong>Updated Production Controller:</strong> Features an integrated proprietary surface-mount microcontroller backplane deployed in the RF2K-S and modern RF2K+ amplifiers.</li>
+    </ul>
+
+    <p>While RF-KIT has declined to release proprietary schematics for the updated controller board, rigorous bus analysis and reverse-engineering confirm that <strong>operational circuit parity is 100% maintained</strong>. The analog sensing circuitry, the 9 potentiometer calibration trimmers (R1, R2, R14, R15, R17, R19, R20, R21, SPARE), the relay drivers, and the binary SimpleRPC protocol are identical across all hardware revisions. Every calibration step in this cookbook applies universally to both controller variants.</p>
+
+    <!-- Section 2: Hardware Architecture & Test Bench Setup -->
+    <h2><span class="sec-num">02</span> Hardware Architecture &amp; Test Bench Configuration</h2>
+
+    <h3>Subsystem Architecture</h3>
+    <ul>
+        <li><strong>Main DC Power Supply:</strong> High-efficiency <strong>Heiwoo 53.5V Switching Power Supply</strong> (53.5 VDC @ ~55 A / 3000 W capacity). The power supply is managed via discrete hardware AC line switching and standby/operate inhibit control lines. <em>Note: CAN bus communication is NOT used for power supply control in production units.</em></li>
+        <li><strong>RF Power Deck:</strong> Dual <strong>Ampleon BLF189 / BLF189XR 50V LDMOS</strong> transistors configured in a high-efficiency push-pull topology on a copper heat-spreader.</li>
+        <li><strong>Low Pass Filter &amp; ATU:</strong> Toroidal low-pass filters (160m to 6m) and an integrated 8-step inductor / 8-step capacitor automatic antenna tuner (ATU).</li>
+    </ul>
+
+    <h3>Required Test Equipment</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Equipment</th>
+                <th>Specification / Model</th>
+                <th>Calibration Role</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>High-Power Dummy Load</strong></td>
+                <td>50Ω 1500W+ Continuous (Alpha 198 / Bird 8201)</td>
+                <td>RF power termination and SWR bridge nulling.</td>
+            </tr>
+            <tr>
+                <td><strong>Auxiliary Dummy Load</strong></td>
+                <td>50Ω 100W with Coaxial T-Connector</td>
+                <td>Paralleled to create a certified 25Ω load (2.0:1 SWR).</td>
+            </tr>
+            <tr>
+                <td><strong>Digital Multimeter (DMM)</strong></td>
+                <td>Fluke 87V or equivalent (10 MΩ input Z)</td>
+                <td>Precision DC rail voltage and quiescent current measurement.</td>
+            </tr>
+            <tr>
+                <td><strong>Calibrated In-Line Wattmeter</strong></td>
+                <td>LP-100A, LP-700, or Bird 43</td>
+                <td>Forward and reflected RF power reference standards.</td>
+            </tr>
+            <tr>
+                <td><strong>HF Transceiver / Exciter</strong></td>
+                <td>Clean CW carrier, adjustable 1W to 50W</td>
+                <td>RF drive signal source across 160m through 6m.</td>
+            </tr>
+            <tr>
+                <td><strong>Alignment Tool</strong></td>
+                <td>Non-inductive ceramic / plastic trimming tool</td>
+                <td>Adjustment of multi-turn trimmers without capacitive detuning.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="blueprint-card">
+        <div class="bp-title">The PA Bypass Test Harness (Safety Isolation)</div>
+        <p>To safely calibrate the low-level logic, frequency counter, and SWR detectors without risking damage to the Ampleon BLF189 LDMOS transistors:</p>
+        <ol style="margin-left: 15px; padding-left: 0;">
+            <li>Disconnect the SMA cable from the RF2K5 PA pallet RF input.</li>
+            <li>Leave PA output solder pads disconnected from the 11.5-inch PTFE coax.</li>
+            <li>Connect the transceiver drive directly through the LPF and SWR bridge via the bypass SMA link. Transceiver drive now passes safely to the wattmeter and load without energizing the PA pallet!</li>
+        </ol>
+    </div>
+
+    <!-- Section 3: The 9 Potentiometers -->
+    <h2><span class="sec-num">03</span> The 9 Potentiometer Alignment Matrix</h2>
+
+    <p>The controller backplane contains 9 precision multi-turn potentiometers that calibrate sensor scaling, protection comparators, and display readouts:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Potentiometer</th>
+                <th>Subsystem Function</th>
+                <th>Calibration Target</th>
+                <th>Adjustment Procedure</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>R1</strong></td>
+                <td>Input Overdrive Trip Comparator</td>
+                <td>28W CW RF Drive Threshold</td>
+                <td>Preset 5 turns CCW during setup; trim clockwise until fault trips at 28W.</td>
+            </tr>
+            <tr>
+                <td><strong>R2</strong></td>
+                <td>53.5V Main DC Rail Display Scale</td>
+                <td>±0.1 VDC vs Calibrated DMM</td>
+                <td>Adjust until front-panel voltage display exactly matches DMM on DC bus.</td>
+            </tr>
+            <tr>
+                <td><strong>R14</strong></td>
+                <td>Front-Panel Relative Drive Bar</td>
+                <td>Full-Scale at 50W CW Drive</td>
+                <td>Adjust drive bargraph sensitivity to reach 100% indication at 50W drive.</td>
+            </tr>
+            <tr>
+                <td><strong>R15</strong></td>
+                <td>ATU Pre-Amplifier Gain</td>
+                <td>600 ADC Units @ 10W into 25Ω</td>
+                <td>Set transceiver to 10W CW into 25Ω load; trim R15 until A1 reads 600.</td>
+            </tr>
+            <tr>
+                <td><strong>R17</strong></td>
+                <td>LPF Difference Power Trip Limit</td>
+                <td>93 ADC Units @ 50W Drive</td>
+                <td>Key 50W through bypass harness; trim R17 until A2 reads 93 ADC counts.</td>
+            </tr>
+            <tr>
+                <td><strong>R19</strong></td>
+                <td>Forward Power Display Multiplier</td>
+                <td>50W Display @ 50W CW Input</td>
+                <td>Standby mode; key 50W into calibrated wattmeter; adjust R19 to 50W.</td>
+            </tr>
+            <tr>
+                <td><strong>R20</strong></td>
+                <td>Reflected Power / SWR Calibration</td>
+                <td>2.0:1 SWR @ 25Ω Load (50W)</td>
+                <td>Attach 25Ω parallel load; key 50W; trim R20 until SWR reads exactly 2.0:1.</td>
+            </tr>
+            <tr>
+                <td><strong>R21</strong></td>
+                <td>LDMOS Idle Quiescent Current (Idq)</td>
+                <td>Exact Match to DMM in DC Rail</td>
+                <td>Key PA in standby/idle; adjust R21 until GUI current matches series DMM.</td>
+            </tr>
+            <tr>
+                <td><strong>SPARE</strong></td>
+                <td>Hardware PA Over-Current Latch</td>
+                <td>1000 ADC Units at Idle Bias</td>
+                <td>Preset 5 turns CCW; trim until ADC current trip threshold reaches 1000.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Section 4: 17-Step Precision Bench Calibration -->
+    <h2><span class="sec-num">04</span> The 17-Step Precision Bench Calibration Procedure</h2>
+
+    <p>Perform the 17 steps in exact chronological order to ensure safe and accurate alignment:</p>
+
+    <!-- Phase 1 -->
+    <h3>Phase 1: Initial Safety Presets &amp; DC Rail Alignment</h3>
+
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 1</span> Temporarily Disable Input Overdrive Trip (R1)</h4>
+        <p>Turn potentiometer <strong>R1</strong> 5 full turns counter-clockwise (CCW). This prevents premature comparator tripping during initial drive calibration.</p>
+    </div>
+
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 2</span> Temporarily Disable LPF Difference Trip (R17)</h4>
+        <p>Turn potentiometer <strong>R17</strong> 5 full turns counter-clockwise (CCW) to prevent differential trip locks while measuring low-pass filters.</p>
+    </div>
+
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 3</span> Preset SPARE Potentiometer</h4>
+        <p>Locate the <strong>SPARE</strong> potentiometer positioned below R21 and above R17. Turn 5 full turns counter-clockwise (CCW).</p>
+    </div>
+
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 4</span> Calibrate 53.5V DC Voltage Display (R2)</h4>
+        <p>Energize the amplifier on AC mains with PA bias jumpers set to Bypass. Connect your calibrated DMM across the Heiwoo DC power supply output bus studs (target: 53.5 VDC). Observe the front-panel touch display voltage. Adjust multiturn potentiometer <strong>R2</strong> until the display matches the DMM within ±0.1 VDC.</p>
+    </div>
+
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 5</span> Verify PA Pallet Bias Inhibit Jumpers</h4>
+        <p>Confirm that both 2-pin bias jumpers on the RF2K5 PA pallet are set to the <strong>REAR position (Disabled/Bypass)</strong>. This guarantees gate bias cannot be energized while initial RF switching tests are executed.</p>
+    </div>
+
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 6</span> RF Coaxial Harness Continuity &amp; Port Verification</h4>
+        <p>Connect transceiver at 14.175 MHz CW (5W drive) through the PA bypass harness into the 50Ω dummy load at ANT 1. Key transceiver and verify with in-line wattmeter that 5W passes through with &lt; 1.1:1 SWR, proving all relays and coaxial connections are sound.</p>
+    </div>
+
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 7</span> Frequency Counter Prescaler Calibration (C18 / R_FREQ)</h4>
+        <p>Navigate on the GUI to <code>Menu -&gt; Hardware -&gt; Frequency Detector</code>. Set transceiver to 28.500 MHz CW at 10W drive. Key transceiver and observe display. Adjust ceramic trimmer capacitor <strong>C18</strong> on the backplane until the counter reads exactly <strong>28,500 kHz</strong>. Test across 1.8 MHz, 7.0 MHz, 14.0 MHz, and 50.0 MHz to confirm clean counting.</p>
+    </div>
+
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 8</span> Low Pass Filter (LPF) Auto-Selection Verification</h4>
+        <p>Verify that switching bands on the transceiver instantly energizes the matching toroidal low-pass filter relay bank within 15 ms in both UNIVERSAL RF-sensing mode and CAT interface mode.</p>
+    </div>
+
+    <!-- Phase 2 -->
+    <h3>Phase 2: SWR Bridge Nulling &amp; Power Calibration</h3>
+
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 9</span> SWR Bridge Balance &amp; Reflected Detector Nulling</h4>
+        <p>Connect certified 50Ω dummy load to ANT 1. Temporarily reverse TRX and ANT 1 coaxial cables (transceiver connected to ANT 1, dummy load to TRX input). Set transceiver to 50.0 MHz CW at 20W drive. Key transceiver and adjust the ceramic coupling trimmer on the SWR Bridge board using a non-inductive plastic tool for <strong>absolute minimum voltage reading at the Reflected test pin (&lt; 5 mV DC null)</strong>. Restore cables to normal orientation.</p>
+    </div>
+
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 10</span> Calibrate Forward (R19) and Reflected (R20) Power Displays</h4>
+        <p><strong>Forward Power:</strong> Place amplifier in STANDBY. Set transceiver to 14.175 MHz CW at 50W into calibrated external wattmeter. Key transceiver; adjust potentiometer <strong>R19</strong> until the front-panel forward power bar reads exactly <strong>50W</strong>.<br/>
+        <strong>Reflected Power &amp; SWR:</strong> Attach coaxial T-connector with two 50Ω dummy loads in parallel (25Ω load = 2.0:1 SWR). Key transceiver at 50W CW; adjust potentiometer <strong>R20</strong> until the SWR display reads exactly <strong>2.0:1 SWR</strong>. Remove parallel load.</p>
+    </div>
+
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 11</span> Calibrate Antenna Tuner Pre-Amplifier Gain (R15)</h4>
+        <p>Attach the 25Ω load (2.0:1 SWR). On the GUI, navigate to <code>Menu -&gt; Debug</code> and locate analog reading <strong>A1 PowerTunerGain</strong>. Set transceiver to 10W CW at 14.175 MHz. Key transceiver and adjust potentiometer <strong>R15</strong> until the <strong>A1 reading displays exactly 600 ADC counts</strong>.</p>
+    </div>
+
+    <!-- Phase 3 -->
+    <h3>Phase 3: LDMOS Quiescent Current (Idq) Calibration</h3>
+
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 12</span> Restore PA Pallet RF Connections</h4>
+        <p>Power down the amplifier and wait 30 seconds. Disconnect the temporary PA bypass harness. Reconnect the SMA input cable to the RF2K5 pallet RF input. Solder the PA output pads to the 11.5-inch PTFE coaxial cable leading to the Relay Board.</p>
+    </div>
+
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 13</span> Connect In-Line DMM for Drain Current Measurement</h4>
+        <p>Insert your calibrated DMM (switched to 10A DC current mode) in series with the 53.5V DC positive supply lead feeding the RF2K5 PA pallet.</p>
+    </div>
+
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 14</span> Enable PA Gate Bias Jumpers &amp; Adjust Idle Current</h4>
+        <p>Move both 2-pin bias jumpers on the RF2K5 pallet to the <strong>FORWARD position (Enabled)</strong>. Power on amplifier in OPERATE mode (no RF drive applied). Key the PTT line. Adjust the gate bias trimmers on the PA pallet until the DMM reads the specified idle current for the Ampleon BLF189 / BLF189XR transistors (typically <strong>1.8A to 2.2A per device</strong>, total ~3.6A to 4.4A).</p>
+    </div>
+
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 15</span> Calibrate Quiescent Current Display (R21)</h4>
+        <p>While PTT is keyed at idle bias, observe the current readout on the front-panel touchscreen. Adjust potentiometer <strong>R21</strong> until the displayed current matches the physical DMM reading within ±0.05A.</p>
+    </div>
+
+    <!-- Phase 4 -->
+    <h3>Phase 4: Hardware Protection Comparators</h3>
+
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 16</span> Calibrate Input Overdrive Trip Threshold (R1)</h4>
+        <p>Set transceiver to 28W CW carrier at 14.175 MHz. Slowly turn potentiometer <strong>R1</strong> clockwise (CW) while keying until the amplifier hardware instantly trips on <strong>"INPUT OVERDRIVE"</strong> fault at exactly 28W drive.</p>
+    </div>
+
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 17</span> Calibrate LPF Forward Power Difference Trip (R17)</h4>
+        <p>Set transceiver to 50W CW drive. In the Debug menu, monitor analog reading <strong>A2 LPF_FWD_DIFF</strong>. Turn potentiometer <strong>R17</strong> clockwise until the reading reaches <strong>93 ADC counts</strong>.</p>
+    </div>
+
+    <!-- Section 5: 10-Part Characterization Suite -->
+    <h2><span class="sec-num">05</span> The 10-Part Comprehensive Characterization Plan</h2>
+
+    <p>Following calibration, perform this exhaustive 10-part verification suite to validate station readiness:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Test</th>
+                <th>Test Parameter</th>
+                <th>Methodology &amp; Conditions</th>
+                <th>Pass / Fail Criteria</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>T1</strong></td>
+                <td>Cold DC Isolation Audit</td>
+                <td>Measure resistance from 53.5V bus to ground (unpowered).</td>
+                <td>R &gt; 100 kΩ after filter cap charge; no shorts.</td>
+            </tr>
+            <tr>
+                <td><strong>T2</strong></td>
+                <td>Low-Voltage Rail Accuracy</td>
+                <td>DMM verification of +12V, +5V, and +3.3V backplane rails.</td>
+                <td>All rails within ±2.5% of nominal voltage.</td>
+            </tr>
+            <tr>
+                <td><strong>T3</strong></td>
+                <td>SWR Bridge Detector Null</td>
+                <td>50W CW into certified 50Ω load at 50 MHz.</td>
+                <td>Reflected detector voltage &lt; 5 mV DC.</td>
+            </tr>
+            <tr>
+                <td><strong>T4</strong></td>
+                <td>LPF Return Loss Verification</td>
+                <td>Network analyzer / transceiver SWR through all 7 filters.</td>
+                <td>Return loss &gt; 20 dB (SWR &lt; 1.2:1) across passband.</td>
+            </tr>
+            <tr>
+                <td><strong>T5</strong></td>
+                <td>Antenna Matrix Isolation</td>
+                <td>Measure RF isolation between unenergized coaxial ports.</td>
+                <td>Isolation &gt; 55 dB from 1.8 MHz to 54 MHz.</td>
+            </tr>
+            <tr>
+                <td><strong>T6</strong></td>
+                <td>ATU Component Step Audit</td>
+                <td>Verify all 8 L-steps and 8 C-steps latch relay contacts.</td>
+                <td>Inductance 0.05µH to 6.4µH; Capacitance 10pF to 2600pF.</td>
+            </tr>
+            <tr>
+                <td><strong>T7</strong></td>
+                <td>Bias Thermal Stability</td>
+                <td>Key idle bias for 10 minutes; monitor current drift.</td>
+                <td>Idq drift &lt; ±5% over 20°C to 50°C heatsink range.</td>
+            </tr>
+            <tr>
+                <td><strong>T8</strong></td>
+                <td>Harmonic Suppression</td>
+                <td>Spectrum analyzer audit of 2nd and 3rd harmonics at 1500W.</td>
+                <td>All harmonics &gt; 60 dB below fundamental carrier.</td>
+            </tr>
+            <tr>
+                <td><strong>T9</strong></td>
+                <td>Full-Power Saturation &amp; Sag</td>
+                <td>1500W CW key-down for 30s into high-power load.</td>
+                <td>53.5V rail sag &lt; 1.5 VDC; RF gain &gt; 14.5 dB.</td>
+            </tr>
+            <tr>
+                <td><strong>T10</strong></td>
+                <td>Protection State Machine Latency</td>
+                <td>Assert high SWR (&gt; 3.0:1) and measure fault trip time.</td>
+                <td>Hardware fault trip latency &lt; 15 ms; PA unkeyed.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Section 6: Inspection Checklist -->
+    <h2><span class="sec-num">06</span> Post-Calibration Bench Verification Checklist</h2>
+
+    <div class="blueprint-card">
+        <div class="bp-title">Pre-Flight Shack Verification Sign-Off</div>
+        <p>☐ All 9 potentiometers calibrated and locking nuts/trimmers verified.</p>
+        <p>☐ Heiwoo 53.5V switching power supply output verified at 53.50 VDC under load.</p>
+        <p>☐ Ampleon BLF189 / BLF189XR LDMOS quiescent bias set to exact specification.</p>
+        <p>☐ PA bypass harness removed; RF coaxial cables torqued to 8 in-lbs.</p>
+        <p>☐ Frequency counter counter-checks correctly across all bands (160m..6m).</p>
+        <p>☐ Emergency thermal safety trip verified at 60°C on Port 8088 Health Monitor.</p>
+        <p>☐ GOLD1 MicroSD card safely placed in air-gapped shack vault.</p>
+    </div>
+
+</div>
+
+</body>
+</html>
