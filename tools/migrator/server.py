@@ -280,109 +280,10 @@ def assert_writable_non_gold_sd(disk_index, drive_letter=None, require_letter=Fa
 def _dismiss_windows_format_dialogs():
     """Close Windows 11 'You need to format the disk', 'Location is not available',
     AutoPlay alerts, and unformatted partition popups automatically so Linux/RAW SD partitions never show popups."""
-    if os.name != "nt":
-        return 0
-    closed = 0
     try:
-        user32 = ctypes.windll.user32
-        enum_proc = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
-        child_proc = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
-
-        # Ensure calling thread is attached to the interactive user desktop
-        hdesk = None
-        try:
-            hwinsta = user32.OpenWindowStationW('WinSta0', False, 0x037F)
-            if hwinsta:
-                user32.SetProcessWindowStation(hwinsta)
-                hdesk = user32.OpenDesktopW('default', 0, False, 0x01FF)
-                if hdesk:
-                    user32.SetThreadDesktop(hdesk)
-        except Exception:
-            pass
-
-        def _wtext(hwnd):
-            n = user32.GetWindowTextLengthW(hwnd)
-            if n <= 0:
-                return ""
-            b = ctypes.create_unicode_buffer(n + 1)
-            user32.GetWindowTextW(hwnd, b, n + 1)
-            return b.value
-
-        def _wcls(hwnd):
-            b = ctypes.create_unicode_buffer(128)
-            user32.GetClassNameW(hwnd, b, 128)
-            return b.value
-
-        targets = []
-        button_targets = []
-
-        def _cb(hwnd, _lp):
-            if not user32.IsWindowVisible(hwnd):
-                return True
-            cls = _wcls(hwnd).lower()
-            title = _wtext(hwnd).lower()
-
-            texts = []
-
-            def _ccb(chwnd, _clp):
-                t = _wtext(chwnd)
-                if t:
-                    texts.append(t.lower())
-                    ccls = _wcls(chwnd).lower()
-                    if "button" in ccls or t.strip().lower() in ["ok", "cancel", "close", "format disk"]:
-                        button_targets.append((hwnd, chwnd))
-                return True
-
-            user32.EnumChildWindows(hwnd, child_proc(_ccb), 0)
-            joined = " ".join(texts)
-
-            is_match = False
-            if any(k in title for k in [
-                "location is not available", "not available", "microsoft windows",
-                "format ", "autoplay", "wddriveutilities", "no disk", "removable disk"
-            ]):
-                is_match = True
-            elif any(phrase in joined for phrase in [
-                "not contain a recognized file system",
-                "is not accessible",
-                "you need to format the disk",
-                "format the disk in drive",
-                "before you can use it",
-                "volume does not contain",
-                "parameter is incorrect",
-                "there is no disk in the drive",
-                "insert a disk"
-            ]):
-                is_match = True
-            elif cls in ["cabinetwclass", "explorewclass"] and (
-                "not accessible" in joined or "not recognized" in joined or "location is not available" in title
-            ):
-                is_match = True
-
-            if is_match:
-                targets.append(hwnd)
-            return True
-
-        if hdesk:
-            user32.EnumDesktopWindows(hdesk, enum_proc(_cb), 0)
-        else:
-            user32.EnumWindows(enum_proc(_cb), 0)
-
-        # Directly click OK/Cancel buttons in matched windows
-        for parent_hwnd, btn_hwnd in button_targets:
-            if parent_hwnd in targets:
-                user32.SendMessageW(btn_hwnd, 0x00F5, 0, 0) # BM_CLICK
-
-        for hwnd in targets:
-            # Post both IDOK (1) and IDCANCEL (2), followed by WM_CLOSE and WM_SYSCOMMAND SC_CLOSE
-            user32.PostMessageW(hwnd, 0x0111, 1, 0)      # IDOK (dismisses 'Location is not available' & info dialogs)
-            user32.PostMessageW(hwnd, 0x0111, 2, 0)      # IDCANCEL (dismisses 'Format disk?' prompt)
-            user32.PostMessageW(hwnd, 0x0010, 0, 0)      # WM_CLOSE
-            user32.PostMessageW(hwnd, 0x0112, 0xF060, 0) # WM_SYSCOMMAND, SC_CLOSE
-            closed += 1
+        return w11_popup_suppressor.dismiss_matching_windows()
     except Exception:
-        pass
-    return closed
+        return 0
 
 
 def _set_windows_automount(enable):
@@ -681,6 +582,7 @@ def flash_raw_image(img_path, disk_index, progress_callback=None, verified_disk=
                     pct = min(99, int((bytes_written_total / max(total_size, 1)) * 100))
                     progress_callback(pct, bytes_written_total, max(total_size, bytes_written_total), speed)
                     _dismiss_windows_format_dialogs()
+                    _suppress_non_fat_letters(disk_index)
 
         # Write deferred MBR + partition table (first 4096 bytes) now that all partitions are on disk
         if expected_head and len(expected_head) >= 512:
@@ -1804,6 +1706,10 @@ class MigratorHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({"status": "ok", "message": "Server restarting."}).encode('utf-8'))
                 def _restart():
                     time.sleep(0.5)
+                    try:
+                        subprocess.run(["taskkill", "/F", "/IM", "JRFK.exe"], capture_output=True)
+                    except Exception:
+                        pass
                     python_exe = sys.executable
                     script = os.path.join(BASE_DIR, "tools", "migrator", "server.py")
                     subprocess.Popen([python_exe, script, str(PORT)], cwd=BASE_DIR)
@@ -2122,6 +2028,10 @@ class MigratorHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({"status": "ok", "message": "Server restarting."}).encode('utf-8'))
                 def _restart():
                     time.sleep(0.5)
+                    try:
+                        subprocess.run(["taskkill", "/F", "/IM", "JRFK.exe"], capture_output=True)
+                    except Exception:
+                        pass
                     python_exe = sys.executable
                     script = os.path.join(BASE_DIR, "tools", "migrator", "server.py")
                     subprocess.Popen([python_exe, script, str(PORT)], cwd=BASE_DIR)
@@ -2151,12 +2061,7 @@ def run_server():
     append_log(f"JRFK Migrator Server starting on port {PORT}...")
 
     # Start background suppressor for Windows format and "Location is not available" dialogs
-    def _format_dialog_watcher():
-        while True:
-            _dismiss_windows_format_dialogs()
-            time.sleep(0.15)
-
-    threading.Thread(target=_format_dialog_watcher, daemon=True).start()
+    w11_popup_suppressor.start_suppressor_daemon(poll_interval=0.1)
 
     if is_admin():
         append_log("[+] Running with elevated Administrator privileges.")

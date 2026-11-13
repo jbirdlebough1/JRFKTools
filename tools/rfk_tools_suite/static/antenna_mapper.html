@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RF-KIT Antenna Mapper & Tuner SWR Characterizer (Blueprint Format)</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>RF-KIT Antenna Mapper & Tuner Matrix (Blueprint Format)</title>
     <style>
         :root {
             --bp-bg: #1a5695;          /* Classic medium blueprint cyanotype blue */
@@ -36,20 +37,22 @@
             min-height: 100vh;
         }
 
-        /* Blueprint Technical Header */
+        /* Technical Blueprint Header */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
             border: 2px solid var(--bp-line);
-            padding: 16px 20px;
+            padding: 14px 20px;
             margin-bottom: 20px;
             background: var(--bp-card-bg);
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             position: relative;
         }
         .header::after {
-            content: "DWG NO. RFK-ANT-001 | REV 2.4 | REF: SCHEMATIC B26-ATU";
+            content: "DWG NO. RFK-ANT-001 | REV 2.6 | REF: SCHEMATIC B26-ATU RELAY MATRIX";
             position: absolute;
             bottom: 3px;
             right: 15px;
@@ -57,31 +60,32 @@
             color: var(--bp-line-dim);
             letter-spacing: 1px;
         }
-
         .header h1 {
             margin: 0;
-            font-size: 22px;
+            font-size: 20px;
             letter-spacing: 1.5px;
             text-transform: uppercase;
             font-weight: 800;
         }
         .header .meta {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--bp-line-dim);
             margin-top: 4px;
         }
 
         .nav-tools {
             display: flex;
-            gap: 10px;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
         }
         .btn {
             background-color: var(--bp-bg);
             border: 1px solid var(--bp-line);
             color: var(--bp-line);
-            padding: 8px 14px;
+            padding: 7px 12px;
             font-family: inherit;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             text-decoration: none;
@@ -92,20 +96,127 @@
             text-transform: uppercase;
         }
         .btn:hover {
-            background-color: var(--bp-border-bright);
+            background-color: #2563eb;
             color: #ffffff;
             box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
         }
         .btn-active {
             background-color: #1e40af !important;
-            border-color: #60a5fa !important;
+            border-color: #ffffff !important;
+            box-shadow: 0 0 8px rgba(255,255,255,0.4);
         }
 
-        /* Band & Antenna Controller Card */
+        /* 4-Port Antenna Matrix Display */
+        .antenna-ports-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .ant-port-card {
+            background: #081d33;
+            border: 2px solid var(--bp-border);
+            padding: 14px 16px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .ant-port-card.active-port {
+            background: #0c2d54;
+            border-color: var(--data-green);
+            box-shadow: 0 0 16px rgba(34, 197, 94, 0.45);
+        }
+        .ant-port-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .ant-port-num {
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: var(--data-cyan);
+            text-transform: uppercase;
+        }
+        .ant-relay-badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 2px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border: 1px solid var(--bp-border);
+            color: var(--bp-line-dim);
+            background: rgba(0,0,0,0.3);
+        }
+        .active-port .ant-relay-badge {
+            background: var(--data-green);
+            color: #000000;
+            border-color: var(--data-green);
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+        }
+        .ant-port-name {
+            font-size: 15px;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .ant-port-bands {
+            font-size: 11px;
+            color: var(--bp-line-dim);
+            line-height: 1.4;
+        }
+
+        /* Band Selection Ribbon */
+        .band-ribbon {
+            background: var(--bp-card-bg);
+            border: 1px solid var(--bp-line);
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .band-ribbon-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--bp-line-dim);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-right: 6px;
+        }
+        .band-btn {
+            background: #081d33;
+            border: 1px solid var(--bp-border);
+            color: var(--bp-line);
+            padding: 6px 12px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .band-btn:hover {
+            background: #1e3a8a;
+            border-color: #ffffff;
+        }
+        .band-btn.active {
+            background: #2563eb;
+            border-color: #ffffff;
+            color: #ffffff;
+            font-weight: 900;
+            box-shadow: 0 0 8px rgba(37, 99, 235, 0.6);
+        }
+
+        /* Controls Card (Spinner + Active Info) */
         .controls-card {
             background: var(--bp-card-bg);
             border: 1px solid var(--bp-line);
-            padding: 15px 20px;
+            padding: 14px 20px;
             display: grid;
             grid-template-columns: auto 1fr auto;
             gap: 20px;
@@ -113,7 +224,6 @@
             margin-bottom: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-
         .band-spinner {
             display: flex;
             align-items: center;
@@ -124,8 +234,8 @@
             border: 1px solid var(--bp-line);
             color: var(--bp-line);
             font-size: 16px;
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             cursor: pointer;
             font-weight: bold;
             display: flex;
@@ -133,44 +243,43 @@
             justify-content: center;
         }
         .spinner-btn:hover {
-            background: var(--bp-border-bright);
+            background: #2563eb;
             color: #fff;
         }
         .band-display {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 900;
             color: #ffffff;
-            min-width: 90px;
+            min-width: 85px;
             text-align: center;
             border: 1px solid var(--bp-line-dim);
-            padding: 4px 12px;
+            padding: 4px 10px;
             background: #081d33;
         }
-
         .antenna-assigned-box {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             border-left: 1px solid var(--bp-border);
             padding-left: 20px;
         }
         .ant-tag {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--bp-line-dim);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         .ant-value {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             color: var(--data-cyan);
             border: 1px solid var(--data-cyan);
             padding: 4px 12px;
             background: #071e36;
+            margin-top: 3px;
         }
-
         .segment-legend {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--bp-line-dim);
             text-align: right;
             line-height: 1.5;
@@ -191,63 +300,62 @@
             border-bottom: 1px solid var(--bp-border);
             padding-bottom: 8px;
             margin-bottom: 15px;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--bp-line-dim);
         }
         canvas {
             width: 100%;
-            height: 340px;
+            height: 320px;
             display: block;
             cursor: crosshair;
         }
 
-        /* Blueprint Inspection Grid */
+        /* Inspector Card */
         .inspect-card {
             background: var(--bp-card-bg);
             border: 1px solid var(--bp-line);
-            padding: 18px 24px;
+            padding: 16px 20px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
         }
         .inspect-item {
+            background: #081d33;
             border: 1px solid var(--bp-border);
-            padding: 12px 16px;
-            background: #071a2e;
+            padding: 12px 14px;
         }
-        .inspect-item .label {
+        .lbl {
             font-size: 11px;
             color: var(--bp-line-dim);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
         }
-        .inspect-item .val {
-            font-size: 20px;
-            font-weight: bold;
+        .val {
+            font-size: 18px;
+            font-weight: 900;
             color: #ffffff;
         }
-        .inspect-item .sub {
+        .sub {
             font-size: 11px;
             color: var(--bp-line-dim);
-            margin-top: 4px;
+            margin-top: 3px;
         }
 
-        /* Full ATU Segment Calibration Table */
-        .segment-table-card {
+        /* Segment Table */
+        .table-container {
             background: var(--bp-card-bg);
             border: 1px solid var(--bp-line);
             padding: 18px 20px;
-            margin-top: 20px;
+            margin-bottom: 20px;
         }
-        .segment-table-header {
+        .table-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--bp-border);
-            padding-bottom: 8px;
             margin-bottom: 12px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             color: var(--bp-line-dim);
             text-transform: uppercase;
@@ -282,36 +390,27 @@
             font-weight: bold;
         }
 
-        /* Print Stylesheet */
+        @media (max-width: 900px) {
+            .antenna-ports-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .inspect-card {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         @media print {
-            body {
-                background: white !important;
-                color: black !important;
-                background-image: none !important;
-                padding: 10px;
-            }
-            .header, .controls-card, .chart-container, .inspect-card, .inspect-item {
-                background: white !important;
-                border-color: #000 !important;
-                color: black !important;
-                box-shadow: none !important;
-            }
-            .nav-tools, .spinner-btn {
-                display: none !important;
-            }
-            .val, .ant-value, .band-display {
-                color: black !important;
-                background: white !important;
-                border-color: #000 !important;
-            }
-            canvas {
-                border: 1px solid #333;
-            }
+            body { background: white !important; color: black !important; background-image: none !important; padding: 10px; }
+            .header, .controls-card, .chart-container, .inspect-card, .inspect-item, .ant-port-card { background: white !important; border-color: #000 !important; color: black !important; box-shadow: none !important; }
+            .nav-tools, .spinner-btn, .band-ribbon { display: none !important; }
+            .val, .ant-value, .band-display { color: black !important; background: white !important; border-color: #000 !important; }
+            canvas { border: 1px solid #333; }
         }
     </style>
 </head>
 <body>
 
+    <!-- Blueprint Technical Header with ALL 7 Tools Buttons -->
     <div class="header">
         <div>
             <h1>RF-KIT Tuner Bode Plot &amp; Antenna Matrix</h1>
@@ -328,6 +427,62 @@
         </div>
     </div>
 
+    <!-- 4 Physical Antenna Port Relays with Energized / Standby Indicators -->
+    <div class="antenna-ports-container" id="antennaPortsMatrix">
+        <div class="ant-port-card" id="port-card-1">
+            <div class="ant-port-header">
+                <span class="ant-port-num">ANT 1</span>
+                <span class="ant-relay-badge" id="relay-status-1">STANDBY</span>
+            </div>
+            <div class="ant-port-name" id="port-name-1">ANT 1: 160m-40m Dipole</div>
+            <div class="ant-port-bands" id="port-bands-1">Mapped Bands: 160m, 80m, 60m, 40m</div>
+        </div>
+
+        <div class="ant-port-card" id="port-card-2">
+            <div class="ant-port-header">
+                <span class="ant-port-num">ANT 2</span>
+                <span class="ant-relay-badge" id="relay-status-2">STANDBY</span>
+            </div>
+            <div class="ant-port-name" id="port-name-2">ANT 2: 20m/30m SteppIR</div>
+            <div class="ant-port-bands" id="port-bands-2">Mapped Bands: 30m, 20m</div>
+        </div>
+
+        <div class="ant-port-card" id="port-card-3">
+            <div class="ant-port-header">
+                <span class="ant-port-num">ANT 3</span>
+                <span class="ant-relay-badge" id="relay-status-3">STANDBY</span>
+            </div>
+            <div class="ant-port-name" id="port-name-3">ANT 3: 17m-10m Array</div>
+            <div class="ant-port-bands" id="port-bands-3">Mapped Bands: 17m, 15m, 12m, 10m</div>
+        </div>
+
+        <div class="ant-port-card" id="port-card-4">
+            <div class="ant-port-header">
+                <span class="ant-port-num">ANT 4</span>
+                <span class="ant-relay-badge" id="relay-status-4">STANDBY</span>
+            </div>
+            <div class="ant-port-name" id="port-name-4">ANT 4: 6m / Dummy Load</div>
+            <div class="ant-port-bands" id="port-bands-4">Mapped Bands: 6m</div>
+        </div>
+    </div>
+
+    <!-- Quick Band Selection Ribbon -->
+    <div class="band-ribbon">
+        <span class="band-ribbon-title">Band Selector:</span>
+        <button class="band-btn" onclick="selectBandByName('160m')">160m</button>
+        <button class="band-btn" onclick="selectBandByName('80m')">80m</button>
+        <button class="band-btn" onclick="selectBandByName('60m')">60m</button>
+        <button class="band-btn" onclick="selectBandByName('40m')">40m</button>
+        <button class="band-btn" onclick="selectBandByName('30m')">30m</button>
+        <button class="band-btn active" onclick="selectBandByName('20m')">20m</button>
+        <button class="band-btn" onclick="selectBandByName('17m')">17m</button>
+        <button class="band-btn" onclick="selectBandByName('15m')">15m</button>
+        <button class="band-btn" onclick="selectBandByName('12m')">12m</button>
+        <button class="band-btn" onclick="selectBandByName('10m')">10m</button>
+        <button class="band-btn" onclick="selectBandByName('6m')">6m</button>
+    </div>
+
+    <!-- Controls Card (Band Spinner + Active Antenna Details) -->
     <div class="controls-card">
         <div class="band-spinner">
             <button class="spinner-btn" onclick="prevBand()">◀</button>
@@ -338,7 +493,7 @@
         <div class="antenna-assigned-box">
             <div>
                 <div class="ant-tag">ACTIVE ANTENNA (RFK PORT MAP)</div>
-                <div class="ant-value" id="active-ant-label">ANT 2: 20m-6m SteppIR</div>
+                <div class="ant-value" id="active-ant-label">ANT 2: 20m/30m SteppIR</div>
             </div>
         </div>
 
@@ -348,6 +503,7 @@
         </div>
     </div>
 
+    <!-- Chart Canvas Card -->
     <div class="chart-container">
         <div class="chart-header">
             <span>TUNER MATCHING BODE PLOT (SWR vs. FREQUENCY)</span>
@@ -356,46 +512,42 @@
         <canvas id="swrChart"></canvas>
     </div>
 
+    <!-- Segment Inspector -->
     <div class="inspect-card">
         <div class="inspect-item">
-            <div class="label">Tuning Segment &amp; Range</div>
-            <div class="val" id="insp-seg" style="color:var(--data-cyan);">Segment 8</div>
+            <div class="lbl">Active Segment</div>
+            <div class="val" id="insp-seg" style="color:var(--data-cyan)">Segment 8</div>
             <div class="sub" id="insp-freq">14.175 - 14.200 MHz</div>
         </div>
         <div class="inspect-item">
-            <div class="label">Amplifier SWR (ATU Matched)</div>
-            <div class="val" id="insp-swr" style="color:var(--data-green);">1.08 : 1</div>
-            <div class="sub" id="insp-raw-swr">Raw Antenna Load: 1.35 : 1</div>
+            <div class="lbl">Amp Matched SWR</div>
+            <div class="val" id="insp-swr" style="color:var(--data-green)">1.08 : 1</div>
+            <div class="sub" id="insp-raw-swr">Raw Antenna Load: 1.48 : 1</div>
         </div>
         <div class="inspect-item">
-            <div class="label">Physical Inductance (L)</div>
-            <div class="val" id="insp-l">1,750 nH</div>
-            <div class="sub" id="insp-l-uh">Equivalent: 1.75 µH</div>
+            <div class="lbl">Physical Inductance (L)</div>
+            <div class="val" id="insp-l">1,450 nH</div>
+            <div class="sub" id="insp-l-uh">Equivalent: 1.45 µH</div>
         </div>
         <div class="inspect-item">
-            <div class="label">Physical Capacitance (C)</div>
-            <div class="val" id="insp-c">385 pF</div>
-            <div class="sub" id="insp-topo">Topology: CL (Cin / Tx Side)</div>
-        </div>
-        <div class="inspect-item">
-            <div class="label">Port Map Relay</div>
-            <div class="val" id="insp-port">ANT PORT 2</div>
-            <div class="sub" id="insp-ant-name">20m/30m SteppIR</div>
+            <div class="lbl">Physical Capacitance (C)</div>
+            <div class="val" id="insp-c">240 pF</div>
+            <div class="sub" id="insp-topo">Topology: High-Pass L-Network</div>
         </div>
     </div>
 
-    <!-- Full Band ATU Segment Allocation Table (No Steps / Actual L & C) -->
-    <div class="segment-table-card">
-        <div class="segment-table-header">
-            <span>ATU Segment Calibration Table — Physical L &amp; C Matching Values</span>
+    <!-- Segment Calibration Table -->
+    <div class="table-container">
+        <div class="table-header">
+            <span>ATU Segment Calibration Table &amp; Component Map</span>
             <span id="table-summary-info">14 Segments Loaded | Click any row to inspect &amp; focus</span>
         </div>
         <div style="overflow-x: auto;">
             <table class="seg-table">
                 <thead>
                     <tr>
-                        <th>Seg #</th>
-                        <th>Frequency Span</th>
+                        <th>Segment</th>
+                        <th>Frequency Range</th>
                         <th>Physical Inductance (L)</th>
                         <th>Physical Capacitance (C)</th>
                         <th>Topology</th>
@@ -414,12 +566,12 @@
         const BANDS = ["160m", "80m", "60m", "40m", "30m", "20m", "17m", "15m", "12m", "10m", "6m"];
         let curBandIdx = 5; // 20m default
         let mapData = null;
-        let selectedSegIdx = 7; // Seg 8 (0-indexed 7)
+        let selectedSegIdx = 7;
         let canvas = document.getElementById('swrChart');
         let ctx = canvas.getContext('2d');
 
         function fetchMapData() {
-            fetch('/api/antenna_map')
+            fetch('/api/antenna_map', { cache: "no-store" })
                 .then(r => r.json())
                 .then(data => {
                     mapData = data;
@@ -427,6 +579,7 @@
                         document.getElementById('station-info').innerText = 
                             `CALLSIGN: ${data.callsign} | CONTROLLER: B26-ATU V4 (AUTO SEGMENT TUNING)`;
                     }
+                    updateAntennaPortCards();
                     updateBandDisplay();
                 })
                 .catch(err => {
@@ -435,12 +588,49 @@
                 });
         }
 
+        function updateAntennaPortCards() {
+            if (!mapData) return;
+            const antNames = mapData.antenna_names || ["ANT 1", "ANT 2", "ANT 3", "ANT 4"];
+            for (let i = 1; i <= 4; i++) {
+                const nameEl = document.getElementById(`port-name-${i}`);
+                if (nameEl && antNames[i - 1]) {
+                    nameEl.innerText = antNames[i - 1];
+                }
+            }
+
+            // Map which bands route to each port
+            const portBands = { 1: [], 2: [], 3: [], 4: [] };
+            if (mapData.bands) {
+                for (let b of BANDS) {
+                    if (mapData.bands[b]) {
+                        let p = mapData.bands[b].antenna_port_index + 1; // 1-indexed
+                        if (portBands[p]) portBands[p].push(b);
+                    }
+                }
+            }
+            for (let i = 1; i <= 4; i++) {
+                const bandsEl = document.getElementById(`port-bands-${i}`);
+                if (bandsEl && portBands[i]) {
+                    bandsEl.innerText = `Mapped Bands: ${portBands[i].length > 0 ? portBands[i].join(', ') : 'None'}`;
+                }
+            }
+        }
+
         function resizeCanvas() {
             canvas.width = canvas.parentElement.clientWidth - 40;
-            canvas.height = 340;
+            canvas.height = 320;
             drawChart();
         }
         window.addEventListener('resize', resizeCanvas);
+
+        function selectBandByName(name) {
+            let idx = BANDS.indexOf(name);
+            if (idx >= 0) {
+                curBandIdx = idx;
+                selectedSegIdx = 0;
+                updateBandDisplay();
+            }
+        }
 
         function prevBand() {
             if (curBandIdx > 0) curBandIdx--;
@@ -470,8 +660,16 @@
             let band = BANDS[curBandIdx];
             document.getElementById('band-label').innerText = band;
 
+            // Update Band Selector ribbon buttons
+            document.querySelectorAll('.band-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText === band);
+            });
+
             let bInfo = (mapData && mapData.bands && mapData.bands[band]) ? mapData.bands[band] : null;
+            let activePortIdx = 0;
+
             if (bInfo) {
+                activePortIdx = (bInfo.antenna_port_index !== undefined) ? bInfo.antenna_port_index : 0;
                 document.getElementById('active-ant-label').innerText = `${bInfo.antenna_port}: ${bInfo.antenna_name}`;
                 document.getElementById('chart-sub-label').innerText = 
                     `FREQUENCY SPAN: ${(bInfo.min_khz/1000).toFixed(3)} MHz - ${(bInfo.max_khz/1000).toFixed(3)} MHz | ${bInfo.segments.length} SEGMENTS`;
@@ -480,8 +678,27 @@
                 updateInspector(bInfo.segments[selectedSegIdx], bInfo);
                 renderSegmentTable(bInfo.segments);
             } else {
-                document.getElementById('active-ant-label').innerText = `ANT 1: Multi-band Array`;
+                // Fallback default mapping
+                if (["160m", "80m", "60m", "40m"].includes(band)) activePortIdx = 0;
+                else if (["30m", "20m"].includes(band)) activePortIdx = 1;
+                else if (["17m", "15m", "12m", "10m"].includes(band)) activePortIdx = 2;
+                else if (band === "6m") activePortIdx = 3;
+                document.getElementById('active-ant-label').innerText = `ANT ${activePortIdx + 1}: Multi-band Array`;
             }
+
+            // Energize the active antenna port card & set others to standby
+            for (let i = 1; i <= 4; i++) {
+                const card = document.getElementById(`port-card-${i}`);
+                const badge = document.getElementById(`relay-status-${i}`);
+                const isThisActive = (i === (activePortIdx + 1));
+                if (card) {
+                    card.classList.toggle('active-port', isThisActive);
+                }
+                if (badge) {
+                    badge.innerText = isThisActive ? '● ACTIVE RELAY' : 'STANDBY';
+                }
+            }
+
             drawChart();
         }
 
@@ -494,7 +711,7 @@
             let tSwr = seg.tuned_swr || seg.swr;
             let rSwr = seg.raw_swr || (tSwr * 1.35);
             swrElem.innerText = `${tSwr.toFixed(2)} : 1`;
-            swrElem.style.color = tSwr < 1.5 ? 'var(--data-green)' : (tSwr < 2.0 ? 'var(--data-yellow)' : 'var(--data-red)');
+            swrElem.style.color = tSwr < 1.3 ? 'var(--data-green)' : (tSwr < 1.8 ? 'var(--data-yellow)' : 'var(--data-red)');
 
             document.getElementById('insp-raw-swr').innerText = `Raw Antenna Load: ${rSwr.toFixed(2)} : 1`;
 
@@ -503,11 +720,6 @@
 
             document.getElementById('insp-c').innerText = `${seg.c_pf} pF`;
             document.getElementById('insp-topo').innerText = `Topology: ${seg.topology}`;
-
-            if (bInfo) {
-                document.getElementById('insp-port').innerText = bInfo.antenna_port;
-                document.getElementById('insp-ant-name').innerText = bInfo.antenna_name;
-            }
         }
 
         function renderSegmentTable(segments) {
@@ -554,8 +766,8 @@
 
             let leftMargin = 55;
             let rightMargin = 30;
-            let topMargin = 35;
-            let bottomMargin = 40;
+            let topMargin = 30;
+            let bottomMargin = 35;
             let plotW = w - leftMargin - rightMargin;
             let plotH = h - topMargin - bottomMargin;
 
@@ -563,10 +775,9 @@
             ctx.strokeStyle = '#103b68';
             ctx.lineWidth = 1;
 
-            // Draw SWR Reference Threshold Lines (1.0, 1.5, 2.0, 3.0)
             const swrToY = (swr) => topMargin + plotH - (Math.min(3.0, Math.max(1.0, swr) - 1.0) / 2.0) * plotH;
 
-            // 1.5 SWR Line (Green threshold)
+            // 1.5 SWR Line
             let y15 = swrToY(1.5);
             ctx.beginPath();
             ctx.strokeStyle = 'rgba(34, 197, 94, 0.4)';
@@ -575,7 +786,7 @@
             ctx.lineTo(leftMargin + plotW, y15);
             ctx.stroke();
 
-            // 2.0 SWR Line (Yellow threshold)
+            // 2.0 SWR Line
             let y20 = swrToY(2.0);
             ctx.beginPath();
             ctx.strokeStyle = 'rgba(250, 204, 21, 0.4)';
@@ -604,93 +815,70 @@
 
             const fToX = (f) => leftMargin + ((f - minF) / (maxF - minF)) * plotW;
 
-            // Highlight Selected Segment background
-            if (segments[selectedSegIdx]) {
-                let selSeg = segments[selectedSegIdx];
-                let sx1 = fToX(selSeg.f_start_khz);
-                let sx2 = fToX(selSeg.f_end_khz);
-                ctx.fillStyle = 'rgba(59, 130, 246, 0.25)';
-                ctx.fillRect(sx1, topMargin, sx2 - sx1, plotH);
-            }
-
-            // Legend inside chart header
-            ctx.textAlign = 'left';
-            ctx.font = 'bold 11px Consolas, monospace';
-            
-            // Tuned SWR Legend (Solid Cyan)
-            ctx.fillStyle = '#38bdf8';
-            ctx.fillRect(leftMargin + 10, topMargin - 20, 18, 3);
-            ctx.fillText("Tuned SWR (Amp Perspective via ATU)", leftMargin + 34, topMargin - 16);
-
-            // Raw Antenna SWR Legend (Dashed Light Gray)
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-            ctx.fillText("┅ Raw Antenna Load SWR", leftMargin + 295, topMargin - 16);
-
-            // Draw Vertical Segment Boundaries with "|" at each end!
-            ctx.textAlign = 'center';
+            // Segment Boundary Vertical Lines (| markers)
             boundaries.forEach((f, idx) => {
                 let x = fToX(f);
-                
-                // Vertical dividing line
+                ctx.strokeStyle = 'rgba(147, 197, 253, 0.35)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([3, 3]);
                 ctx.beginPath();
-                ctx.strokeStyle = (idx === 0 || idx === boundaries.length - 1) ? '#ffffff' : '#2563eb';
-                ctx.lineWidth = (idx === 0 || idx === boundaries.length - 1) ? 1.5 : 1;
-                ctx.setLineDash([4, 4]);
                 ctx.moveTo(x, topMargin);
                 ctx.lineTo(x, topMargin + plotH);
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // Show vertical boundary marker "|"
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 13px Consolas, monospace';
-                ctx.fillText("|", x, topMargin - 4);
-
-                // Frequency tick at bottom for major boundaries
-                if (boundaries.length <= 15 || idx % 2 === 0) {
+                if (idx % 2 === 0 || boundaries.length < 10) {
                     ctx.fillStyle = '#93c5fd';
                     ctx.font = '10px Consolas, monospace';
+                    ctx.textAlign = 'center';
                     ctx.fillText((f / 1000).toFixed(3), x, topMargin + plotH + 18);
                 }
             });
 
-            // 1. Draw Raw Antenna SWR Curve (Dashed line)
+            // Highlight selected segment band
+            if (segments[selectedSegIdx]) {
+                let s = segments[selectedSegIdx];
+                let x1 = fToX(s.f_start_khz);
+                let x2 = fToX(s.f_end_khz);
+                ctx.fillStyle = 'rgba(37, 99, 235, 0.35)';
+                ctx.fillRect(x1, topMargin, x2 - x1, plotH);
+            }
+
+            // Raw Antenna SWR Curve (dim dotted line)
             ctx.beginPath();
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-            ctx.lineWidth = 1.8;
-            ctx.setLineDash([5, 4]);
+            ctx.strokeStyle = 'rgba(147, 197, 253, 0.5)';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 4]);
             segments.forEach((seg, idx) => {
                 let x = fToX(seg.f_mid_khz);
-                let y = swrToY(seg.raw_swr || (seg.swr * 1.35));
+                let tSwr = seg.tuned_swr || seg.swr;
+                let rSwr = seg.raw_swr || (tSwr * 1.35);
+                let y = swrToY(rSwr);
                 if (idx === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
             });
             ctx.stroke();
             ctx.setLineDash([]);
 
-            // 2. Draw Tuned SWR Scallop Curve (Amplifier Perspective via ATU)
-            // Each segment has a small scallop matching curve
+            // Tuned ATU SWR Curve with parabolic scalloping
             ctx.beginPath();
             ctx.strokeStyle = '#38bdf8';
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 2.5;
             segments.forEach((seg, idx) => {
                 let xStart = fToX(seg.f_start_khz);
-                let xMid = fToX(seg.f_mid_khz);
                 let xEnd = fToX(seg.f_end_khz);
+                let xMid = fToX(seg.f_mid_khz);
                 let tSwr = seg.tuned_swr || seg.swr;
                 let yMid = swrToY(tSwr);
                 let yEdge = swrToY(tSwr + 0.12);
 
-                if (idx === 0) {
-                    ctx.moveTo(xStart, yEdge);
-                } else {
-                    ctx.lineTo(xStart, yEdge);
-                }
+                if (idx === 0) ctx.moveTo(xStart, yEdge);
+                else ctx.lineTo(xStart, yEdge);
                 ctx.quadraticCurveTo(xMid, yMid, xEnd, yEdge);
             });
             ctx.stroke();
 
-            // 3. Draw Segment Tuning Center Points with Data Colors
+            // Segment Center Calibration Points
             segments.forEach((seg, idx) => {
                 let x = fToX(seg.f_mid_khz);
                 let tSwr = seg.tuned_swr || seg.swr;
@@ -710,7 +898,7 @@
             });
         }
 
-        // Click interaction on chart to select segment
+        // Click on chart to select segment
         canvas.addEventListener('click', (e) => {
             const rect = canvas.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
@@ -724,7 +912,6 @@
             let frac = Math.max(0, Math.min(1, (clickX - leftMargin) / plotW));
             let clickedFreq = bInfo.min_khz + frac * (bInfo.max_khz - bInfo.min_khz);
 
-            // Find matching segment
             for (let i = 0; i < bInfo.segments.length; i++) {
                 let s = bInfo.segments[i];
                 if (clickedFreq >= s.f_start_khz && clickedFreq <= s.f_end_khz) {
@@ -734,9 +921,29 @@
             }
         });
 
+        // Background polling for live band tracking from amplifier
+        function pollLiveBand() {
+            fetch('/api/telemetry', { cache: "no-store" })
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.band) {
+                        let liveBand = `${data.band}m`;
+                        let idx = BANDS.indexOf(liveBand);
+                        // If user hasn't manually overridden or if amplifier changed
+                        if (idx >= 0 && idx !== curBandIdx) {
+                            curBandIdx = idx;
+                            selectedSegIdx = 0;
+                            updateBandDisplay();
+                        }
+                    }
+                })
+                .catch(() => {});
+        }
+
         // Initialize
         fetchMapData();
         resizeCanvas();
+        setInterval(pollLiveBand, 4000);
     </script>
 </body>
 </html>

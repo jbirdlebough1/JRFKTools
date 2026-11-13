@@ -833,17 +833,41 @@ namespace JrfkLauncher
             catch { }
             try
             {
-                using (var k = Microsoft.Win32.Registry.LocalMachine.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"))
+                using (var k = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"))
                 {
-                    if (k != null) k.SetValue("NoDriveTypeAutoRun", 255, Microsoft.Win32.RegistryValueKind.DWord);
+                    if (k != null)
+                    {
+                        k.SetValue("NoDriveTypeAutoRun", 255, Microsoft.Win32.RegistryValueKind.DWord);
+                        k.SetValue("NoAutorun", 1, Microsoft.Win32.RegistryValueKind.DWord);
+                    }
                 }
             }
             catch { }
             try
             {
-                using (var k = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"))
+                using (var k = Microsoft.Win32.Registry.LocalMachine.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"))
                 {
-                    if (k != null) k.SetValue("NoDriveTypeAutoRun", 255, Microsoft.Win32.RegistryValueKind.DWord);
+                    if (k != null)
+                    {
+                        k.SetValue("NoDriveTypeAutoRun", 255, Microsoft.Win32.RegistryValueKind.DWord);
+                        k.SetValue("NoAutorun", 1, Microsoft.Win32.RegistryValueKind.DWord);
+                    }
+                }
+            }
+            catch { }
+            try
+            {
+                using (var k = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Policies\Microsoft\Windows\Explorer"))
+                {
+                    if (k != null) k.SetValue("NoAutoplayfornonVolume", 1, Microsoft.Win32.RegistryValueKind.DWord);
+                }
+            }
+            catch { }
+            try
+            {
+                using (var k = Microsoft.Win32.Registry.LocalMachine.CreateSubKey(@"Software\Policies\Microsoft\Windows\Explorer"))
+                {
+                    if (k != null) k.SetValue("NoAutoplayfornonVolume", 1, Microsoft.Win32.RegistryValueKind.DWord);
                 }
             }
             catch { }
@@ -903,17 +927,18 @@ namespace JrfkLauncher
                         string cls = GetClass(hWnd).ToLowerInvariant();
 
                         List<string> childTexts = new List<string>();
+                        List<IntPtr> localButtons = new List<IntPtr>();
                         EnumWindowsProc childProc = delegate(IntPtr chWnd, IntPtr cParam)
                         {
                             string ct = GetText(chWnd);
                             if (!string.IsNullOrEmpty(ct))
                             {
-                                string ctl = ct.ToLowerInvariant();
+                                string ctl = ct.Trim().ToLowerInvariant();
                                 childTexts.Add(ctl);
                                 string ccls = GetClass(chWnd).ToLowerInvariant();
-                                if (ccls.Contains("button") || ctl == "ok" || ctl == "cancel" || ctl == "close")
+                                if (ccls.Contains("button") || ctl == "ok" || ctl == "cancel" || ctl == "close" || ctl == "format disk")
                                 {
-                                    buttons.Add(chWnd);
+                                    localButtons.Add(chWnd);
                                 }
                             }
                             return true;
@@ -946,7 +971,8 @@ namespace JrfkLauncher
                             isMatch = true;
                         }
                         else if ((cls == "cabinetwclass" || cls == "explorewclass") &&
-                                 (joined.Contains("not accessible") || joined.Contains("not recognized") || title.Contains("location is not available")))
+                                 (joined.Contains("not accessible") || joined.Contains("not recognized") || title.Contains("location is not available") ||
+                                  title.EndsWith(":\\") || title.Contains(" (d:)") || title.Contains(" (e:)") || title.Contains(" (f:)") || title.Contains(" (g:)")))
                         {
                             isMatch = true;
                         }
@@ -954,6 +980,7 @@ namespace JrfkLauncher
                         if (isMatch)
                         {
                             targets.Add(hWnd);
+                            buttons.AddRange(localButtons);
                         }
                         return true;
                     };
@@ -965,7 +992,8 @@ namespace JrfkLauncher
 
                     foreach (IntPtr btn in buttons)
                     {
-                        SendMessage(btn, 0x00F5, IntPtr.Zero, IntPtr.Zero);
+                        // Use asynchronous PostMessage to avoid freezing on hung Explorer windows
+                        PostMessage(btn, 0x00F5, IntPtr.Zero, IntPtr.Zero);
                     }
 
                     foreach (IntPtr hwnd in targets)

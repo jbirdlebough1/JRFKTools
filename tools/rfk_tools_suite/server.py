@@ -402,6 +402,7 @@ def build_band_segments_data(ant_names, ant_matrix):
             "max_khz": max_f,
             "step_khz": seg_step,
             "antenna_port": f"ANT {p_idx + 1}",
+            "antenna_port_index": p_idx,
             "antenna_name": assigned_ant,
             "segment_boundaries_khz": segments,
             "segments": seg_details
