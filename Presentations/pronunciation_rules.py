@@ -4,7 +4,11 @@ import re
 def clean_for_speech(text):
     t = text
     
-    # 1. Callsign: NEVER use the word "station", NEVER use "John", ALWAYS use "K7BIT"
+    # 1. OS Reference: Strictly Debian Trixie (Debian 13) / Raspberry Pi OS current
+    t = re.sub(r'\bBookworm\b', 'Trixie', t, flags=re.IGNORECASE)
+    t = re.sub(r'\bDebian Bookworm\b', 'Debian Trixie', t, flags=re.IGNORECASE)
+    
+    # 2. Callsign & Station: NEVER use the word "station", NEVER use "John", ALWAYS use "K7BIT"
     t = re.sub(r'\bfrom station K7BIT\b', 'from K seven B I T', t, flags=re.IGNORECASE)
     t = re.sub(r'\bfrom the station\b', 'from K seven B I T', t, flags=re.IGNORECASE)
     t = re.sub(r'\bat the station\b', 'at K seven B I T', t, flags=re.IGNORECASE)
@@ -16,34 +20,35 @@ def clean_for_speech(text):
     t = re.sub(r'\bJohn\b', 'K seven B I T', t)
     t = re.sub(r'\bK7BIT\b', 'K seven B I T', t)
     
-    # 2. Terminology: NEVER say "web cockpit", ALWAYS say "JRFK Web Tools"
+    # 3. Terminology: NEVER say "web cockpit", ALWAYS say "JRFK Web Tools"
     t = re.sub(r'\b(?:web cockpit|operational web cockpit|web operations cockpit)\b', 'JRFK Web Tools', t, flags=re.IGNORECASE)
     t = re.sub(r'\b7-screen operational web cockpit\b', 'seven-screen JRFK Web Tools', t, flags=re.IGNORECASE)
     t = re.sub(r'\b7-screen web cockpit\b', 'seven-screen JRFK Web Tools', t, flags=re.IGNORECASE)
     t = re.sub(r'\bJRFK Web Tool\b', 'JRFK Web Tools', t, flags=re.IGNORECASE)
     
-    # 3. LDMOS: pronounced "LD MOS"
+    # 4. LDMOS: pronounced "LD MOS"
     t = re.sub(r'\bLDMOS\b', 'L-D moss', t)
     t = re.sub(r'\bL D M O S\b', 'L-D moss', t)
     
-    # 4. 1500 Watt PEP: natural spoken ham radio delivery
-    t = t.replace('fifteen hundred watts peak envelope power', 'fifteen hundred watts, P-E-P,')
-    t = t.replace('1500W PEP', 'fifteen hundred watts, P-E-P,')
-    t = t.replace('1500 watts PEP', 'fifteen hundred watts, P-E-P,')
-    t = re.sub(r'\bPEP\b', 'P-E-P', t)
+    # 5. PEP: pronounced "PEE EEE PEE" with 500ms pause: "fifteen hundred ... Watts, P, E, P,"
+    t = re.sub(r'1500\s*(?:W|watts?)?\s*PEP', 'fifteen hundred ... Watts, P, E, P,', t, flags=re.IGNORECASE)
+    t = t.replace('fifteen hundred watts, P-E-P,', 'fifteen hundred ... Watts, P, E, P,')
+    t = t.replace('fifteen hundred watts peak envelope power', 'fifteen hundred ... Watts, P, E, P,')
+    t = re.sub(r'\bPEP\b', 'P, E, P,', t)
+    t = re.sub(r'\bP-E-P\b', 'P, E, P,', t)
     
-    # 5. RF-KIT -> R F kit
+    # 6. RF-KIT -> R F kit
     t = re.sub(r'\bRF-KIT\b', 'R F kit', t)
     t = re.sub(r'\bRF-Kit\b', 'R F kit', t)
     t = re.sub(r'\bRF\b', 'R F', t)
     
-    # 6. Bands
+    # 7. Bands
     t = t.replace('160 meters through 6 meters', 'one sixty through six meters')
     t = t.replace('160m through 6m', 'one sixty through six meters')
     t = t.replace('160 meters', 'one sixty')
     t = t.replace('6 meters', 'six meters')
     
-    # 7. Architecture & Tool names
+    # 8. Architectures
     t = re.sub(r'\b32-bit\b', 'thirty-two-bit', t)
     t = re.sub(r'\b64-bit\b', 'sixty-four-bit', t)
     t = t.replace('JRFK.exe', 'J R F K dot E X E')
@@ -51,7 +56,7 @@ def clean_for_speech(text):
     t = t.replace('C-sharp', 'C sharp')
     t = t.replace('166-megabyte', 'one hundred sixty-six megabyte')
     
-    # 8. Radio Engineering terms
+    # 9. Radio Engineering terms
     t = re.sub(r'\bSWR\b', 'S W R', t)
     t = re.sub(r'\bVSWR\b', 'V S W R', t)
     t = t.replace('SimpleRPC', 'Simple R P C')
