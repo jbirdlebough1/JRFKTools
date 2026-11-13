@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>JRFK Presentation 1: Interactive Preview</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JRFK Presentation 1: Interactive Ham Radio Preview</title>
     <style>
         body {
             margin: 0;
-            background: #0a192f;
+            padding: 20px;
+            background: #06152b;
             color: #ffffff;
             font-family: 'Segoe UI', -apple-system, sans-serif;
             display: flex;
@@ -14,95 +16,206 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            box-sizing: border-box;
         }
-        .player-box {
-            width: 1024px;
-            background: #134679;
+        .player-container {
+            width: 1060px;
+            background: #0c2340;
             border: 2px solid #38bdf8;
-            border-radius: 8px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            border-radius: 10px;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.7);
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
         .slide-frame {
-            width: 1024px;
-            height: 576px;
+            width: 1060px;
+            height: 596px;
             border: none;
             background: #000;
+            display: block;
         }
-        .controls {
-            padding: 12px 20px;
-            background: #0f172a;
+        .control-panel {
+            padding: 16px 24px;
+            background: #081a33;
+            border-top: 2px solid #1e3a5f;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .top-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-top: 1px solid #334155;
+        }
+        .nav-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
         .btn {
-            background: #2563eb;
-            color: #fff;
+            background: #0284c7;
+            color: #ffffff;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 9px 18px;
+            border-radius: 5px;
             cursor: pointer;
             font-weight: 700;
             font-size: 13px;
+            letter-spacing: 0.5px;
+            transition: background 0.15s ease;
         }
-        .btn:hover { background: #3b82f6; }
-        .meta { font-size: 14px; color: #94a3b8; }
+        .btn:hover { background: #0369a1; }
+        .btn-green {
+            background: #16a34a;
+        }
+        .btn-green:hover { background: #15803d; }
+        .slide-indicator {
+            font-size: 14px;
+            font-weight: 600;
+            color: #38bdf8;
+            letter-spacing: 0.5px;
+        }
+        .audio-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #051329;
+            padding: 10px 14px;
+            border-radius: 6px;
+            border: 1px solid #1e3a5f;
+        }
+        .audio-label {
+            font-size: 12px;
+            color: #94a3b8;
+            font-family: monospace;
+            white-space: nowrap;
+        }
+        audio {
+            flex: 1;
+            height: 38px;
+            outline: none;
+        }
+        .timeline-guide {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #64748b;
+            font-family: monospace;
+            padding: 0 4px;
+        }
     </style>
 </head>
 <body>
-    <div class="player-box">
+    <div class="player-container">
+        <!-- Interactive 720p Slide Frame -->
         <iframe id="slideFrame" class="slide-frame" src="slide_1.html"></iframe>
-        <div class="controls">
-            <div>
-                <button class="btn" onclick="prevSlide()">◀ Previous</button>
-                <button class="btn" onclick="nextSlide()">Next ▶</button>
-                <button class="btn" style="background:#16a34a;" onclick="playAudio()">🔊 Play Feynman Audio</button>
+        
+        <!-- Controls & Visible Audio Track -->
+        <div class="control-panel">
+            <div class="top-row">
+                <div class="nav-group">
+                    <button class="btn" onclick="prevSlide()">◀ Previous Slide</button>
+                    <button class="btn" onclick="nextSlide()">Next Slide ▶</button>
+                    <button class="btn btn-green" onclick="restartAudio()">▶ Play Narration</button>
+                </div>
+                <div class="slide-indicator" id="slideMeta">
+                    Slide 1 of 5: Modernizing the RF-KIT Linear Amplifier
+                </div>
             </div>
-            <div class="meta" id="slideMeta">Slide 1 of 5: Modernizing the RF-KIT Linear Amplifier</div>
+            
+            <!-- Visible Audio Track & Real-Time Player -->
+            <div class="audio-wrapper">
+                <span class="audio-label" id="audioLabel">🔊 TRACK: audio/slide_1.mp3</span>
+                <audio id="audioPlayer" controls preload="auto"></audio>
+            </div>
+            
+            <div class="timeline-guide">
+                <span id="timingStart">Timeline Offset: 00:00.00</span>
+                <span>Format: 1280x720 30fps • Audio: 44.1kHz Stereo</span>
+                <span id="timingDur">Duration: 24.05s</span>
+            </div>
         </div>
     </div>
-    <audio id="audioPlayer"></audio>
 
     <script>
         const slides = [
-            { id: "slide_1", title: "Modernizing the RF-KIT Linear Amplifier", audio: "audio/slide_1.mp3" },
-            { id: "slide_2", title: "Why Legacy 32-Bit OS Must Go", audio: "audio/slide_2.mp3" },
-            { id: "slide_3", title: "Dual-Port Architecture: 8089 vs 8088", audio: "audio/slide_3.mp3" },
-            { id: "slide_4", title: "4-Volume Documentation & K7BIT Cookbook", audio: "audio/slide_4.mp3" },
-            { id: "slide_outro", title: "Resources & Project Downloads", audio: "audio/slide_outro.mp3" }
+            { 
+                id: "slide_1", 
+                title: "Modernizing the RF-KIT Linear Amplifier", 
+                audio: "audio/slide_1.mp3",
+                start: "00:00.00",
+                duration: "24.05s"
+            },
+            { 
+                id: "slide_2", 
+                title: "Why Legacy 32-Bit OS Must Go", 
+                audio: "audio/slide_2.mp3",
+                start: "00:25.05",
+                duration: "21.26s"
+            },
+            { 
+                id: "slide_3", 
+                title: "Dual-Port Architecture: 8089 vs 8088", 
+                audio: "audio/slide_3.mp3",
+                start: "00:47.31",
+                duration: "21.12s"
+            },
+            { 
+                id: "slide_4", 
+                title: "4-Volume Documentation & K7BIT Cookbook", 
+                audio: "audio/slide_4.mp3",
+                start: "01:09.43",
+                duration: "20.83s"
+            },
+            { 
+                id: "slide_outro", 
+                title: "Master Resources & Downloads", 
+                audio: "audio/slide_outro.mp3",
+                start: "01:31.26",
+                duration: "16.99s"
+            }
         ];
+        
         let currentIdx = 0;
+        const player = document.getElementById('audioPlayer');
 
-        function updateSlide() {
+        function loadSlide(idx) {
+            currentIdx = idx;
             const s = slides[currentIdx];
             document.getElementById('slideFrame').src = s.id + '.html';
             document.getElementById('slideMeta').innerText = `Slide ${currentIdx + 1} of ${slides.length}: ${s.title}`;
-            playAudio();
+            document.getElementById('audioLabel').innerText = `🔊 TRACK: ${s.audio}`;
+            document.getElementById('timingStart').innerText = `Timeline Offset: ${s.start}`;
+            document.getElementById('timingDur').innerText = `Duration: ${s.duration}`;
+            
+            player.src = s.audio;
+            player.play().catch(() => {
+                // Browsers may require user click to start autoplay
+            });
         }
 
-        function playAudio() {
-            const player = document.getElementById('audioPlayer');
-            player.src = slides[currentIdx].audio;
-            player.play().catch(e => console.log('Autoplay deferred until user interaction'));
+        function restartAudio() {
+            player.currentTime = 0;
+            player.play();
         }
 
         function nextSlide() {
             if (currentIdx < slides.length - 1) {
-                currentIdx++;
-                updateSlide();
+                loadSlide(currentIdx + 1);
             }
         }
 
         function prevSlide() {
             if (currentIdx > 0) {
-                currentIdx--;
-                updateSlide();
+                loadSlide(currentIdx - 1);
             }
         }
+
+        // Initialize first slide on load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSlide(0);
+        });
     </script>
 </body>
 </html>

@@ -140,15 +140,15 @@ body {
     color: var(--bp-line-dim);
     line-height: 1.4;
 }
-.feynman-box {
-    background: rgba(15, 23, 42, 0.9);
-    border: 1px dashed var(--accent-amber);
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-style: italic;
-    font-size: 12.5px;
+.station-note-box {
+    background: rgba(15, 23, 42, 0.95);
+    border-left: 4px solid var(--accent-amber);
+    padding: 9px 13px;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
     color: #fef08a;
-    line-height: 1.35;
+    line-height: 1.4;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 .footer {
     display: flex;
@@ -188,11 +188,11 @@ table.clean-table tr:hover td {
 <body>
     <div class="header">
         <div class="header-badge">JRFK SERIES • PART 5</div>
-        <div class="header-meta">MODIFICATION LINKS DIRECTORY</div>
+        <div class="header-meta">PARTS & MODIFICATION DIRECTORY</div>
     </div>
     <div class="title-row">
-        <h1>Master Table of Links for Every Mod</h1>
-        <div class="subtitle">Direct References, Part Sources, and Community Forum Threads</div>
+        <h1>Community Hardware Modifications Directory</h1>
+        <div class="subtitle">Summary Table of Proven Enhancements, Components, and Benefits</div>
     </div>
     <div class="content">
         
@@ -202,67 +202,55 @@ table.clean-table tr:hover td {
                     <thead>
                         <tr>
                             <th>Modification Name</th>
-                            <th>Primary Purpose & Benefit</th>
-                            <th>Forum / Discussion Link</th>
-                            <th>Part / Material Source</th>
+                            <th>Target Area</th>
+                            <th>Recommended Components</th>
+                            <th>Primary Benefit</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><b>LDMOS Clamp Bar</b></td>
-                            <td>Uniform clamping, stops flange warp</td>
-                            <td>b26-pa.groups.io/g/main</td>
-                            <td>CNC Machined Clamp Kit</td>
+                            <td><b>Solid Thermal Clamp</b></td>
+                            <td>LDMOS Pallet</td>
+                            <td>CNC Aluminum Clamp Bar + Indium Foil (0.1mm)</td>
+                            <td>Uniform flange pressure; eliminates grease pump-out</td>
                         </tr>
                         <tr>
-                            <td><b>0.1mm Indium Foil</b></td>
-                            <td>Zero thermal pump-out @ >50°C</td>
-                            <td>b26-pa.groups.io/g/main</td>
-                            <td>Indium Corp 99.99% foil</td>
+                            <td><b>16 dB Input Pad</b></td>
+                            <td>RF Input Stage</td>
+                            <td>High-power 16 dB attenuator pad</td>
+                            <td>Transceiver ALC overshoot protection; cleaner IMD3</td>
                         </tr>
                         <tr>
-                            <td><b>16 dB Input Attenuator</b></td>
-                            <td>50W linear drive sweet spot for 100W rigs</td>
-                            <td>b26-pa.groups.io/g/main</td>
-                            <td>High-power RF flange pad</td>
+                            <td><b>ATC Filter Caps</b></td>
+                            <td>LPF Board</td>
+                            <td>High-Q ATC 100B / 800B porcelain capacitors</td>
+                            <td>Handles high circulating RF current on 10m/12m</td>
                         </tr>
                         <tr>
-                            <td><b>ATC Porcelain LPF Caps</b></td>
-                            <td>Prevents dielectric breakdown on 10/12/15m</td>
-                            <td>b26-pa.groups.io/g/main</td>
-                            <td>ATC 100B / 100E Capacitors</td>
+                            <td><b>Coupler Shielding</b></td>
+                            <td>SWR Bridge</td>
+                            <td>Adhesive copper foil shield, bonded to chassis</td>
+                            <td>Stops stray 6m RF pickup & false SWR trips</td>
                         </tr>
                         <tr>
-                            <td><b>Coupler RF Shielding</b></td>
-                            <td>Stops false 6m/10m high-SWR trips</td>
-                            <td>b26-pa.groups.io/g/main</td>
-                            <td>Copper foil partition / shield</td>
-                        </tr>
-                        <tr>
-                            <td><b>Mix 31/43 Ferrite Chokes</b></td>
-                            <td>Touchscreen / I2C RFI immunity</td>
-                            <td>b26-pa.groups.io/g/main</td>
-                            <td>Fair-Rite split snap-on beads</td>
-                        </tr>
-                        <tr>
-                            <td><b>K7BIT Master Cookbook</b></td>
-                            <td>193-page historical assembly reference</td>
-                            <td>jbirdlebough1.github.io/JRFKTools</td>
-                            <td>Vol 1 Reference (Preserved)</td>
+                            <td><b>Ferrite Chokes</b></td>
+                            <td>Data / Video Cables</td>
+                            <td>Fair-Rite Mix 31 & Mix 43 snap-on cores</td>
+                            <td>Eliminates touchscreen lockups & common-mode RFI</td>
                         </tr>
                     </tbody>
                 </table>
                 
                 <div style="display:flex; gap:16px;">
                     
-                <div class="card ">
-                    <div class="card-title">Quick Jump Directory</div>
-                    <div class="card-desc">Every modification is fully documented with direct links to groups.io forum threads and part sources.</div>
+                <div class="card card-green">
+                    <div class="card-title">Field-Tested Solutions</div>
+                    <div class="card-desc">Every modification listed here has been validated by active amateur radio operators in high-power station environments.</div>
                 </div>
                 
-                <div class="card card-green">
-                    <div class="card-title">Cookbook Reference</div>
-                    <div class="card-desc">All underlying original circuit schematics and board layouts are indexed in the K7BIT Master Cookbook in the docs portal.</div>
+                <div class="card ">
+                    <div class="card-title">Full Documentation</div>
+                    <div class="card-desc">Detailed installation schematics and component suppliers are indexed in the JRFK Documentation Portal.</div>
                 </div>
                 
                 </div>
@@ -270,7 +258,7 @@ table.clean-table tr:hover td {
             
     </div>
     <div class="footer">
-        <div>JRFK 64-BIT STATION SUITE</div>
+        <div>JRFK 64-BIT STATION SUITE • AMATEUR RADIO HIGH-POWER LINEAR AMPLIFIERS</div>
         <div>GITHUB.COM/JBIRDLEBOUGH1/JRFKTOOLS</div>
     </div>
 </body>

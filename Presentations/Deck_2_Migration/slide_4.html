@@ -140,15 +140,15 @@ body {
     color: var(--bp-line-dim);
     line-height: 1.4;
 }
-.feynman-box {
-    background: rgba(15, 23, 42, 0.9);
-    border: 1px dashed var(--accent-amber);
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-style: italic;
-    font-size: 12.5px;
+.station-note-box {
+    background: rgba(15, 23, 42, 0.95);
+    border-left: 4px solid var(--accent-amber);
+    padding: 9px 13px;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
     color: #fef08a;
-    line-height: 1.35;
+    line-height: 1.4;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 .footer {
     display: flex;
@@ -188,29 +188,29 @@ table.clean-table tr:hover td {
 <body>
     <div class="header">
         <div class="header-badge">JRFK SERIES • PART 2</div>
-        <div class="header-meta">STEP 3: 64-BIT BOOKWORM FLASH</div>
+        <div class="header-meta">STEP 3: IMAGE FLASH & CONFIG</div>
     </div>
     <div class="title-row">
-        <h1>Step 3: Automated Bookworm Flashing</h1>
-        <div class="subtitle">Writing the 64-Bit OS Image, Video Modelines & Deprecation Patches</div>
+        <h1>Flashing 64-Bit OS & Injecting Drivers</h1>
+        <div class="subtitle">Writing Debian Bookworm, 1024x600 Video Modeline, and SimpleRPC</div>
     </div>
     <div class="content">
         
             <div class="col-text">
                 
                 <div class="card card-green">
-                    <div class="card-title">Pure 64-Bit Debian Bookworm</div>
-                    <div class="card-desc">Installs the official Debian aarch64 kernel with optimized ARM64 compiler optimizations.</div>
+                    <div class="card-title">Automated OS Flashing</div>
+                    <div class="card-desc">Writes clean 64-bit Debian Bookworm base image directly to the target SD card with SHA-256 integrity verification.</div>
                 </div>
                 
                 <div class="card ">
-                    <div class="card-title">1024x600 Full KMS Modelines</div>
-                    <div class="card-desc">Configures direct hardware DRM modelines for the 7-inch HDMI touchscreen with zero display flickering.</div>
+                    <div class="card-title">Driver & Modeline Injection</div>
+                    <div class="card-desc">Injects native 1024x600 video modelines directly into /boot/firmware/cmdline.txt for touch precision.</div>
                 </div>
                 
-                <div class="card ">
-                    <div class="card-title">Python 3.13 Patches Applied</div>
-                    <div class="card-desc">Patches SimpleRPC to eliminate all deprecated asynchronous socket calls, guaranteeing continuous 24/7 uptime.</div>
+                <div class="card card-amber">
+                    <div class="card-title">Calibration Migration</div>
+                    <div class="card-desc">Transfers all your existing band tables and SWR calibration offsets automatically.</div>
                 </div>
                 
             </div>
@@ -218,7 +218,7 @@ table.clean-table tr:hover td {
             
     </div>
     <div class="footer">
-        <div>JRFK 64-BIT STATION SUITE</div>
+        <div>JRFK 64-BIT STATION SUITE • AMATEUR RADIO HIGH-POWER LINEAR AMPLIFIERS</div>
         <div>GITHUB.COM/JBIRDLEBOUGH1/JRFKTOOLS</div>
     </div>
 </body>

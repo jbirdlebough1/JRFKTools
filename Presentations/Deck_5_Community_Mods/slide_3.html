@@ -140,15 +140,15 @@ body {
     color: var(--bp-line-dim);
     line-height: 1.4;
 }
-.feynman-box {
-    background: rgba(15, 23, 42, 0.9);
-    border: 1px dashed var(--accent-amber);
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-style: italic;
-    font-size: 12.5px;
+.station-note-box {
+    background: rgba(15, 23, 42, 0.95);
+    border-left: 4px solid var(--accent-amber);
+    padding: 9px 13px;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
     color: #fef08a;
-    line-height: 1.35;
+    line-height: 1.4;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 .footer {
     display: flex;
@@ -188,37 +188,42 @@ table.clean-table tr:hover td {
 <body>
     <div class="header">
         <div class="header-badge">JRFK SERIES • PART 5</div>
-        <div class="header-meta">MOD 2: RF INPUT OPTIMIZATION</div>
+        <div class="header-meta">RF DRIVE PROTECTION</div>
     </div>
     <div class="title-row">
-        <h1>Mod 2: The 16 dB Input Attenuator Pad</h1>
-        <div class="subtitle">Matching Modern 100W Transceivers to the LDMOS Linear Sweet Spot</div>
+        <h1>16 dB Input Attenuator Upgrade</h1>
+        <div class="subtitle">Protecting LDMOS Gates from Modern Transceiver ALC Power Spikes</div>
     </div>
     <div class="content">
         
             <div class="col-text">
                 
                 <div class="card card-amber">
-                    <div class="card-title">The 13 dB vs 16 dB Problem</div>
-                    <div class="card-desc">Stock 13 dB attenuator requires very low drive (~20-25W) where modern 100W radios experience ALC overshoot, causing SWR trip spikes.</div>
+                    <div class="card-title">The Problem: ALC Overshoot</div>
+                    <div class="card-desc">Modern 100W transceivers produce brief 80W power spikes before ALC loops settle, overdriving LDMOS gates.</div>
                 </div>
                 
                 <div class="card card-green">
-                    <div class="card-title">The 16 dB Solution</div>
-                    <div class="card-desc">Upgrading to a 16 dB pad lets your exciter run comfortably in its linear sweet spot: 45W to 55W drive for full 1500W PEP output.</div>
+                    <div class="card-title">The Solution: 16 dB Pad</div>
+                    <div class="card-desc">Increases drive requirement to a comfortable 50W, placing transceivers in their cleanest, most linear power zone.</div>
                 </div>
                 
                 <div class="card ">
-                    <div class="card-title">Transceiver Protection</div>
-                    <div class="card-desc">Provides an ideal 50-ohm broadband load back to the radio, completely eliminating input SWR trips during keying.</div>
+                    <div class="card-title">Purity & Linearity</div>
+                    <div class="card-desc">Eliminates input clipping, lowers transmitter phase noise, and ensures clean IMD3 performance.</div>
                 </div>
                 
             </div>
             
+                <div class="col-media">
+                    <img src="file:///D:/JRFK/docs/cookbook_media/img_023.jpeg">
+                    <div class="media-caption">FIG 3: 16 DB INPUT ATTENUATOR PAD ON RF DRIVER BOARD</div>
+                </div>
+                
             
     </div>
     <div class="footer">
-        <div>JRFK 64-BIT STATION SUITE</div>
+        <div>JRFK 64-BIT STATION SUITE • AMATEUR RADIO HIGH-POWER LINEAR AMPLIFIERS</div>
         <div>GITHUB.COM/JBIRDLEBOUGH1/JRFKTOOLS</div>
     </div>
 </body>

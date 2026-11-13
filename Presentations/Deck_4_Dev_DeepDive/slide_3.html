@@ -140,15 +140,15 @@ body {
     color: var(--bp-line-dim);
     line-height: 1.4;
 }
-.feynman-box {
-    background: rgba(15, 23, 42, 0.9);
-    border: 1px dashed var(--accent-amber);
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-style: italic;
-    font-size: 12.5px;
+.station-note-box {
+    background: rgba(15, 23, 42, 0.95);
+    border-left: 4px solid var(--accent-amber);
+    padding: 9px 13px;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
     color: #fef08a;
-    line-height: 1.35;
+    line-height: 1.4;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 .footer {
     display: flex;
@@ -188,37 +188,42 @@ table.clean-table tr:hover td {
 <body>
     <div class="header">
         <div class="header-badge">JRFK SERIES • PART 4</div>
-        <div class="header-meta">ELECTRICAL & HARDWARE SPECIFICATIONS</div>
+        <div class="header-meta">ELECTRICAL CHARACTERISTICS</div>
     </div>
     <div class="title-row">
-        <h1>RF Deck & Standard DC Architecture</h1>
-        <div class="subtitle">Ampleon BLF189 LDMOS Envelope & Standard Discrete DC Rail Sensing</div>
+        <h1>Hardware Truth: Dual BLF189 & Discrete DC</h1>
+        <div class="subtitle">The True Architecture: RF-KIT Does NOT Use CAN Bus Power Supplies</div>
     </div>
     <div class="content">
         
             <div class="col-text">
                 
                 <div class="card card-green">
-                    <div class="card-title">Ampleon BLF189 / BLF189XR LDMOS</div>
-                    <div class="card-desc">Optimized electrical curves for dual 50V LDMOS devices capable of 1500W PEP output across 1.8 MHz through 54 MHz with >65% efficiency.</div>
-                </div>
-                
-                <div class="card ">
-                    <div class="card-title">No CAN BUS PSU Dependency</div>
-                    <div class="card-desc">The RF-KIT does not use CAN bus power supplies. Voltage and current are monitored cleanly via precision discrete resistive shunts and ADCs.</div>
+                    <div class="card-title">Dual Ampleon BLF189 LDMOS</div>
+                    <div class="card-desc">Provides 1500W PEP output across 160m through 6m with massive linearity headroom.</div>
                 </div>
                 
                 <div class="card card-amber">
-                    <div class="card-title">Robust Reliability</div>
-                    <div class="card-desc">Eliminating CAN bus communications eliminates software handshake timeouts, transceiver faults, and PSU lockouts.</div>
+                    <div class="card-title">NO CAN Bus Power Supplies</div>
+                    <div class="card-desc">Voltage and current telemetry use direct discrete analog sensing—no complex CAN bus handshakes or crashes.</div>
+                </div>
+                
+                <div class="card ">
+                    <div class="card-title">Rugged Reliability</div>
+                    <div class="card-desc">Analog shunts feed directly into the Arduino controller ADC with hardware comparator interrupts.</div>
                 </div>
                 
             </div>
             
+                <div class="col-media">
+                    <img src="file:///D:/JRFK/docs/cookbook_media/img_006.jpeg">
+                    <div class="media-caption">FIG 3: DISCRETE ANALOG VOLTAGE SHUNT & SENSOR WIRING</div>
+                </div>
+                
             
     </div>
     <div class="footer">
-        <div>JRFK 64-BIT STATION SUITE</div>
+        <div>JRFK 64-BIT STATION SUITE • AMATEUR RADIO HIGH-POWER LINEAR AMPLIFIERS</div>
         <div>GITHUB.COM/JBIRDLEBOUGH1/JRFKTOOLS</div>
     </div>
 </body>

@@ -140,15 +140,15 @@ body {
     color: var(--bp-line-dim);
     line-height: 1.4;
 }
-.feynman-box {
-    background: rgba(15, 23, 42, 0.9);
-    border: 1px dashed var(--accent-amber);
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-style: italic;
-    font-size: 12.5px;
+.station-note-box {
+    background: rgba(15, 23, 42, 0.95);
+    border-left: 4px solid var(--accent-amber);
+    padding: 9px 13px;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
     color: #fef08a;
-    line-height: 1.35;
+    line-height: 1.4;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 .footer {
     display: flex;
@@ -187,57 +187,67 @@ table.clean-table tr:hover td {
 </head>
 <body>
     <div class="header">
-        <div class="header-badge">DEVELOPMENT DEEP DIVE & BUILD AUTOMATION</div>
-        <div class="header-meta">MASTER STATION RESOURCES & LINKS</div>
+        <div class="header-badge">JRFK STATION SUITE</div>
+        <div class="header-meta">RESOURCES & COMMUNITY REPOSITORY</div>
     </div>
     <div class="title-row">
-        <h1>Resources & Project Downloads</h1>
-        <div class="subtitle">Turnkey Links for Software, Documentation, Firmware & Community Support</div>
+        <h1>Project Resources & Reference Links</h1>
+        <div class="subtitle">Complete Downloads, Documentation, and Links for DEVELOPMENT DEEP DIVE & BUILD AUTOMATION</div>
     </div>
     <div class="content">
         
-    <div class="col-text" style="flex:1;">
-        <div class="card card-green">
-            <div class="card-title">⚡ Fast Download (No Developer Tools Required)</div>
-            <div class="card-desc">
-                Direct Windows Executable: <b>JRFK.exe (Beta 1.0)</b><br>
-                <code>https://github.com/jbirdlebough1/JRFKTools/releases/download/v01.00.00-beta/JRFK.exe</code>
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:16px;">
+        <div style="text-align:center; margin-bottom:8px;">
+            <div style="font-size:24px; font-weight:800; color:#38bdf8; letter-spacing:1px; text-transform:uppercase;">
+                Turnkey Resources & Community Links
+            </div>
+            <div style="font-size:14px; color:#cbd5e1; margin-top:4px;">
+                Open-Source Tools, Engineering Documentation, and Ham Radio Community Support
             </div>
         </div>
-        <div class="card">
-            <div class="card-title">🌐 Live Web Documentation Portal (GitHub Pages)</div>
-            <div class="card-desc">
-                Read all manuals in your browser (desktop, tablet, or shack mobile):<br>
-                <code>https://jbirdlebough1.github.io/JRFKTools/</code>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+            <div class="card card-green">
+                <div class="card-title">📦 JRFK Migration Executable (Windows)</div>
+                <div class="card-desc">
+                    <b>Direct Executable:</b> Standalone turnkey migrator with automated safety locks.<br>
+                    <code style="color:#38bdf8;">github.com/jbirdlebough1/JRFKtools/releases</code>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">📖 Master Documentation Portal</div>
+                <div class="card-desc">
+                    <b>Live In-Browser Reader:</b> Complete 4-Volume manuals and K7BIT Cookbook.<br>
+                    <code style="color:#38bdf8;">jbirdlebough1.github.io/JRFKtools/</code>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">💻 Full Source Repository</div>
+                <div class="card-desc">
+                    <b>Source Code & Scripts:</b> Migration server, first-boot scripts, and systemd units.<br>
+                    <code style="color:#38bdf8;">github.com/jbirdlebough1/JRFKtools</code>
+                </div>
+            </div>
+            
+            <div class="card card-amber">
+                <div class="card-title">📻 RF-KIT Community Discussion</div>
+                <div class="card-desc">
+                    <b>Operator Forum:</b> Technical exchange, mod sharing, and live operating support.<br>
+                    <code style="color:#38bdf8;">groups.io/g/rf-kit</code>
+                </div>
             </div>
         </div>
-        <div class="card">
-            <div class="card-title">📂 Open Source GitHub Repository</div>
-            <div class="card-desc">
-                Source code, migrator tools, and full session audit logs:<br>
-                <code>https://github.com/jbirdlebough1/JRFKTools</code>
-            </div>
-        </div>
-        <div class="card card-amber">
-            <div class="card-title">💬 Community & Discussion Forum</div>
-            <div class="card-desc">
-                RF-KIT / B26-PA Worldwide Community:<br>
-                <code>https://b26-pa.groups.io/g/main</code>
-            </div>
-        </div>
-    </div>
-    <div class="col-media" style="flex:0.8;">
-        <div style="font-size:24px; font-weight:800; color:#ffffff; text-align:center; margin-bottom:12px;">73 & GOOD DX</div>
-        <div style="font-size:14px; color:var(--accent-cyan); text-align:center; line-height:1.6;">
-            RF-KIT RF2K+ / RF2K-S Linear Amplifier Modernization<br>
-            Designed & Maintained for the Global Amateur Radio Community<br><br>
-            <span style="color:#22c55e; font-weight:700;">Zero LaTeX Defects • Pure 64-Bit Bookworm • 7-Screen Telemetry</span>
+        
+        <div class="station-note-box" style="text-align:center;">
+            <b>Ham Radio Station Notice:</b> All software and documentation are provided free and open source for the amateur radio community. 73 and good DX!
         </div>
     </div>
     
     </div>
     <div class="footer">
-        <div>JRFK 64-BIT STATION SUITE</div>
+        <div>JRFK 64-BIT STATION SUITE • AMATEUR RADIO HIGH-POWER LINEAR AMPLIFIERS</div>
         <div>GITHUB.COM/JBIRDLEBOUGH1/JRFKTOOLS</div>
     </div>
 </body>

@@ -140,15 +140,15 @@ body {
     color: var(--bp-line-dim);
     line-height: 1.4;
 }
-.feynman-box {
-    background: rgba(15, 23, 42, 0.9);
-    border: 1px dashed var(--accent-amber);
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-style: italic;
-    font-size: 12.5px;
+.station-note-box {
+    background: rgba(15, 23, 42, 0.95);
+    border-left: 4px solid var(--accent-amber);
+    padding: 9px 13px;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
     color: #fef08a;
-    line-height: 1.35;
+    line-height: 1.4;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 .footer {
     display: flex;
@@ -199,31 +199,26 @@ table.clean-table tr:hover td {
             <div class="col-text">
                 
                 <div class="card card-green">
-                    <div class="card-title">Full KMS DRM Driver</div>
-                    <div class="card-desc">Transitioned from legacy fake-KMS to native Linux Full KMS DRM. Injected custom 1024x600 @ 60Hz video modeline directly into kernel boot parameters.</div>
+                    <div class="card-title">Video Modeline Fix</div>
+                    <div class="card-desc">Injected kernel command line video=HDMI-A-1:1024x600M@60D to permanently resolve display blanking.</div>
                 </div>
                 
                 <div class="card ">
-                    <div class="card-title">SimpleRPC Deprecation Patches</div>
-                    <div class="card-desc">Replaced obsolete asynchronous socket schemas with clean non-blocking JSON-RPC schemas compatible with modern Python 3.13.</div>
+                    <div class="card-title">Python SimpleRPC Modernization</div>
+                    <div class="card-desc">Patched legacy async socket handlers to comply with modern Python 3.11 through 3.13 standards.</div>
                 </div>
                 
                 <div class="card card-amber">
-                    <div class="card-title">Zero Lockup Architecture</div>
-                    <div class="card-desc">Isolates hardware polling loops so UI rendering stalls never interrupt amplifier protection watchdogs.</div>
+                    <div class="card-title">Systemd Services</div>
+                    <div class="card-desc">Native systemd unit files replace fragile rc.local background scripts for robust automatic recovery.</div>
                 </div>
                 
             </div>
             
-                <div class="col-media">
-                    <img src="file:///D:/JRFK/docs/cookbook_media/img_018.jpeg">
-                    <div class="media-caption">FIG 2: CONTROLLER BACKPLANE & 7-INCH DISPLAY INTERFACE</div>
-                </div>
-                
             
     </div>
     <div class="footer">
-        <div>JRFK 64-BIT STATION SUITE</div>
+        <div>JRFK 64-BIT STATION SUITE • AMATEUR RADIO HIGH-POWER LINEAR AMPLIFIERS</div>
         <div>GITHUB.COM/JBIRDLEBOUGH1/JRFKTOOLS</div>
     </div>
 </body>
