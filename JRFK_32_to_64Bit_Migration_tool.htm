@@ -406,33 +406,23 @@ body {
 </head>
 <body>
 
-<!-- Blueprint Technical Header with Top Row Navigation -->
+<!-- Blueprint Technical Header -->
 <div class="header">
   <div>
     <h1>RF-KIT 64-Bit Appliance Builder &amp; Migration Console</h1>
     <div class="meta">STATION CALLSIGN: K7BIT | ARCHITECTURE: 64-BIT AARCH64 GOLD REPLICATION ENGINE</div>
   </div>
-  <div class="nav-tools">
-    <a href="/docs" class="btn">📖 Station Docs</a>
-    <a href="/antenna" class="btn">🗺️ Antenna Mapper</a>
-    <a href="/health" class="btn">📈 Health Monitor</a>
-    <a href="/screen" class="btn">📺 Remote Screen</a>
-    <a href="/backup" class="btn">💾 SD Backup</a>
-    <a href="/report" class="btn">📋 System Report</a>
-    <a href="/logs" class="btn">📜 Log Viewer</a>
-  </div>
-</div>
-
-<!-- Sub-Header Ribbon with Station Status Pills & Builder Tabs -->
-<div class="topbar-sub">
   <div style="display:flex; gap:10px; align-items:center;">
     <span class="pill ok" id="hostPill" style="background:#0c2340; border-color:var(--data-green); color:var(--data-green); font-weight:bold;">● Windows Host Ready</span>
     <span class="pill" id="sdPill" style="background:#0c2340; border-color:var(--data-cyan); color:var(--data-cyan); font-weight:bold;">○ Target SD: None Detected</span>
   </div>
+</div>
+
+<!-- Builder Tabs -->
+<div class="topbar-sub">
   <nav class="ribbon" style="margin:0; padding:0; background:transparent; border:none; display:flex; gap:8px;">
     <button class="mode-btn active" id="btnTabWizard" onclick="switchTab('wizard')">💽 SD Appliance Builder</button>
     <button class="mode-btn" id="btnTabDocs" onclick="switchTab('docs')">📖 Master Manual</button>
-    <button class="mode-btn" id="btnTabUtils" onclick="switchTab('utils')">🌐 Web Utilities</button>
     <button class="mode-btn" id="btnTabProfile" onclick="switchTab('profile')">⚙️ Station Profile</button>
   </nav>
 </div>

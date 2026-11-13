@@ -20,7 +20,13 @@ import threading
 import subprocess
 import logging
 from logging.handlers import RotatingFileHandler
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+try:
+    from http.server import ThreadingHTTPServer as ServerClass, SimpleHTTPRequestHandler
+except ImportError:
+    import socketserver
+    from http.server import HTTPServer, SimpleHTTPRequestHandler
+    class ServerClass(socketserver.ThreadingMixIn, HTTPServer):
+        daemon_threads = True
 import urllib.request
 import urllib.error
 
@@ -974,7 +980,7 @@ def run_server():
     collector.start()
 
     server_address = ('0.0.0.0', PORT)
-    httpd = HTTPServer(server_address, RFKToolsHandler)
+    httpd = ServerClass(server_address, RFKToolsHandler)
     print(f"[*] RFK Tools Suite running on http://0.0.0.0:{PORT}...")
     try:
         httpd.serve_forever()
