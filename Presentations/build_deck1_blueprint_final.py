@@ -12,186 +12,6 @@ DECK_DIR = r"D:\JRFK\Presentations\Deck_1_Intro"
 VSDC_DIR = os.path.join(DECK_DIR, "vsdc_media_blueprint")
 os.makedirs(VSDC_DIR, exist_ok=True)
 
-# Master Blueprint Layout Template
-# For Slide 1 & 2: Bullets layout
-# For Slides 3+: Screen-focused layout (Full width 1830px screen with overlay control panel, zero bullets)
-
-TEMPLATE_BULLETS = """<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { width: 1920px; height: 1080px; overflow: hidden; }
-    body {
-        background-color: #1a5695;
-        background-image: 
-            linear-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.18) 1px, transparent 1px),
-            linear-gradient(rgba(147, 197, 253, 0.35) 2px, transparent 2px),
-            linear-gradient(90deg, rgba(147, 197, 253, 0.35) 2px, transparent 2px);
-        background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
-        color: #ffffff;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: 30px 45px;
-        border: 4px solid #93c5fd;
-    }
-    .master-header {
-        width: 1830px;
-        border-bottom: 3px solid #93c5fd;
-        padding-bottom: 12px;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        background: rgba(26, 86, 149, 0.90);
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-    .header-left { display: flex; flex-direction: column; gap: 3px; }
-    .header-tagline {
-        font-family: "Consolas", monospace;
-        font-size: 14px;
-        letter-spacing: 2px;
-        color: #93c5fd;
-        text-transform: uppercase;
-        font-weight: 700;
-    }
-    .header-title {
-        font-size: 34px;
-        font-weight: 900;
-        letter-spacing: -0.5px;
-        color: #ffffff;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-    }
-    .header-subtitle { font-size: 16px; color: #bfdbfe; font-weight: 500; }
-    .header-right {
-        text-align: right;
-        font-family: "Consolas", monospace;
-        font-size: 15px;
-        color: #ffffff;
-        letter-spacing: 1.5px;
-        font-weight: bold;
-        background: #0284c7;
-        padding: 8px 18px;
-        border-radius: 4px;
-        border: 1px solid #93c5fd;
-    }
-    .master-body {
-        width: 1830px;
-        height: 870px;
-        display: flex;
-        gap: 20px;
-        margin: 12px 0;
-    }
-    .col-one-third {
-        width: 600px;
-        flex-shrink: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        gap: 8px;
-    }
-    .bullet-card {
-        background: rgba(15, 45, 85, 0.95);
-        border: 2px solid #93c5fd;
-        border-left: 6px solid #60a5fa;
-        border-radius: 6px;
-        padding: 12px 16px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    }
-    .bullet-title {
-        font-size: 16px;
-        font-weight: 800;
-        color: #ffffff;
-        margin-bottom: 4px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .bullet-title::before { content: "►"; color: #93c5fd; font-size: 12px; }
-    .bullet-desc { font-size: 14px; line-height: 1.4; color: #e0f2fe; }
-    .col-two-thirds {
-        width: 1210px;
-        flex-shrink: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 10px;
-    }
-    .graphic-frame {
-        width: 1210px;
-        background: rgba(10, 30, 60, 0.95);
-        border: 3px solid #93c5fd;
-        border-radius: 8px;
-        padding: 8px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-        max-height: 820px;
-        overflow: hidden;
-    }
-    .graphic-frame img { width: 100%; max-height: 780px; border-radius: 4px; display: block; object-fit: contain; }
-    .graphic-caption {
-        font-family: "Consolas", monospace;
-        font-size: 13px;
-        color: #93c5fd;
-        text-align: center;
-        font-weight: 700;
-        letter-spacing: 1px;
-        background: rgba(15, 45, 85, 0.95);
-        padding: 4px 8px;
-        border-radius: 4px;
-        border: 1px solid rgba(147, 197, 253, 0.5);
-    }
-    .master-footer {
-        width: 1830px;
-        border-top: 2px solid #93c5fd;
-        padding-top: 8px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-family: "Consolas", monospace;
-        font-size: 12px;
-        color: #bfdbfe;
-        background: rgba(26, 86, 149, 0.90);
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-    .footer-left { color: #93c5fd; font-weight: 700; }
-</style>
-</head>
-<body>
-    <div class="master-header">
-        <div class="header-left">
-            <div class="header-tagline">{{PART}} • {{CATEGORY}}</div>
-            <div class="header-title">{{TITLE}}</div>
-            <div class="header-subtitle">{{SUBTITLE}}</div>
-        </div>
-        <div class="header-right">
-            <div>CALLSIGN: K7BIT</div>
-            <div>SLIDE {{SLIDE_NUM}} OF {{TOTAL_SLIDES}}</div>
-        </div>
-    </div>
-    <div class="master-body">
-        <div class="col-one-third">
-            {{BULLETS_HTML}}
-        </div>
-        <div class="col-two-thirds">
-            {{GRAPHICS_HTML}}
-        </div>
-    </div>
-    <div class="master-footer">
-        <div class="footer-left">JRFK 64-BIT MODERNIZATION SUITE • HIGH-POWER AMATEUR RADIO • K7BIT</div>
-        <div class="footer-right">GITHUB.COM/BIRDIEBOUGHT/JRFKTOOLS</div>
-    </div>
-</body>
-</html>
-"""
-
 TEMPLATE_FULLSCREEN = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -212,105 +32,103 @@ TEMPLATE_FULLSCREEN = """<!DOCTYPE html>
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        padding: 24px 35px;
-        border: 4px solid #93c5fd;
+        padding: 6px 12px;
+        border: 2px solid #93c5fd;
     }
     .master-header {
-        width: 1850px;
-        border-bottom: 3px solid #93c5fd;
-        padding-bottom: 10px;
+        width: 100%;
+        height: 44px;
+        border-bottom: 2px solid #93c5fd;
         display: flex;
         justify-content: space-between;
-        align-items: flex-end;
-        background: rgba(26, 86, 149, 0.92);
-        padding-left: 10px;
-        padding-right: 10px;
+        align-items: center;
+        background: rgba(26, 86, 149, 0.96);
+        padding: 0 10px;
+        flex-shrink: 0;
     }
-    .header-left { display: flex; flex-direction: column; gap: 2px; }
+    .header-left { display: flex; align-items: baseline; gap: 12px; }
     .header-tagline {
         font-family: "Consolas", monospace;
-        font-size: 13px;
-        letter-spacing: 2px;
+        font-size: 12px;
+        letter-spacing: 1.5px;
         color: #93c5fd;
         text-transform: uppercase;
         font-weight: 700;
     }
     .header-title {
-        font-size: 32px;
+        font-size: 24px;
         font-weight: 900;
         letter-spacing: -0.5px;
         color: #ffffff;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
     }
-    .header-subtitle { font-size: 15px; color: #bfdbfe; font-weight: 500; }
+    .header-subtitle { font-size: 13.5px; color: #bfdbfe; font-weight: 500; }
     .header-right {
-        text-align: right;
+        display: flex;
+        gap: 10px;
+        align-items: center;
         font-family: "Consolas", monospace;
-        font-size: 14px;
+        font-size: 12px;
         color: #ffffff;
         letter-spacing: 1.5px;
         font-weight: bold;
+    }
+    .badge-callsign {
         background: #0284c7;
-        padding: 6px 16px;
+        padding: 3px 10px;
         border-radius: 4px;
         border: 1px solid #93c5fd;
     }
+    .badge-slide {
+        background: rgba(15, 45, 85, 0.95);
+        padding: 3px 8px;
+        border-radius: 4px;
+        border: 1px solid #60a5fa;
+        color: #7dd3fc;
+    }
     .master-body-fullscreen {
-        width: 1850px;
-        height: 890px;
+        width: 100%;
+        flex: 1 1 auto;
+        min-height: 0;
         display: flex;
-        flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: 8px;
-        margin: 8px 0;
+        margin: 4px 0;
+        overflow: hidden;
     }
     .graphic-frame-full {
-        width: 1850px;
-        height: 840px;
-        background: rgba(10, 30, 60, 0.95);
-        border: 3px solid #93c5fd;
-        border-radius: 8px;
-        padding: 6px;
+        width: 100%;
+        height: 100%;
+        background: rgba(8, 26, 50, 0.98);
+        border: 2px solid #93c5fd;
+        border-radius: 4px;
+        padding: 2px;
         display: flex;
         justify-content: center;
         align-items: center;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
         overflow: hidden;
     }
     .graphic-frame-full img {
         width: 100%;
         height: 100%;
-        border-radius: 4px;
+        border-radius: 2px;
         display: block;
         object-fit: contain;
     }
-    .graphic-caption-full {
-        width: 1850px;
-        font-family: "Consolas", monospace;
-        font-size: 14px;
-        color: #93c5fd;
-        text-align: center;
-        font-weight: 700;
-        letter-spacing: 1px;
-        background: rgba(15, 45, 85, 0.95);
-        padding: 6px 12px;
-        border-radius: 4px;
-        border: 1px solid rgba(147, 197, 253, 0.5);
-    }
     .master-footer {
-        width: 1850px;
-        border-top: 2px solid #93c5fd;
-        padding-top: 8px;
+        width: 100%;
+        height: 24px;
+        border-top: 1px solid #93c5fd;
         display: flex;
         justify-content: space-between;
         align-items: center;
         font-family: "Consolas", monospace;
-        font-size: 12px;
+        font-size: 11px;
         color: #bfdbfe;
-        background: rgba(26, 86, 149, 0.90);
-        padding-left: 10px;
-        padding-right: 10px;
+        background: rgba(26, 86, 149, 0.96);
+        padding: 0 10px;
+        flex-shrink: 0;
     }
     .footer-left { color: #93c5fd; font-weight: 700; }
 </style>
@@ -323,294 +141,183 @@ TEMPLATE_FULLSCREEN = """<!DOCTYPE html>
             <div class="header-subtitle">{{SUBTITLE}}</div>
         </div>
         <div class="header-right">
-            <div>CALLSIGN: K7BIT</div>
-            <div>SLIDE {{SLIDE_NUM}} OF {{TOTAL_SLIDES}}</div>
+            <div class="badge-callsign">K7BIT</div>
+            <div class="badge-slide">SLIDE {{SLIDE_NUM}} OF {{TOTAL_SLIDES}}</div>
         </div>
     </div>
     <div class="master-body-fullscreen">
         <div class="graphic-frame-full">
             <img src="{{IMAGE_SRC}}" alt="{{TITLE}}">
         </div>
-        <div class="graphic-caption-full">{{CAPTION}}</div>
     </div>
     <div class="master-footer">
-        <div class="footer-left">JRFK 64-BIT MODERNIZATION SUITE • HIGH-POWER AMATEUR RADIO • K7BIT</div>
-        <div class="footer-right">GITHUB.COM/BIRDIEBOUGHT/JRFKTOOLS</div>
+        <div class="footer-left">{{CAPTION}}</div>
+        <div class="footer-right">JRFK 64-BIT MODERNIZATION SUITE • K7BIT</div>
     </div>
 </body>
 </html>
 """
 
-# Complete 20 Slide Definition
-# Slide 1 & 2: Intro & Architecture Overview
-# Slides 3 to 7: Migration in 5 deep-dive slides (Zero bullets, full screen graphics, technical discussion of controls)
-# Slides 8 to 20: JRFK Web Tools deep-dive slides (Zero bullets, full screen graphics, discussion of each page's controls)
+# 13 TECHNICAL SLIDES
+# Focus: Operations, Engineering, Disaster Recovery
+# Cookbook de-emphasized to brief reference
+# Last slide: Resources & Contact Info
 SLIDES = [
     # -------------------------------------------------------------
-    # SLIDE 1: INTRO (THE 4 CORE TOPICS)
+    # SLIDE 1: INTRO (PC MIGRATION OVERVIEW)
     # -------------------------------------------------------------
     {
-        "type": "bullets",
-        "part": "PART 1: SYSTEM INTRO",
-        "category": "JRFK MODERNIZATION SUITE • ARCHITECTURAL OVERVIEW",
-        "title": "JRFK 32-to-64 Bit Migration & Web Tools",
-        "subtitle": "Modernizing RFK Linear Amplifiers to Current 64-Bit Debian Trixie on RPi 4 & 5",
-        "bullets": [
-            ("32-Bit RPi OS Obsolete", "Thirty-two-bit Raspberry Pi OS is obsolete, unmaintained, and reaches end-of-life across Linux distributions."),
-            ("RFK Amp Owners at Risk", "Leaves RFK amplifier owners at serious risk from unpatched kernel bugs, security gaps, and SD card failure."),
-            ("64-Bit Trixie Migration", "The JRFK 32-bit to 64-bit Migration and Web Tools enable seamless migration to current 64-bit Raspberry Pi 4 or 5 Debian Trixie."),
-            ("Concurrent Web Tools", "JRFK Web Tools run concurrently on any web-capable platform with the original RFK application via port 8088.")
-        ],
-        "image": "tool0_portal_main.png",
-        "caption": "JRFK MODERNIZATION SUITE: CONCURRENT 64-BIT ARCHITECTURE & BLUEPRINT WEB TOOLS",
-        "narration": "Thirty-two-bit Raspberry Pi O S is obsolete. This leaves R F kit amplifier owners at risk. The J R F K thirty-two-bit to sixty-four-bit Migration and J R F K Web Tools enable users to migrate from obsolete systems to current sixty-four-bit Raspberry Pi four or five Debian Trixie. J R F K Web Tools run concurrently on any web capable platform with the original R F kit application."
-    },
-    # -------------------------------------------------------------
-    # SLIDE 2: SUITE ARCHITECTURE & WEB PORTAL
-    # -------------------------------------------------------------
-    {
-        "type": "fullscreen",
-        "part": "PART 1: SYSTEM INTRO",
-        "category": "WEB TOOLS PORTAL • PORT 8088 BLUEPRINT DASHBOARD",
-        "title": "JRFK Web Tools: Unified Station Portal",
-        "subtitle": "Access all amplifier telemetry, matrix routing, and diagnostics simultaneously over port 8088",
-        "image": "intro_portal_overview.png",
-        "caption": "PORT 8088 BLUEPRINT PORTAL: DIRECT ACCESS TO HEALTH, ANTENNA MATRIX, BACKUPS, LOGS & DOCS",
-        "narration": "Here is the master blueprint portal running live on port eighty eighty-eight. It displays the complete J R F K Web Tools suite, providing direct tiles to the Health Guard, Antenna Matrix, S D Backup Manager, System Report, Diagnostic Logs, Documentation Library, and live front panel screen streamer. Everything runs simultaneously in the background without disturbing the amplifier front display."
-    },
-    # -------------------------------------------------------------
-    # SLIDE 3: MIGRATION 1 - DISCOVERY & DRIVE GUARD
-    # -------------------------------------------------------------
-    {
-        "type": "fullscreen",
-        "part": "PART 2: MIGRATION TOOL",
-        "category": "MIGRATION DEEP-DIVE 1 OF 5 • DISK DISCOVERY & DRIVE GUARD",
-        "title": "Migrator: Original SD Discovery & Drive Guard",
-        "subtitle": "Automated disk enumeration, safe drive locking, and raw ext4 partition mounting",
+        "part": "PART 1: PC MIGRATOR",
+        "category": "SUITE OVERVIEW • WINDOWS PC APP",
+        "title": "JRFK 64-Bit Appliance Builder & Migrator",
+        "subtitle": "Standalone PC utility to create a 64-bit Raspberry Pi OS card with RFK & Web Tools",
         "image": "migrator_step1_discovery.png",
-        "caption": "MIGRATOR STEP 1: PHYSICAL DRIVE ENUMERATION, DRIVE GUARD PROTECTION, AND EXT4 DISCOVERY",
-        "narration": "Covering the migration suite starting with step one of the J R F K Migrator console. On the upper left, the Drive Guard engine scans connected storage buses and locks out your primary Windows system disks to eliminate any risk of accidental drive wiping. It directly mounts the raw ext four Linux partitions from your original thirty-two-bit S D card, identifies the controller firmware version, and verifies card health."
+        "caption": "MIGRATOR RUNNING ON PC: CREATES 64-BIT TRIXIE OS WITH RFK CONTROLLER & WEB TOOLS",
+        "narration": "Thirty-two-bit Raspberry Pi O S is obsolete, leaving R F kit amplifier owners at risk from unmaintained kernels and S D card failures. On screen is the J R F K Migrator running on your Windows P C. Its purpose is to prepare a complete sixty-four-bit Raspberry Pi operating system containing all original R F kit calibrations, user data, and the J R F K Web Tools suite for your amplifier. Over the next four slides, we look at the P C migration process, and then we will explore each of the on-amplifier web tools."
     },
     # -------------------------------------------------------------
-    # SLIDE 4: MIGRATION 2 - CALIBRATION EXTRACTION
+    # SLIDE 2: MIGRATOR OPTION A (GOLD TO PROD)
     # -------------------------------------------------------------
     {
-        "type": "fullscreen",
-        "part": "PART 2: MIGRATION TOOL",
-        "category": "MIGRATION DEEP-DIVE 2 OF 5 • CALIBRATION EXTRACTION",
-        "title": "Migrator: Factory Calibration Extraction",
-        "subtitle": "Reading factory ADC lookup tables, forward/reflected coupler constants, and relay profiles",
+        "part": "PART 1: PC MIGRATOR",
+        "category": "BUILD OPTION A • GOLDEN MASTER MIGRATION",
+        "title": "Migrator Option A: Gold to Production",
+        "subtitle": "Extracts 100% of calibration.json, ADC offsets & Wi-Fi from your existing working card",
+        "image": "migrator_optA_gold_to_prod.png",
+        "caption": "OPTION A: EXTRACTS 100% OF CALIBRATIONS FROM WORKING AMPLIFIER CARD, THEN WRITES 64-BIT OS",
+        "narration": "Examining the primary migration path, Option A: Gold to Production. Look at the upper selector tile on screen. In this mode, you take your existing working S D card from the amplifier and plug it into a U S B reader on your P C. The tool reads your card in read-only safety mode, extracting one hundred percent of your calibration files, directional coupler offsets, and station settings. Once extracted, you remove your original card and insert a new card, which the tool flashes with the complete sixty-four-bit Debian Trixie system."
+    },
+    # -------------------------------------------------------------
+    # SLIDE 3: MIGRATOR OPTION B (NEW TO PROD / CLEAN INSTALL)
+    # -------------------------------------------------------------
+    {
+        "part": "PART 1: PC MIGRATOR",
+        "category": "BUILD OPTION B • CLEAN PRODUCTION INSTALL",
+        "title": "Migrator Option B: Clean Install to Production",
+        "subtitle": "Builds a fresh 64-bit card with user credentials, station Wi-Fi, and default profiles",
+        "image": "migrator_optB_new_to_prod.png",
+        "caption": "OPTION B: CONFIGURES NEW SYSTEM CREDENTIALS, WI-FI SSID, AND PARTITIONS FRESH 64-BIT SD CARD",
+        "narration": "Now look at Option B on screen: Clean Install to Production. This option is used when you are starting fresh with a brand new card or building a spare backup without reading an original card first. On this screen, you directly configure your Raspberry Pi username, system password, hostname, and station Wi-Fi credentials. The tool formats the new target card, installs sixty-four-bit Debian Trixie, and provisions the native R F kit controller alongside the J R F K Web Tools suite."
+    },
+    # -------------------------------------------------------------
+    # SLIDE 4: MIGRATOR CALIBRATION EXTRACTION DETAILS
+    # -------------------------------------------------------------
+    {
+        "part": "PART 1: PC MIGRATOR",
+        "category": "CALIBRATION RECOVERY • ADC OFFSET PRESERVATION",
+        "title": "PC Migrator: Directional Coupler & ADC Calibration",
+        "subtitle": "Raw ext4 inspection of factory forward/reflected power tables and relay timing",
         "image": "report_calibrations.png",
-        "caption": "CALIBRATION RECOVERY: DIRECTIONAL COUPLER ADC MATRICES, RELAY TIMINGS, AND BAND CALIBRATION",
-        "narration": "Examining calibration recovery. On screen you see the directional coupler forward and reflected power A D C lookup tables and band calibration matrices extracted directly from the original card. The migrator extracts every factory calibration coefficient, P T T relay timing constant, and antenna matrix preset, packaging them into an encrypted gold archive so no manual recalibration is required."
+        "caption": "CALIBRATION ARCHIVE: ADC POWER MATRICES, ATTENUATOR STEPS, AND RELAY TIMING CONSTANTS",
+        "narration": "This screen shows the exact calibration data recovered by the P C migrator from your original card. Listed here are the factory directional coupler forward and reflected power A D C lookup tables, attenuator step values, and P T T relay timings. The migrator transfers these exact matrices into the new sixty-four-bit operating system, ensuring that your amplifier retains its factory RF metering precision."
     },
     # -------------------------------------------------------------
-    # SLIDE 5: MIGRATION 3 - TARGET CARD PROVISIONING
+    # SLIDE 5: AMPLIFIER TWO-BOOT DEPLOYMENT
     # -------------------------------------------------------------
     {
-        "type": "fullscreen",
-        "part": "PART 2: MIGRATION TOOL",
-        "category": "MIGRATION DEEP-DIVE 3 OF 5 • TARGET CARD PROVISIONING",
-        "title": "Migrator: 64-Bit Target Provisioning",
-        "subtitle": "Writing verified Debian Trixie golden image, setting network credentials, and partition creation",
-        "image": "migrator_step2_provisioning.png",
-        "caption": "MIGRATOR STEP 2: CREDENTIAL SETUP, TARGET DISK SELECTION, AND BLOCK-LEVEL IMAGE FLASHING",
-        "narration": "Moving to step two of the migrator: target card provisioning. Here the operator configures network hostnames and station Wi-Fi credentials before selecting the high-speed target Micro S D card or U S B boot media. The flasher writes the pure sixty-four-bit Debian Trixie golden image with automatic sector verification and hash checking to ensure flawless boot integrity."
-    },
-    # -------------------------------------------------------------
-    # SLIDE 6: MIGRATION 4 - CALIBRATION INJECTION & BUILD
-    # -------------------------------------------------------------
-    {
-        "type": "fullscreen",
-        "part": "PART 2: MIGRATION TOOL",
-        "category": "MIGRATION DEEP-DIVE 4 OF 5 • CALIBRATION INJECTION",
-        "title": "Migrator: Automated Configuration Injection",
-        "subtitle": "Direct ext4 configuration injection, driver binding, and systemd service initialization",
-        "image": "migrator_tab_utils.png",
-        "caption": "MIGRATOR UTILITIES: CALIBRATION INJECTION ENGINE, CARD REPAIR, AND SECTOR FORMAT TOOLS",
-        "narration": "This view shows the migrator utilities tab. Once the base operating system is written, the injection pipeline directly writes your extracted calibration files, controller configurations, and network settings into the target ext four filesystem. It provisions system D service supervisors and binds low-level hardware drivers before ejecting the completed card."
-    },
-    # -------------------------------------------------------------
-    # SLIDE 7: MIGRATION 5 - FIRST BOOT & TRIXIE KERNEL
-    # -------------------------------------------------------------
-    {
-        "type": "fullscreen",
-        "part": "PART 2: MIGRATION TOOL",
-        "category": "MIGRATION DEEP-DIVE 5 OF 5 • DEBIAN TRIXIE FIRST BOOT",
-        "title": "Migrator: 64-Bit Debian Trixie Verification",
-        "subtitle": "Automated root partition expansion, 64-bit kernel 6.12 initialization, and hardware verification",
+        "part": "PART 1: PC MIGRATOR",
+        "category": "DEPLOYMENT COMPLETE • AMPLIFIER INITIALIZATION",
+        "title": "Amplifier Deployment: Two-Boot Production Verification",
+        "subtitle": "Boot 1: Automated partition expansion • Boot 2: Production service on Debian Trixie",
         "image": "tool4_report_hardware.png",
-        "caption": "SYSTEM VERIFICATION: DEBIAN TRIXIE 64-BIT LINUX 6.12 KERNEL AND RASPBERRY PI HARDWARE REPORT",
-        "narration": "Concluding the migration on the amplifier itself. When the card boots on your Raspberry Pi four or five, first-boot automation scripts automatically expand the Linux root partition to fill the entire card capacity and initialize the sixty-four-bit kernel six point twelve. The amplifier launches directly into service with all factory calibrations intact and verified."
+        "caption": "SYSTEM VERIFICATION: 64-BIT DEBIAN TRIXIE KERNEL 6.12 ACTIVE ON AMPLIFIER RASPBERRY PI",
+        "narration": "Once flashing finishes on your P C, you insert the new card into your amplifier's Raspberry Pi four or five. On the first boot, automated scripts expand the Linux root partition to fill the full card and configure controller devices. On the second boot, your amplifier enters full production service running pure sixty-four-bit Debian Trixie with the native front panel app and all Web Tools active."
     },
     # -------------------------------------------------------------
-    # SLIDE 8: WEB TOOL 1 - HEALTH OVERVIEW
+    # SLIDE 6: WEB TOOLS INTRO: PORTAL OVERVIEW
     # -------------------------------------------------------------
     {
-        "type": "fullscreen",
-        "part": "PART 3: JRFK WEB TOOLS",
-        "category": "TOOL 1: HEALTH MONITOR • LIVE RF METERS",
-        "title": "Health Guard: Real-Time RF Telemetry",
-        "subtitle": "Precision forward power up to 1500 Watts P, E, P, reflected power, and continuous VSWR",
-        "image": "tool1_health_meters.png",
-        "caption": "HEALTH MONITOR: HIGH-SPEED FORWARD POWER, REFLECTED POWER, AND DYNAMIC SWR BARS",
-        "narration": "Examining the first web tool, the Health and Thermal Guard. The prominent upper instruments display instantaneous forward power up to fifteen hundred Watts, P, E, P, alongside reflected power in Watts. The central V S W R indicator updates at thirty Hertz, giving you precise, low-latency visual feedback on antenna loading during transmission."
+        "part": "PART 2: ON-AMPLIFIER WEB TOOLS",
+        "category": "SUITE PORTAL • BROWSER-BASED MANAGEMENT",
+        "title": "JRFK Web Tools: Unified Station Dashboard",
+        "subtitle": "Concurrent remote management served directly by the amplifier on port 8088",
+        "image": "intro_portal_overview.png",
+        "caption": "BLUEPRINT PORTAL ON PORT 8088: ACCESS HEALTH, ANTENNA MATRIX, BACKUPS, LOGS & DOCS",
+        "narration": "Now we move to the J R F K Web Tools running live on the amplifier. On screen is the master blueprint portal accessed via any browser on port eighty eighty-eight. It runs simultaneously alongside the native R F kit application using shared memory, giving you direct access to the Health Guard, Antenna Matrix, S D Backup Manager, System Diagnostics, Event Logs, and live Screen Streamer."
     },
     # -------------------------------------------------------------
-    # SLIDE 9: WEB TOOL 1 - THERMALS & POWER RAILS
+    # SLIDE 7: WEB TOOL 1 - HEALTH RF METERS & THERMALS
     # -------------------------------------------------------------
     {
-        "type": "fullscreen",
-        "part": "PART 3: JRFK WEB TOOLS",
-        "category": "TOOL 1: HEALTH MONITOR • POWER RAILS & THERMALS",
-        "title": "Health Guard: 53.5V Rail & LDMOS Thermals",
-        "subtitle": "Main switching supply rail shunt monitoring and individual LDMOS heatsink probes",
-        "image": "tool1_health_thermals.png",
-        "caption": "THERMAL SUPERVISION: 53.5V DC BUS METERS, AMMETERS, AND INDIVIDUAL LDMOS HEATSINK SENSORS",
-        "narration": "Looking at the lower pane of the health tool. On the left are the fifty-three point five volt D C rail voltage and current meters, showing exact power supply draw under heavy carrier. To the right, individual temperature sensors monitor the dual L-D moss heatsinks with a sixty degree threshold and automatic cooling fan regulation."
+        "part": "PART 2: ON-AMPLIFIER WEB TOOLS",
+        "category": "TOOL 1: HEALTH MONITOR • LIVE RF & THERMAL STATUS",
+        "title": "Health Guard: Real-Time RF Telemetry & Safety Ceiling",
+        "subtitle": "Forward power up to 1500 Watts P, E, P, reflected power, and 60°C thermal protection",
+        "image": "slide_health_main.png",
+        "caption": "HEALTH MONITOR: LIVE RF POWER METERS, 53.5V SUPPLY SHUNTS & 60°C THERMAL SAFETY TRIP",
+        "narration": "Examining the Health and Thermal Guard on screen. At the top of the page, the thermal safety banner supervises the P A heatsink temperature against the sixty degree ceiling, unkeying the amplifier into standby if cooling limits are reached. Down below, the instruments display instantaneous forward power up to fifteen hundred Watts, P, E, P, reflected power in Watts, and the fifty-three point five volt D C power supply rail status."
     },
     # -------------------------------------------------------------
-    # SLIDE 10: WEB TOOL 1 - PROTECTION INTERLOCKS
+    # SLIDE 8: WEB TOOL 2 - ANTENNA MATRIX & TUNER BODE PLOT
     # -------------------------------------------------------------
     {
-        "type": "fullscreen",
-        "part": "PART 3: JRFK WEB TOOLS",
-        "category": "TOOL 1: HEALTH MONITOR • PROTECTION INTERLOCKS",
-        "title": "Health Guard: Protection Alarms & Reset",
-        "subtitle": "Microsecond hardware fault detection, alarm latching, and authorized remote reset",
-        "image": "tool1_health_main.png",
-        "caption": "PROTECTION DASHBOARD: LATCHED FAULT INDICATORS, HARDWARE INTERLOCKS, AND REMOTE RESET",
-        "narration": "On screen is the protection interlock supervisory pane. In the event of excessive reflected power or overcurrent, hardware interlocks disengage bias within microseconds. The web interface identifies the specific fault, latches the alarm for operator inspection, and allows an authorized remote reset once antenna conditions are safe."
+        "part": "PART 2: ON-AMPLIFIER WEB TOOLS",
+        "category": "TOOL 2: ANTENNA MATRIX & ATU • RELAY SWITCHED MATCHING",
+        "title": "Antenna Matrix & ATU: Auto Segment Tuning",
+        "subtitle": "4-way band routing and B26-ATU switched relay/PIN diode matching network",
+        "image": "slide_antenna_main.png",
+        "caption": "ANTENNA & ATU MATRIX: 4-WAY SELECTION & B26-ATU SWITCHED COMPONENT TUNING BODE PLOT",
+        "narration": "Looking at the Antenna Mapper and Tuner Matrix screen. At the top are the four antenna ports covering one sixty through six meters, which switch automatically via C A T control. Below is the B twenty-six A T U matching network. The R F kit tuner uses relay and P I N diode switching to engage discrete physical inductors and capacitors for each frequency segment. The Bode plot displays S W R across the band and lists the exact physical inductance in nanohenries and capacitance in picofarads selected for that segment."
     },
     # -------------------------------------------------------------
-    # SLIDE 11: WEB TOOL 1 - CONSOLIDATED REMOTE VIEW
+    # SLIDE 9: WEB TOOL 3 - SD BACKUP & DISASTER RECOVERY
     # -------------------------------------------------------------
     {
-        "type": "fullscreen",
-        "part": "PART 3: JRFK WEB TOOLS",
-        "category": "TOOL 1: HEALTH MONITOR • CONSOLIDATED REMOTE VIEW",
-        "title": "Health Guard: Responsive Operations Cockpit",
-        "subtitle": "Complete single-pane amplifier health, power rails, and interlocks from any browser",
-        "image": "health_overview.png",
-        "caption": "REMOTE OVERVIEW: CLEAN BLUEPRINT DISPLAY OPTIMIZED FOR PC, TABLET, AND PHONE BROWSERS",
-        "narration": "Here is the full Health Guard overview. It organizes power meters, thermal gauges, voltage shunts, and protection alarms onto a clean blueprint canvas. You can monitor high-power transmissions remotely from anywhere in the home or operating shack with complete peace of mind."
+        "part": "PART 2: ON-AMPLIFIER WEB TOOLS",
+        "category": "TOOL 3: SD BACKUP • DUAL-SD RECOVERY PIPELINE",
+        "title": "SD Backup Manager: Automated Cloning & Recovery",
+        "subtitle": "Three-minute background clone to secondary USB storage while operating",
+        "image": "slide_backup_main.png",
+        "caption": "SD DISASTER RECOVERY: LIVE CLONING PIPELINE TO SECONDARY STORAGE & SCHEDULER",
+        "narration": "Examining the S D Backup and Disaster Recovery tool on screen. The top status panel verifies the active boot card, while the storage selector identifies connected U S B target drives. In under three minutes, this tool writes a complete, bootable clone of your operating system to secondary storage in the background while you remain on the air, keeping a verified standby card ready in case of media failure."
     },
     # -------------------------------------------------------------
-    # SLIDE 12: WEB TOOL 2 - ANTENNA MATRIX ROUTING
+    # SLIDE 10: WEB TOOL 4 - SYSTEM REPORT & ENGINEERING ARCHIVE
     # -------------------------------------------------------------
     {
-        "type": "fullscreen",
-        "part": "PART 3: JRFK WEB TOOLS",
-        "category": "TOOL 2: ANTENNA MATRIX • 4-WAY ROUTING",
-        "title": "Antenna Matrix: 4-Way Routing Grid",
-        "subtitle": "Band-by-band antenna selection, frequency memory recall, and manual overrides",
-        "image": "tool2_antenna_matrix_grid.png",
-        "caption": "ANTENNA MATRIX: 4-WAY OUTPUT SELECTION GRID ACROSS ALL AMATEUR BANDS",
-        "narration": "Moving to the second web tool, the Antenna Matrix. The upper grid provides four-way antenna port routing for every amateur band from one sixty through six meters. As you tune your transceiver, C A T control automatically recalls the programmed antenna port with zero manual intervention."
-    },
-    # -------------------------------------------------------------
-    # SLIDE 13: WEB TOOL 2 - TUNER BODE PLOT
-    # -------------------------------------------------------------
-    {
-        "type": "fullscreen",
-        "part": "PART 3: JRFK WEB TOOLS",
-        "category": "TOOL 2: ANTENNA MATRIX • TUNER BODE PLOT",
-        "title": "Antenna Matrix: Tuner Bode Plot & Steppers",
-        "subtitle": "Real-time return loss curves, stepper motor coordinates, and LC memory solutions",
-        "image": "tool2_antenna_tuner_plot.png",
-        "caption": "TUNER BODE PLOT: GRAPHICAL SWR SWEEP AND PRECISION STEPPER TUNING COORDINATES",
-        "narration": "Looking at the lower section of the antenna tool. On the left is the real-time tuner Bode plot, showing S W R across the active band. On the right are precision stepper motor coordinates for the roller inductor and tuning capacitors, recalling stored match solutions every ten kilohertz."
-    },
-    # -------------------------------------------------------------
-    # SLIDE 14: WEB TOOL 2 - RELAY SAFETY LOGIC
-    # -------------------------------------------------------------
-    {
-        "type": "fullscreen",
-        "part": "PART 3: JRFK WEB TOOLS",
-        "category": "TOOL 2: ANTENNA MATRIX • RELAY SAFETY LOGIC",
-        "title": "Antenna Matrix: Cold-Switching Interlocks",
-        "subtitle": "PTT sensing, RF power threshold detection, and mechanical contact arc protection",
-        "image": "antenna_tuning_bode.png",
-        "caption": "TUNER LOGIC: RELAY TRANSIT COMPENSATION, RF POWER INTERLOCKS, AND STEPPER TRACKING",
-        "narration": "This view highlights the antenna matrix relay safety logic. Firmware enforces cold switching by blocking relay movement whenever forward power exceeds twenty Watts. It factors in mechanical relay transit delays before allowing the transceiver to un-mute, preventing contact arcing and relay destruction."
-    },
-    # -------------------------------------------------------------
-    # SLIDE 15: WEB TOOL 2 - CONSOLIDATED WORKSPACE
-    # -------------------------------------------------------------
-    {
-        "type": "fullscreen",
-        "part": "PART 3: JRFK WEB TOOLS",
-        "category": "TOOL 2: ANTENNA MATRIX • CONSOLIDATED WORKSPACE",
-        "title": "Antenna Matrix: Complete Control Surface",
-        "subtitle": "Single-pane antenna configuration, tuner status, and live transceiver tracking",
-        "image": "tool2_antenna_main.png",
-        "caption": "ANTENNA & TUNER SUITE: CONSOLIDATED BLUEPRINT DASHBOARD ACROSS 160 TO 6 METERS",
-        "narration": "Shown here is the consolidated Antenna Matrix workspace. It integrates port configuration, tuner tracking, and transceiver frequency data into a single responsive screen, allowing operators to change antennas or adjust matches directly from their computer or tablet."
-    },
-    # -------------------------------------------------------------
-    # SLIDE 16: WEB TOOL 3 - SD BACKUP & CLONING
-    # -------------------------------------------------------------
-    {
-        "type": "fullscreen",
-        "part": "PART 3: JRFK WEB TOOLS",
-        "category": "TOOL 3: SD BACKUP • LIVE DISASTER RECOVERY",
-        "title": "SD Backup Manager: 3-Minute Live Media Cloning",
-        "subtitle": "Creating live bootable MicroSD/USB clones while the amplifier remains in active service",
-        "image": "tool3_backup_status.png",
-        "caption": "BACKUP MANAGER: AUTOMATED DISASTER RECOVERY CLONING ENGINE AND SCHEDULE MANAGER",
-        "narration": "Examining the third web tool, the S D Backup and Disaster Recovery Manager. This tool creates an exact, fully bootable duplicate of your active operating card to an external U S B flash drive or spare reader. Cloning takes under three minutes and runs in the background while the amplifier continues normal operation."
-    },
-    # -------------------------------------------------------------
-    # SLIDE 17: WEB TOOL 3 - PIPELINE LOGS & VERIFICATION
-    # -------------------------------------------------------------
-    {
-        "type": "fullscreen",
-        "part": "PART 3: JRFK WEB TOOLS",
-        "category": "TOOL 3: SD BACKUP • PIPELINE LOGS",
-        "title": "SD Backup: Pipeline Console & Hash Verification",
-        "subtitle": "Real-time block copying audit, sector hash checks, and standby media generation",
-        "image": "tool3_backup_pipeline.png",
-        "caption": "BACKUP PIPELINE CONSOLE: REAL-TIME SECTOR STREAMING AND INTEGRITY AUDIT TRAIL",
-        "narration": "The lower panel provides the live backup pipeline log. You can follow sector replication, filesystem synchronizations, and integrity hash checks line by line. With a verified standby card always available, card corruption will never take your amplifier off the air."
-    },
-    # -------------------------------------------------------------
-    # SLIDE 18: WEB TOOL 4 - SYSTEM REPORT & CALIBRATIONS
-    # -------------------------------------------------------------
-    {
-        "type": "fullscreen",
-        "part": "PART 3: JRFK WEB TOOLS",
+        "part": "PART 2: ON-AMPLIFIER WEB TOOLS",
         "category": "TOOL 4: SYSTEM REPORT • ARCHIVE & HARDWARE",
-        "title": "System Report: Hardware Profile & Calibrations",
-        "subtitle": "Operating system parameters, storage utilization, and complete calibration tables",
-        "image": "report_system_overview.png",
-        "caption": "SYSTEM REPORT: HARDWARE ARCHITECTURE, STORAGE UTILIZATION, AND CALIBRATION DATA",
-        "narration": "Next is the System Report and Calibration Archive. This screen presents an exhaustive profile of the amplifier hardware, Linux kernel status, memory usage, and storage allocations. It also provides an instant downloadable archive of all factory calibration parameters for off-site backup."
+        "title": "System Report: Complete Calibration Archive",
+        "subtitle": "Firmware profile, storage utilization, and downloadable calibration archive",
+        "image": "slide_report_main.png",
+        "caption": "SYSTEM REPORT: HARDWARE PROFILE, STORAGE UTILIZATION, AND CALIBRATION DATA EXPORT",
+        "narration": "On screen is the Complete System Report and Calibration Archive. The upper cards display station identity, operating system version, and storage utilization across the root and U S B partitions. Below, full hardware calibration tables can be reviewed on screen and downloaded as a single compressed archive for off-site backup."
     },
     # -------------------------------------------------------------
-    # SLIDE 19: WEB TOOL 5 - DIAGNOSTIC LOGS
+    # SLIDE 11: WEB TOOL 5 - DIAGNOSTIC LOG VIEWER
     # -------------------------------------------------------------
     {
-        "type": "fullscreen",
-        "part": "PART 3: JRFK WEB TOOLS",
-        "category": "TOOL 5: DIAGNOSTIC LOGS • CENTRAL EVENT VIEWER",
+        "part": "PART 2: ON-AMPLIFIER WEB TOOLS",
+        "category": "TOOL 5: DIAGNOSTIC LOGS • CENTRAL EVENT TERMINAL",
         "title": "Diagnostic Logs: Centralized Event Terminal",
-        "subtitle": "Systemd daemon monitoring, controller fault logging, and timestamped audit logs",
-        "image": "tool5_logs_terminal.png",
-        "caption": "DIAGNOSTIC LOGS: REAL-TIME EVENT STREAMING, SYSTEMD LOGS, AND CONTROLLER TELEMETRY",
-        "narration": "Here is the Centralized Diagnostic Log Viewer. It streams live system D daemon logs, hardware serial communications, and amplifier controller events in real time. Timestamped warnings and trip events are captured for troubleshooting and engineering review."
+        "subtitle": "Live telemetry logs, GUI events, backup progress, and first-boot migration history",
+        "image": "slide_logs_main.png",
+        "caption": "DIAGNOSTIC LOGS: REAL-TIME EVENT STREAMING ACROSS SYSTEM SERVICES & CONTROLLER INTERFACES",
+        "narration": "Here is the Centralized Diagnostic Log Viewer. On screen, the dropdown allows you to inspect the core R F kit G U I log, the rolling telemetry log, S D backup records, and first-boot migration automation output. System D daemon events and amplifier trip alerts are captured with exact millisecond timestamps for instant diagnosis."
     },
     # -------------------------------------------------------------
-    # SLIDE 20: WEB TOOL 6 & 7 - DOCS & SCREEN STREAMER
+    # SLIDE 12: WEB TOOL 6 - REMOTE SCREEN VIEWER & REFERENCE
     # -------------------------------------------------------------
     {
-        "type": "fullscreen",
-        "part": "PART 3: JRFK WEB TOOLS",
-        "category": "TOOL 6 & 7: REFERENCE LIBRARY & SCREEN STREAMER",
-        "title": "Documentation Library & Screen Streamer",
-        "subtitle": "193-page K7BIT technical cookbook, offline schematics, and live front panel LCD stream",
-        "image": "tool6_docs_schematics.png",
-        "caption": "TECHNICAL LIBRARY: 193-PAGE K7BIT COOKBOOK, BOARD SCHEMATICS, AND LIVE LCD STREAMER",
-        "narration": "Concluding with the Documentation Library and live Screen Streamer. Operators have instant offline access to the complete one hundred ninety-three page K seven B I T technical cookbook, high-resolution schematics, and wiring diagrams stored directly on the Raspberry Pi. The companion screen viewer streams the front panel touch display live over H T T P. Thank you from K seven B I T."
+        "part": "PART 2: ON-AMPLIFIER WEB TOOLS",
+        "category": "TOOL 6: REMOTE SCREEN • LIVE CONSOLE MIRROR",
+        "title": "Remote Screen Viewer: Live 1024x600 Display",
+        "subtitle": "Real-time HTTP video mirror of the physical front panel LCD touch screen",
+        "image": "slide_screen_main.png",
+        "caption": "REMOTE SCREEN: DIRECT FRAMEBUFFER STREAM OF THE 7-INCH FRONT PANEL LCD DISPLAY",
+        "narration": "On screen is the Remote Screen Viewer. This web tool grabs the physical X eleven framebuffer of the amplifier's seven-inch front panel display and mirrors it live over H T T P at ten twenty-four by six hundred resolution. You see the physical front panel display update in real time from any browser on your network. Technical documentation and schematics are also stored locally on the Pi for offline reference."
+    },
+    # -------------------------------------------------------------
+    # SLIDE 13: RESOURCES & SUPPORT
+    # -------------------------------------------------------------
+    {
+        "part": "PART 3: RESOURCES & SUPPORT",
+        "category": "OPEN SOURCE & COMMUNITY • GETTING STARTED",
+        "title": "Resources, Community Support & Project Links",
+        "subtitle": "GitHub repository, releases, community group, and station contact info",
+        "image": "slide_resources_main.png",
+        "caption": "PROJECT RESOURCES: GITHUB REPOSITORY, STANDALONE EXECUTABLE, GROUPS.IO & CONTACT",
+        "narration": "In summary, the J R F K Modernization Suite delivers rock-solid operations, comprehensive engineering supervision, and verified disaster recovery for R F kit amplifiers. All source code, pre-compiled Windows migrator executables, and technical releases are available on GitHub at github dot com slash jbirdlebough one slash J R F K Tools. For discussions and technical support, connect with the community on the R F kit groups dot I O reflector. Thank you from K seven B I T."
     }
 ]
 
@@ -618,50 +325,23 @@ async def generate_slides_and_audio():
     print(f"Starting generation for {len(SLIDES)} slides...")
     total_slides = len(SLIDES)
     
-    # Renumber sequentially 1..N
     for idx, s in enumerate(SLIDES):
         s["id"] = idx + 1
 
-    # 1. Generate HTML slides
+    # 1. Generate HTML slides (Zero bullets, full-bleed screen)
     for s in SLIDES:
         slide_id = s["id"]
         slide_num_str = f"{slide_id:02d}"
         
-        if s["type"] == "bullets":
-            bullets_html = ""
-            for b_title, b_desc in s["bullets"]:
-                bullets_html += f"""
-                <div class="bullet-card">
-                    <div class="bullet-title">{b_title}</div>
-                    <div class="bullet-desc">{b_desc}</div>
-                </div>"""
-            
-            img_rel_path = f"real_screenshots/{s['image']}"
-            graphics_html = f"""
-            <div class="graphic-frame">
-                <img src="{img_rel_path}" alt="{s['title']}">
-            </div>
-            <div class="graphic-caption">{s['caption']}</div>"""
-            
-            html_content = TEMPLATE_BULLETS.replace("{{PART}}", s["part"])
-            html_content = html_content.replace("{{CATEGORY}}", s["category"])
-            html_content = html_content.replace("{{TITLE}}", s["title"])
-            html_content = html_content.replace("{{SUBTITLE}}", s["subtitle"])
-            html_content = html_content.replace("{{SLIDE_NUM}}", str(slide_id))
-            html_content = html_content.replace("{{TOTAL_SLIDES}}", str(total_slides))
-            html_content = html_content.replace("{{BULLETS_HTML}}", bullets_html)
-            html_content = html_content.replace("{{GRAPHICS_HTML}}", graphics_html)
-        else:
-            # Fullscreen layout
-            img_rel_path = f"real_screenshots/{s['image']}"
-            html_content = TEMPLATE_FULLSCREEN.replace("{{PART}}", s["part"])
-            html_content = html_content.replace("{{CATEGORY}}", s["category"])
-            html_content = html_content.replace("{{TITLE}}", s["title"])
-            html_content = html_content.replace("{{SUBTITLE}}", s["subtitle"])
-            html_content = html_content.replace("{{SLIDE_NUM}}", str(slide_id))
-            html_content = html_content.replace("{{TOTAL_SLIDES}}", str(total_slides))
-            html_content = html_content.replace("{{IMAGE_SRC}}", img_rel_path)
-            html_content = html_content.replace("{{CAPTION}}", s["caption"])
+        img_rel_path = f"real_screenshots/{s['image']}"
+        html_content = TEMPLATE_FULLSCREEN.replace("{{PART}}", s["part"])
+        html_content = html_content.replace("{{CATEGORY}}", s["category"])
+        html_content = html_content.replace("{{TITLE}}", s["title"])
+        html_content = html_content.replace("{{SUBTITLE}}", s["subtitle"])
+        html_content = html_content.replace("{{SLIDE_NUM}}", str(slide_id))
+        html_content = html_content.replace("{{TOTAL_SLIDES}}", str(total_slides))
+        html_content = html_content.replace("{{IMAGE_SRC}}", img_rel_path)
+        html_content = html_content.replace("{{CAPTION}}", s["caption"])
             
         html_path = os.path.join(DECK_DIR, f"slide_{slide_num_str}.html")
         with open(html_path, "w", encoding="utf-8") as f:
@@ -729,8 +409,8 @@ async def generate_slides_and_audio():
         current_time_ms += duration_ms + 1000
         print(f"Generated slide_{slide_num_str}.mp3 ({duration_sec:.2f}s)")
 
-    # 4. Generate Interactive Auto-Advancing Presentation Player (preview.html)
-    print("\nGenerating Auto-Advancing Presentation Player (preview.html)...")
+    # 4. Generate Responsive Auto-Advancing Presentation Player (preview.html)
+    print("\nGenerating Responsive Auto-Advancing Presentation Player (preview.html)...")
     
     slides_json = []
     for e in timeline_entries:
@@ -767,24 +447,24 @@ async def generate_slides_and_audio():
         flex-direction: column;
     }}
     .player-header {{
-        height: 48px;
+        height: 44px;
         background: #0f2d4f;
         border-bottom: 2px solid #38bdf8;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 20px;
+        padding: 0 16px;
         flex-shrink: 0;
     }}
-    .player-title {{ font-size: 16px; font-weight: 800; color: #38bdf8; display: flex; align-items: center; gap: 8px; }}
+    .player-title {{ font-size: 15px; font-weight: 800; color: #38bdf8; display: flex; align-items: center; gap: 8px; }}
     .player-callsign {{
         background: #0284c7;
         color: white;
-        padding: 3px 10px;
+        padding: 2px 10px;
         border-radius: 4px;
         font-family: monospace;
         font-weight: bold;
-        font-size: 13px;
+        font-size: 12px;
     }}
     .player-main {{
         flex: 1 1 auto;
@@ -792,7 +472,7 @@ async def generate_slides_and_audio():
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 8px 12px;
+        padding: 4px 8px;
         background: #061524;
         overflow: hidden;
     }}
@@ -810,68 +490,68 @@ async def generate_slides_and_audio():
         width: auto;
         height: auto;
         object-fit: contain;
-        border-radius: 6px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.8);
+        border-radius: 4px;
+        box-shadow: 0 6px 25px rgba(0,0,0,0.8);
         border: 2px solid #1e3a5f;
     }}
     .player-footer {{
-        height: 72px;
+        height: 64px;
         background: #0f2d4f;
         border-top: 2px solid #38bdf8;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        gap: 6px;
-        padding: 6px 20px;
+        gap: 4px;
+        padding: 4px 16px;
         flex-shrink: 0;
     }}
     .controls-row {{
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 16px;
+        gap: 12px;
     }}
     .btn-group {{ display: flex; gap: 8px; align-items: center; }}
     .btn {{
         background: #0284c7;
         color: white;
         border: 1px solid #38bdf8;
-        padding: 6px 14px;
-        border-radius: 5px;
+        padding: 5px 12px;
+        border-radius: 4px;
         font-weight: 700;
         cursor: pointer;
-        font-size: 13px;
+        font-size: 12px;
         transition: background 0.2s;
     }}
     .btn:hover {{ background: #0369a1; }}
     .btn:disabled {{ opacity: 0.4; cursor: not-allowed; }}
-    .btn-play {{ background: #059669; border-color: #34d399; font-size: 14px; padding: 6px 20px; }}
+    .btn-play {{ background: #059669; border-color: #34d399; font-size: 13px; padding: 5px 18px; }}
     .btn-play:hover {{ background: #047857; }}
     .slide-indicator {{
         font-family: monospace;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: bold;
         color: #7dd3fc;
     }}
     .narration-display {{
         color: #e0f2fe;
-        font-size: 13px;
-        line-height: 1.35;
+        font-size: 12px;
+        line-height: 1.3;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         flex: 1;
-        max-width: 800px;
+        max-width: 850px;
         background: rgba(6, 21, 36, 0.7);
-        padding: 4px 10px;
+        padding: 3px 8px;
         border-radius: 4px;
         border-left: 3px solid #38bdf8;
     }}
     .progress-bar-container {{
         width: 100%;
-        height: 5px;
+        height: 4px;
         background: #1e3a5f;
-        border-radius: 3px;
+        border-radius: 2px;
         overflow: hidden;
         cursor: pointer;
     }}
@@ -886,10 +566,10 @@ async def generate_slides_and_audio():
 <body>
     <div class="player-header">
         <div class="player-title">
-            <span>JRFK 64-Bit Modernization Suite • Auto-Advancing Technical Player</span>
+            <span>JRFK 64-Bit Modernization Suite • Technical Presentation Player</span>
             <span class="player-callsign">K7BIT</span>
         </div>
-        <div class="slide-indicator" id="slideIndicator">Slide 1 of 20</div>
+        <div class="slide-indicator" id="slideIndicator">Slide 1 of {total_slides}</div>
     </div>
 
     <div class="player-main">
@@ -957,12 +637,11 @@ async def generate_slides_and_audio():
             }}
         }}
 
-        // When audio ends: Automatically advance to next slide and start playback immediately!
         audio.addEventListener('ended', () => {{
             if (currentIndex < slides.length - 1) {{
                 setTimeout(() => {{
                     loadSlide(currentIndex + 1, true);
-                }}, 600); // 600ms natural breathing room between slides
+                }}, 600);
             }} else {{
                 isPlaying = false;
                 btnPlayPause.textContent = '▶ Play';
@@ -1003,7 +682,6 @@ async def generate_slides_and_audio():
             loadSlide(0, true);
         }});
 
-        // Keyboard arrow navigation
         window.addEventListener('keydown', (e) => {{
             if (e.key === ' ' || e.code === 'Space') {{
                 e.preventDefault();
@@ -1015,7 +693,6 @@ async def generate_slides_and_audio():
             }}
         }});
 
-        // Initial slide load
         loadSlide(0, false);
     </script>
 </body>
@@ -1024,33 +701,28 @@ async def generate_slides_and_audio():
     with open(os.path.join(DECK_DIR, "preview.html"), "w", encoding="utf-8") as f:
         f.write(player_html)
 
-    # 5. Update VSDC timeline markdown
-    timeline_rows = ""
+    # 5. Generate Text Document with Transcript & Slide Markers
+    print("\nGenerating Presentation Transcript Document (PRESENTATION_TRANSCRIPT.md)...")
+    transcript_md = "# JRFK 64-Bit Modernization Suite: Audio Transcript & Slide Synchronization\n\n"
+    transcript_md += f"**Voice Model:** Australian English Male (`en-AU-WilliamMultilingualNeural`)\n"
+    transcript_md += f"**Callsign:** K7BIT\n"
+    transcript_md += f"**Total Slides:** {len(SLIDES)}\n\n"
+    transcript_md += "---\n\n"
+    
     for e in timeline_entries:
         s_num = f"{e['slide']:02d}"
-        timeline_rows += f"| {e['slide']} | slide_{s_num}.png | slide_{s_num}.mp3 | {e['duration_sec']:.2f}s | {e['start_time_sec']:.2f}s | {e['end_time_sec']:.2f}s | {e['title']} |\n"
+        transcript_md += f"## [SLIDE {e['slide']:02d}: {e['title'].upper()}]\n"
+        transcript_md += f"**File:** `slide_{s_num}.png` | **Audio:** `slide_{s_num}.mp3` ({e['duration_sec']:.2f}s) | **Timestamp:** {e['start_time_sec']:.2f}s - {e['end_time_sec']:.2f}s\n\n"
+        transcript_md += f"> \"{e['narration']}\"\n\n"
+        transcript_md += "---\n\n"
 
-    total_duration_sec = current_time_ms / 1000.0
-    timeline_md = f"""# Deck 1 Intro: Master Timeline Map (Auto-Advancing Player Sync)
-
-**Total Slides:** {len(SLIDES)}  
-**Total Timeline Duration:** {total_duration_sec:.2f} seconds ({total_duration_sec/60:.2f} minutes)  
-**Layout:** Fullscreen Blueprint Screens (Slides 3-20) with verbal walkthrough of controls  
-**Voice Engine:** `en-AU-WilliamMultilingualNeural` (Aussie Male)  
-**Callsign:** K7BIT  
-**Operating System:** 64-Bit Raspberry Pi OS Debian Trixie  
-
-## Slide-by-Slide Synchronization Map
-
-| Slide # | Image File | Audio File | Duration | Start Time | End Time | Title |
-| :---: | :--- | :--- | :---: | :---: | :---: | :--- |
-{timeline_rows}
-"""
+    with open(os.path.join(DECK_DIR, "PRESENTATION_TRANSCRIPT.md"), "w", encoding="utf-8") as f:
+        f.write(transcript_md)
 
     with open(os.path.join(DECK_DIR, "VSDC_TIMELINE_MAP.md"), "w", encoding="utf-8") as f:
-        f.write(timeline_md)
+        f.write(transcript_md)
 
-    print(f"\nALL 20 SLIDES, AUDIO, AND AUTO-ADVANCING PLAYER GENERATED SUCCESSFULLY!")
+    print(f"\nALL {len(SLIDES)} SLIDES, AUDIO, PLAYER & TRANSCRIPT GENERATED SUCCESSFULLY!")
 
 if __name__ == "__main__":
     asyncio.run(generate_slides_and_audio())

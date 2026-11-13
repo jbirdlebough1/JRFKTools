@@ -17,24 +17,24 @@
         flex-direction: column;
     }
     .player-header {
-        height: 48px;
+        height: 44px;
         background: #0f2d4f;
         border-bottom: 2px solid #38bdf8;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 20px;
+        padding: 0 16px;
         flex-shrink: 0;
     }
-    .player-title { font-size: 16px; font-weight: 800; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
+    .player-title { font-size: 15px; font-weight: 800; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
     .player-callsign {
         background: #0284c7;
         color: white;
-        padding: 3px 10px;
+        padding: 2px 10px;
         border-radius: 4px;
         font-family: monospace;
         font-weight: bold;
-        font-size: 13px;
+        font-size: 12px;
     }
     .player-main {
         flex: 1 1 auto;
@@ -42,7 +42,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 8px 12px;
+        padding: 4px 8px;
         background: #061524;
         overflow: hidden;
     }
@@ -60,68 +60,68 @@
         width: auto;
         height: auto;
         object-fit: contain;
-        border-radius: 6px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.8);
+        border-radius: 4px;
+        box-shadow: 0 6px 25px rgba(0,0,0,0.8);
         border: 2px solid #1e3a5f;
     }
     .player-footer {
-        height: 72px;
+        height: 64px;
         background: #0f2d4f;
         border-top: 2px solid #38bdf8;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        gap: 6px;
-        padding: 6px 20px;
+        gap: 4px;
+        padding: 4px 16px;
         flex-shrink: 0;
     }
     .controls-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 16px;
+        gap: 12px;
     }
     .btn-group { display: flex; gap: 8px; align-items: center; }
     .btn {
         background: #0284c7;
         color: white;
         border: 1px solid #38bdf8;
-        padding: 6px 14px;
-        border-radius: 5px;
+        padding: 5px 12px;
+        border-radius: 4px;
         font-weight: 700;
         cursor: pointer;
-        font-size: 13px;
+        font-size: 12px;
         transition: background 0.2s;
     }
     .btn:hover { background: #0369a1; }
     .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-play { background: #059669; border-color: #34d399; font-size: 14px; padding: 6px 20px; }
+    .btn-play { background: #059669; border-color: #34d399; font-size: 13px; padding: 5px 18px; }
     .btn-play:hover { background: #047857; }
     .slide-indicator {
         font-family: monospace;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: bold;
         color: #7dd3fc;
     }
     .narration-display {
         color: #e0f2fe;
-        font-size: 13px;
-        line-height: 1.35;
+        font-size: 12px;
+        line-height: 1.3;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         flex: 1;
-        max-width: 800px;
+        max-width: 850px;
         background: rgba(6, 21, 36, 0.7);
-        padding: 4px 10px;
+        padding: 3px 8px;
         border-radius: 4px;
         border-left: 3px solid #38bdf8;
     }
     .progress-bar-container {
         width: 100%;
-        height: 5px;
+        height: 4px;
         background: #1e3a5f;
-        border-radius: 3px;
+        border-radius: 2px;
         overflow: hidden;
         cursor: pointer;
     }
@@ -136,10 +136,10 @@
 <body>
     <div class="player-header">
         <div class="player-title">
-            <span>JRFK 64-Bit Modernization Suite • Auto-Advancing Technical Player</span>
+            <span>JRFK 64-Bit Modernization Suite • Technical Presentation Player</span>
             <span class="player-callsign">K7BIT</span>
         </div>
-        <div class="slide-indicator" id="slideIndicator">Slide 1 of 20</div>
+        <div class="slide-indicator" id="slideIndicator">Slide 1 of 13</div>
     </div>
 
     <div class="player-main">
@@ -169,182 +169,119 @@
   {
     "id": 1,
     "num": "01",
-    "title": "JRFK 32-to-64 Bit Migration & Web Tools",
+    "title": "JRFK 64-Bit Appliance Builder & Migrator",
     "img": "slide_01.png",
     "audio": "slide_01.mp3",
-    "duration": 24.0,
-    "narration": "Thirty-two-bit Raspberry Pi O S is obsolete. This leaves R F kit amplifier owners at risk. The J R F K thirty-two-bit to sixty-four-bit Migration and J R F K Web Tools enable users to migrate from obsolete systems to current sixty-four-bit Raspberry Pi four or five Debian Trixie. J R F K Web Tools run concurrently on any web capable platform with the original R F kit application."
+    "duration": 31.248,
+    "narration": "Thirty-two-bit Raspberry Pi O S is obsolete, leaving R F kit amplifier owners at risk from unmaintained kernels and S D card failures. On screen is the J R F K Migrator running on your Windows P C. Its purpose is to prepare a complete sixty-four-bit Raspberry Pi operating system containing all original R F kit calibrations, user data, and the J R F K Web Tools suite for your amplifier. Over the next four slides, we look at the P C migration process, and then we will explore each of the on-amplifier web tools."
   },
   {
     "id": 2,
     "num": "02",
-    "title": "JRFK Web Tools: Unified Station Portal",
+    "title": "Migrator Option A: Gold to Production",
     "img": "slide_02.png",
     "audio": "slide_02.mp3",
-    "duration": 23.28,
-    "narration": "Here is the master blueprint portal running live on port eighty eighty-eight. It displays the complete J R F K Web Tools suite, providing direct tiles to the Health Guard, Antenna Matrix, S D Backup Manager, System Report, Diagnostic Logs, Documentation Library, and live front panel screen streamer. Everything runs simultaneously in the background without disturbing the amplifier front display."
+    "duration": 32.28,
+    "narration": "Examining the primary migration path, Option A: Gold to Production. Look at the upper selector tile on screen. In this mode, you take your existing working S D card from the amplifier and plug it into a U S B reader on your P C. The tool reads your card in read-only safety mode, extracting one hundred percent of your calibration files, directional coupler offsets, and station settings. Once extracted, you remove your original card and insert a new card, which the tool flashes with the complete sixty-four-bit Debian Trixie system."
   },
   {
     "id": 3,
     "num": "03",
-    "title": "Migrator: Original SD Discovery & Drive Guard",
+    "title": "Migrator Option B: Clean Install to Production",
     "img": "slide_03.png",
     "audio": "slide_03.mp3",
-    "duration": 23.352,
-    "narration": "Covering the migration suite starting with step one of the J R F K Migrator console. On the upper left, the Drive Guard engine scans connected storage buses and locks out your primary Windows system disks to eliminate any risk of accidental drive wiping. It directly mounts the raw ext four Linux partitions from your original thirty-two-bit S D card, identifies the controller firmware version, and verifies card health."
+    "duration": 29.016,
+    "narration": "Now look at Option B on screen: Clean Install to Production. This option is used when you are starting fresh with a brand new card or building a spare backup without reading an original card first. On this screen, you directly configure your Raspberry Pi username, system password, hostname, and station Wi-Fi credentials. The tool formats the new target card, installs sixty-four-bit Debian Trixie, and provisions the native R F kit controller alongside the J R F K Web Tools suite."
   },
   {
     "id": 4,
     "num": "04",
-    "title": "Migrator: Factory Calibration Extraction",
+    "title": "PC Migrator: Directional Coupler & ADC Calibration",
     "img": "slide_04.png",
     "audio": "slide_04.mp3",
-    "duration": 23.256,
-    "narration": "Examining calibration recovery. On screen you see the directional coupler forward and reflected power A D C lookup tables and band calibration matrices extracted directly from the original card. The migrator extracts every factory calibration coefficient, P T T relay timing constant, and antenna matrix preset, packaging them into an encrypted gold archive so no manual recalibration is required."
+    "duration": 24.024,
+    "narration": "This screen shows the exact calibration data recovered by the P C migrator from your original card. Listed here are the factory directional coupler forward and reflected power A D C lookup tables, attenuator step values, and P T T relay timings. The migrator transfers these exact matrices into the new sixty-four-bit operating system, ensuring that your amplifier retains its factory RF metering precision."
   },
   {
     "id": 5,
     "num": "05",
-    "title": "Migrator: 64-Bit Target Provisioning",
+    "title": "Amplifier Deployment: Two-Boot Production Verification",
     "img": "slide_05.png",
     "audio": "slide_05.mp3",
-    "duration": 21.504,
-    "narration": "Moving to step two of the migrator: target card provisioning. Here the operator configures network hostnames and station Wi-Fi credentials before selecting the high-speed target Micro S D card or U S B boot media. The flasher writes the pure sixty-four-bit Debian Trixie golden image with automatic sector verification and hash checking to ensure flawless boot integrity."
+    "duration": 22.224,
+    "narration": "Once flashing finishes on your P C, you insert the new card into your amplifier's Raspberry Pi four or five. On the first boot, automated scripts expand the Linux root partition to fill the full card and configure controller devices. On the second boot, your amplifier enters full production service running pure sixty-four-bit Debian Trixie with the native front panel app and all Web Tools active."
   },
   {
     "id": 6,
     "num": "06",
-    "title": "Migrator: Automated Configuration Injection",
+    "title": "JRFK Web Tools: Unified Station Dashboard",
     "img": "slide_06.png",
     "audio": "slide_06.mp3",
-    "duration": 20.472,
-    "narration": "This view shows the migrator utilities tab. Once the base operating system is written, the injection pipeline directly writes your extracted calibration files, controller configurations, and network settings into the target ext four filesystem. It provisions system D service supervisors and binds low-level hardware drivers before ejecting the completed card."
+    "duration": 22.992,
+    "narration": "Now we move to the J R F K Web Tools running live on the amplifier. On screen is the master blueprint portal accessed via any browser on port eighty eighty-eight. It runs simultaneously alongside the native R F kit application using shared memory, giving you direct access to the Health Guard, Antenna Matrix, S D Backup Manager, System Diagnostics, Event Logs, and live Screen Streamer."
   },
   {
     "id": 7,
     "num": "07",
-    "title": "Migrator: 64-Bit Debian Trixie Verification",
+    "title": "Health Guard: Real-Time RF Telemetry & Safety Ceiling",
     "img": "slide_07.png",
     "audio": "slide_07.mp3",
-    "duration": 20.256,
-    "narration": "Concluding the migration on the amplifier itself. When the card boots on your Raspberry Pi four or five, first-boot automation scripts automatically expand the Linux root partition to fill the entire card capacity and initialize the sixty-four-bit kernel six point twelve. The amplifier launches directly into service with all factory calibrations intact and verified."
+    "duration": 25.416,
+    "narration": "Examining the Health and Thermal Guard on screen. At the top of the page, the thermal safety banner supervises the P A heatsink temperature against the sixty degree ceiling, unkeying the amplifier into standby if cooling limits are reached. Down below, the instruments display instantaneous forward power up to fifteen hundred Watts, P, E, P, reflected power in Watts, and the fifty-three point five volt D C power supply rail status."
   },
   {
     "id": 8,
     "num": "08",
-    "title": "Health Guard: Real-Time RF Telemetry",
+    "title": "Antenna Matrix & ATU: Auto Segment Tuning",
     "img": "slide_08.png",
     "audio": "slide_08.mp3",
-    "duration": 21.768,
-    "narration": "Examining the first web tool, the Health and Thermal Guard. The prominent upper instruments display instantaneous forward power up to fifteen hundred Watts, P, E, P, alongside reflected power in Watts. The central V S W R indicator updates at thirty Hertz, giving you precise, low-latency visual feedback on antenna loading during transmission."
+    "duration": 31.416,
+    "narration": "Looking at the Antenna Mapper and Tuner Matrix screen. At the top are the four antenna ports covering one sixty through six meters, which switch automatically via C A T control. Below is the B twenty-six A T U matching network. The R F kit tuner uses relay and P I N diode switching to engage discrete physical inductors and capacitors for each frequency segment. The Bode plot displays S W R across the band and lists the exact physical inductance in nanohenries and capacitance in picofarads selected for that segment."
   },
   {
     "id": 9,
     "num": "09",
-    "title": "Health Guard: 53.5V Rail & LDMOS Thermals",
+    "title": "SD Backup Manager: Automated Cloning & Recovery",
     "img": "slide_09.png",
     "audio": "slide_09.mp3",
-    "duration": 18.456,
-    "narration": "Looking at the lower pane of the health tool. On the left are the fifty-three point five volt D C rail voltage and current meters, showing exact power supply draw under heavy carrier. To the right, individual temperature sensors monitor the dual L-D moss heatsinks with a sixty degree threshold and automatic cooling fan regulation."
+    "duration": 22.728,
+    "narration": "Examining the S D Backup and Disaster Recovery tool on screen. The top status panel verifies the active boot card, while the storage selector identifies connected U S B target drives. In under three minutes, this tool writes a complete, bootable clone of your operating system to secondary storage in the background while you remain on the air, keeping a verified standby card ready in case of media failure."
   },
   {
     "id": 10,
     "num": "10",
-    "title": "Health Guard: Protection Alarms & Reset",
+    "title": "System Report: Complete Calibration Archive",
     "img": "slide_10.png",
     "audio": "slide_10.mp3",
-    "duration": 19.632,
-    "narration": "On screen is the protection interlock supervisory pane. In the event of excessive reflected power or overcurrent, hardware interlocks disengage bias within microseconds. The web interface identifies the specific fault, latches the alarm for operator inspection, and allows an authorized remote reset once antenna conditions are safe."
+    "duration": 19.944,
+    "narration": "On screen is the Complete System Report and Calibration Archive. The upper cards display station identity, operating system version, and storage utilization across the root and U S B partitions. Below, full hardware calibration tables can be reviewed on screen and downloaded as a single compressed archive for off-site backup."
   },
   {
     "id": 11,
     "num": "11",
-    "title": "Health Guard: Responsive Operations Cockpit",
+    "title": "Diagnostic Logs: Centralized Event Terminal",
     "img": "slide_11.png",
     "audio": "slide_11.mp3",
-    "duration": 15.72,
-    "narration": "Here is the full Health Guard overview. It organizes power meters, thermal gauges, voltage shunts, and protection alarms onto a clean blueprint canvas. You can monitor high-power transmissions remotely from anywhere in the home or operating shack with complete peace of mind."
+    "duration": 20.184,
+    "narration": "Here is the Centralized Diagnostic Log Viewer. On screen, the dropdown allows you to inspect the core R F kit G U I log, the rolling telemetry log, S D backup records, and first-boot migration automation output. System D daemon events and amplifier trip alerts are captured with exact millisecond timestamps for instant diagnosis."
   },
   {
     "id": 12,
     "num": "12",
-    "title": "Antenna Matrix: 4-Way Routing Grid",
+    "title": "Remote Screen Viewer: Live 1024x600 Display",
     "img": "slide_12.png",
     "audio": "slide_12.mp3",
-    "duration": 16.536,
-    "narration": "Moving to the second web tool, the Antenna Matrix. The upper grid provides four-way antenna port routing for every amateur band from one sixty through six meters. As you tune your transceiver, C A T control automatically recalls the programmed antenna port with zero manual intervention."
+    "duration": 23.544,
+    "narration": "On screen is the Remote Screen Viewer. This web tool grabs the physical X eleven framebuffer of the amplifier's seven-inch front panel display and mirrors it live over H T T P at ten twenty-four by six hundred resolution. You see the physical front panel display update in real time from any browser on your network. Technical documentation and schematics are also stored locally on the Pi for offline reference."
   },
   {
     "id": 13,
     "num": "13",
-    "title": "Antenna Matrix: Tuner Bode Plot & Steppers",
+    "title": "Resources, Community Support & Project Links",
     "img": "slide_13.png",
     "audio": "slide_13.mp3",
-    "duration": 16.632,
-    "narration": "Looking at the lower section of the antenna tool. On the left is the real-time tuner Bode plot, showing S W R across the active band. On the right are precision stepper motor coordinates for the roller inductor and tuning capacitors, recalling stored match solutions every ten kilohertz."
-  },
-  {
-    "id": 14,
-    "num": "14",
-    "title": "Antenna Matrix: Cold-Switching Interlocks",
-    "img": "slide_14.png",
-    "audio": "slide_14.mp3",
-    "duration": 17.664,
-    "narration": "This view highlights the antenna matrix relay safety logic. Firmware enforces cold switching by blocking relay movement whenever forward power exceeds twenty Watts. It factors in mechanical relay transit delays before allowing the transceiver to un-mute, preventing contact arcing and relay destruction."
-  },
-  {
-    "id": 15,
-    "num": "15",
-    "title": "Antenna Matrix: Complete Control Surface",
-    "img": "slide_15.png",
-    "audio": "slide_15.mp3",
-    "duration": 15.48,
-    "narration": "Shown here is the consolidated Antenna Matrix workspace. It integrates port configuration, tuner tracking, and transceiver frequency data into a single responsive screen, allowing operators to change antennas or adjust matches directly from their computer or tablet."
-  },
-  {
-    "id": 16,
-    "num": "16",
-    "title": "SD Backup Manager: 3-Minute Live Media Cloning",
-    "img": "slide_16.png",
-    "audio": "slide_16.mp3",
-    "duration": 18.216,
-    "narration": "Examining the third web tool, the S D Backup and Disaster Recovery Manager. This tool creates an exact, fully bootable duplicate of your active operating card to an external U S B flash drive or spare reader. Cloning takes under three minutes and runs in the background while the amplifier continues normal operation."
-  },
-  {
-    "id": 17,
-    "num": "17",
-    "title": "SD Backup: Pipeline Console & Hash Verification",
-    "img": "slide_17.png",
-    "audio": "slide_17.mp3",
-    "duration": 16.224,
-    "narration": "The lower panel provides the live backup pipeline log. You can follow sector replication, filesystem synchronizations, and integrity hash checks line by line. With a verified standby card always available, card corruption will never take your amplifier off the air."
-  },
-  {
-    "id": 18,
-    "num": "18",
-    "title": "System Report: Hardware Profile & Calibrations",
-    "img": "slide_18.png",
-    "audio": "slide_18.mp3",
-    "duration": 17.352,
-    "narration": "Next is the System Report and Calibration Archive. This screen presents an exhaustive profile of the amplifier hardware, Linux kernel status, memory usage, and storage allocations. It also provides an instant downloadable archive of all factory calibration parameters for off-site backup."
-  },
-  {
-    "id": 19,
-    "num": "19",
-    "title": "Diagnostic Logs: Centralized Event Terminal",
-    "img": "slide_19.png",
-    "audio": "slide_19.mp3",
-    "duration": 15.216,
-    "narration": "Here is the Centralized Diagnostic Log Viewer. It streams live system D daemon logs, hardware serial communications, and amplifier controller events in real time. Timestamped warnings and trip events are captured for troubleshooting and engineering review."
-  },
-  {
-    "id": 20,
-    "num": "20",
-    "title": "Documentation Library & Screen Streamer",
-    "img": "slide_20.png",
-    "audio": "slide_20.mp3",
-    "duration": 22.848,
-    "narration": "Concluding with the Documentation Library and live Screen Streamer. Operators have instant offline access to the complete one hundred ninety-three page K seven B I T technical cookbook, high-resolution schematics, and wiring diagrams stored directly on the Raspberry Pi. The companion screen viewer streams the front panel touch display live over H T T P. Thank you from K seven B I T."
+    "duration": 29.712,
+    "narration": "In summary, the J R F K Modernization Suite delivers rock-solid operations, comprehensive engineering supervision, and verified disaster recovery for R F kit amplifiers. All source code, pre-compiled Windows migrator executables, and technical releases are available on GitHub at github dot com slash jbirdlebough one slash J R F K Tools. For discussions and technical support, connect with the community on the R F kit groups dot I O reflector. Thank you from K seven B I T."
   }
 ];
         let currentIndex = 0;

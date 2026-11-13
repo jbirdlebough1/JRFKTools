@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1920px; height: 1080px; overflow: hidden;
+    background-color: #1a5695;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+        linear-gradient(rgba(147, 197, 253, 0.35) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(147, 197, 253, 0.35) 2px, transparent 2px);
+    background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #ffffff;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 60px 100px;
+  }
+  .box {
+    width: 1720px;
+    background: rgba(10, 30, 60, 0.95);
+    border: 3px solid #93c5fd;
+    border-radius: 12px;
+    padding: 50px 70px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+  }
+  h1 { font-size: 42px; font-weight: 900; color: #ffffff; margin-bottom: 8px; border-bottom: 3px solid #38bdf8; padding-bottom: 16px; }
+  .subtitle { font-size: 20px; color: #93c5fd; margin-bottom: 40px; font-family: monospace; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  .card {
+    background: rgba(15, 45, 85, 0.9);
+    border: 2px solid #38bdf8;
+    border-radius: 8px;
+    padding: 28px;
+  }
+  .card-title { font-size: 22px; font-weight: 800; color: #7dd3fc; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+  .item { margin-bottom: 14px; font-size: 16px; line-height: 1.5; color: #e0f2fe; }
+  .item strong { color: #ffffff; }
+  .badge { background: #0284c7; color: white; padding: 4px 12px; border-radius: 4px; font-family: monospace; font-size: 14px; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <h1>JRFK 64-Bit Modernization Suite: Resources & Support</h1>
+    <div class="subtitle">HIGH-POWER AMATEUR RADIO • RF-KIT LINEAR AMPLIFIERS • CALLSIGN: K7BIT</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-title">📁 Source Code &amp; Releases</div>
+        <div class="item"><strong>GitHub Repository:</strong> github.com/jbirdlebough1/JRFKTools</div>
+        <div class="item"><strong>Releases:</strong> Standalone JRFK Migrator executable for Windows 10 & 11</div>
+        <div class="item"><strong>License:</strong> Open-source amateur radio modernization tooling</div>
+      </div>
+      <div class="card">
+        <div class="card-title">👥 Community &amp; Technical Support</div>
+        <div class="item"><strong>RF-KIT Groups.io:</strong> groups.io/g/rf-kit</div>
+        <div class="item"><strong>Station Callsign:</strong> K7BIT</div>
+        <div class="item"><strong>Bug Reports &amp; Pull Requests:</strong> Submit via GitHub Issues on JRFKTools</div>
+      </div>
+      <div class="card">
+        <div class="card-title">📖 Onboard Engineering Documentation</div>
+        <div class="item"><strong>Operator Manual:</strong> Built-in vector PDF and HTML via port 8088 (/docs)</div>
+        <div class="item"><strong>Engineering Guide:</strong> 56-page B26 controller & hardware schematic references</div>
+        <div class="item"><strong>Local Web Server:</strong> Direct browser access at http://&lt;amplifier-ip&gt;:8088</div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚡ Key Value Architecture</div>
+        <div class="item"><strong>Operations:</strong> Real-time RF power metering & antenna matrix switching</div>
+        <div class="item"><strong>Engineering:</strong> Full 64-bit Debian Trixie kernel, systemd supervision & diagnostics</div>
+        <div class="item"><strong>Disaster Recovery:</strong> 3-minute live USB cloning & factory calibration preservation</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
