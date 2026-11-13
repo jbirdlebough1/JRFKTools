@@ -2,17 +2,52 @@
 
 ### *Turnkey 64-Bit OS Migration for Raspberry Pi 4 & 5, Zero-Loss Calibration Preservation, Automated Weekly Backups & Station Diagnostics*
 
-[![Platform: Raspberry Pi](https://img.shields.io/badge/Platform-Raspberry%20Pi%204%20%7C%205%20(aarch64)-blue.svg)](https://github.com/jbirdlebough1/JRFK)
-[![Release: v01.00.01-alpha](https://img.shields.io/badge/Release-v01.00.01--alpha-success.svg)](https://github.com/jbirdlebough1/JRFK/releases)
+[![Platform: Raspberry Pi](https://img.shields.io/badge/Platform-Raspberry%20Pi%204%20%7C%205%20(aarch64)-blue.svg)](https://github.com/jbirdlebough1/JRFKTools)
+[![Release: v01.00.00-beta](https://img.shields.io/badge/Release-v01.00.00--beta-blue.svg)](https://github.com/jbirdlebough1/JRFKTools/releases)
 [![License: GPL v3 / Open Source](https://img.shields.io/badge/License-GPL%20v3%20%2F%20Open%20Source-green.svg)](LICENSE)
-[![Hardware: RF-KIT](https://img.shields.io/badge/Hardware-RF--KIT%20RF2K--S%20%7C%20RF2K%2B-orange.svg)](https://github.com/jbirdlebough1/JRFK)
-[![Docs: JRFK_EM (60 Pages)](https://img.shields.io/badge/Manual-JRFK__EM%20(60%20Pages)-purple.svg)](docs/JRFK_EM.pdf)
+[![Hardware: RF-KIT](https://img.shields.io/badge/Hardware-RF--KIT%20RF2K--S%20%7C%20RF2K%2B-orange.svg)](https://github.com/jbirdlebough1/JRFKTools)
+[![Cookbook: K7BIT Rev 1.05](https://img.shields.io/badge/Cookbook-K7BIT%20Rev%201.05%20(193%20Pages)-purple.svg)](docs/JRFK_Cookbook.pdf)
+
+---
+
+## ⚡ Fast Download (For Operators — No Developer Tools Required)
+
+If you only want to upgrade or configure your RF-KIT amplifier on Windows 11 without setting up Python, Git, or compilers, download the standalone turnkey migrator:
+
+👉 **[Download Standalone JRFK.exe (Beta 1.0 Release)](https://github.com/jbirdlebough1/JRFKTools/releases/download/v01.00.00-beta/JRFK.exe)**  
+*(Self-contained Windows x64 executable: includes embedded UAC elevation, background format prompt suppression, offline 64-bit OS packages, Python 3.13 shims, and the complete 4-manual station documentation library)*
+
+### Quick 3-Step Operator Instructions:
+1. **Connect SD Card:** Place your existing 32-bit SD card into a USB reader attached to your Windows PC.
+2. **Launch JRFK:** Right-click **`JRFK.exe`** and select **Run as Administrator**. JRFK launches the local web workbench automatically at `http://127.0.0.1:8089/`.
+3. **Execute Two-Click Migration:**
+   - **Step 1:** Click **Validate & Extract Golden Master Data** (strictly read-only; your original card is 100% safe).
+   - **Step 2:** Swap in a fresh blank 32GB MicroSD card and click **Provision SD (Migrate to 64-Bit)**.
+4. **Boot in Amplifier:** Insert the new card into your amplifier and power on. The system performs an automated 3-boot sequence directly into full-screen operational production with all calibrations intact!
+
+---
+
+## 🛠️ For Builders & Developers (Tools Folder)
+
+All developer source code, automated build pipelines, unit test suites, and diagnostic daemons are included in the **`tools/`** directory of this repository:
+* **`tools/migrator/`**: Core Windows migration engine (`server.py`), drive detection guard, Windows 11 format prompt suppressor, and end-to-end unittest suite (`test_jrfk_e2e.py`).
+* **`tools/rfk_tools_suite/`**: Complete 24/7 Raspberry Pi Port 8088 web diagnostic suite:
+  - 📖 **Station Docs (`/docs`)**: Central technical reference library with embedded reader and PDF downloaders.
+  - 🗺️ **Antenna Mapper (`/antenna`)**: 4-port relay visualizer, dynamic band ribbon, and interactive ATU Bode plot with component inspection.
+  - 📈 **Health Monitor (`/health`)**: 5 live gauges, 3 canvas trend charts, and 60°C emergency thermal unkey protection.
+  - 📺 **Remote Screen (`/screen`)**: Full KMS 1024x600 real-time mirror (read-only for safe tablet/phone monitoring).
+  - 💾 **SD Backup Manager (`/backup`)**: Secondary USB card backup manager and automated Sunday 04:00 GMT cron.
+  - 📋 **System Report (`/report`)**: Complete host hardware, storage wear-leveling, and calibration audit.
+  - 📜 **Log Viewer (`/logs`)**: Centralized real-time inspector for 4 system log streams.
+* **`tools/pi_debs/`**: 15 offline `arm64` Debian packages for turnkey first-boot offline installation.
+* **`tools/py_deps/`**: Python 3.13 backward-compatibility shims and Pillow `Image.ANTIALIAS` bindings.
+* **`docs/`**: Master station documentation library (HTML & vector PDFs).
 
 ---
 
 > [!CAUTION]
 > **RESEARCH EXPERIMENTATION & LIABILITY DISCLAIMER**  
-> This software and documentation is purely research experimentation and is provided strictly **"AS IS"**. It communicates directly with high-voltage RF power amplifier hardware and high-current DC power supply subsystems (53.5 VDC @ 55 A). It may damage your amplifier, power supply, LDMOS transistors, exciter/transceiver, antenna system, or computer. The goal of this project is the experimental exploration of what is possible in modern 64-bit embedded Linux platforms, real-time telemetry diagnostics, and resilient disaster recovery for amateur radio linear amplifiers. Users accept all risks and agree to hold authors, contributors, and developers completely harmless regardless of outcome. **USE AT YOUR OWN RISK.**
+> This software and documentation is purely research experimentation and is provided strictly **"AS IS"**. It communicates directly with high-voltage RF power amplifier hardware and high-current DC power supply subsystems (Heiwoo 53.5 VDC @ 55 A). It may damage your amplifier, power supply, LDMOS transistors, exciter/transceiver, antenna system, or computer. The goal of this project is the experimental exploration of what is possible in modern 64-bit embedded Linux platforms, real-time telemetry diagnostics, and resilient disaster recovery for amateur radio linear amplifiers. Users accept all risks and agree to hold authors, contributors, and developers completely harmless regardless of outcome. **USE AT YOUR OWN RISK.**
 > 
 > **Community Rules:**
 > 1. **Open Source & Copyleft:** Keep all innovations accessible, auditable, and free for everyone.
@@ -21,30 +56,20 @@
 
 ---
 
-## 🚀 Quick Start: Windows 11 End-to-End Migration & Builder Workbench
+## 📚 Master Documentation Library (`/docs` Folder)
 
-The primary workflow is hosted in a self-contained, browser-based workbench located directly in the root of this repository:
+The JRFK station library includes four comprehensive, publication-grade manuals in both interactive HTML and downloadable PDF formats:
 
-👉 **[`JRFK_32_to_64Bit_Migration_tool.htm`](file:///d:/JRFK/JRFK_32_to_64Bit_Migration_tool.htm)** (or launch via **[`JRFK_Migrator.bat`](file:///d:/JRFK/JRFK_Migrator.bat)**)
-
-### Two Build Modes Available:
-* **Option A: Migrate Existing 32-Bit RFK SD Image (Primary Option — Data Preserved):**
-  1. Insert your original working amplifier SD card into a USB reader → click **Extract Golden Master Data** (extracts calibration, touch profiles, attenuator offsets, and network settings into a safe local archive `C:\RFK_Backups\RFK_Golden_Master.tar.gz`).
-  2. Remove and safely store your original SD card untouched. Insert a fresh 16GB/32GB A2/V30 SD card → click **Build & Flash 64-Bit Appliance Image** (writes 64-bit Bookworm OS, injects weekly Sunday 4:00 AM maintenance cron, injects all user calibrations, and sets `pi:pi 755` permissions).
-  3. Insert the new card into your amplifier and follow the automated **Boot 1** (auto-expansion & hardware discovery) → **Boot 2** (operational run into full-screen RFKGUI) sequence.
-* **Option B: Clean Install — New Card & New System (Provision with Wi-Fi & Credentials):**
-  1. Insert a new/blank 16GB or 32GB SD card.
-  2. Enter your station credentials: RPi username (default `pi`), password, hostname (default `k7bit`), network mode (DHCP or Static IP), and Wi-Fi SSID / Password.
-  3. Click **Partition, Format & Build 64-Bit System** → writes 64-bit Bookworm, pre-configures `userconf.txt` and `wpa_supplicant.conf`, enables SSH, and injects the JRFK tools suite.
-  4. Boot directly in your amplifier with working Wi-Fi on the network!
-
-### Integrated Capabilities:
-* **📖 Full In-Tool Documentation:** Reference the full 56-page [K7BIT Cookbook & Manual](docs/JRFK_EM.html) right inside the migration tool without leaving the browser!
-* **🌐 Remote Web Operation Console:** Enter your amplifier's IP address or hostname (e.g. `192.168.1.150` or `k7bit.local`) to test connectivity and remotely launch the **Backup Manager** (`:8088/backup`), **Antenna Mapper** (`:8088/antenna`), and **Health Monitor** (`:8088/health`) directly from Windows 11.
+| Document | PDF Edition | HTML Edition | Scope & Content |
+| :--- | :--- | :--- | :--- |
+| **📘 JRFK Operator's Manual & Architecture Guide** | [📥 `JRFK_Users_Guide.pdf`](docs/JRFK_Users_Guide.pdf) | [📄 `JRFK_Users_Guide.html`](docs/JRFK_Users_Guide.html) | Turnkey migration walkthrough, GOLD migration matrix, 7 post-migration web diagnostic tools, 3-boot visual verification, and automated Sunday autopatching. |
+| **⚙️ JRFK Engineering Manual** | [📥 `JRFK_EM.pdf`](docs/JRFK_EM.pdf) | [📄 `JRFK_EM.html`](docs/JRFK_EM.html) | Pure-Python SimpleRPC schemas, Python 3.13 deprecation shims, Full KMS DRM 1024x600 modelines, Heiwoo 53.5V PSU architecture, and 60°C thermal guard state machine. |
+| **🚨 Disaster Recovery Procedure** | [📥 `JRFK_Disaster_Recovery.pdf`](docs/JRFK_Disaster_Recovery.pdf) | [📄 `JRFK_Disaster_Recovery.html`](docs/JRFK_Disaster_Recovery.html) | Emergency "Swap, Boot, Reboot, Run" card. Rapid recovery walkthrough for primary MicroSD failure using the secondary automated USB backup card (<3 min recovery). |
+| **📘 K7BIT B26-RF2K+ Master Cookbook (Rev 1.05)** | [📥 `JRFK_Cookbook.pdf`](docs/JRFK_Cookbook.pdf) *(193 Pages)* | [📄 `JRFK_Cookbook.html`](docs/JRFK_Cookbook.html) | The authentic end-to-end builders, alignment & operators guide by John Birdlebough (K7BIT) and John Stafford (Island RF) with all 158 schematics, diagrams, and photos. |
 
 ---
 
-## 🎯 Project Overview
+## 🎯 Project Overview & Architectural Model
 
 **JRFK** is a complete, modernized 64-bit operating system appliance, hardware interface layer, and diagnostic tool suite engineered for the **RF-KIT RF2K-S** and **RF2K+** high-power solid-state amateur radio linear power amplifiers.
 
@@ -53,7 +78,7 @@ Historically, the RF-KIT touch user interface and telemetry logic were tied to l
 JRFK resolves these bottlenecks permanently, delivering:
 1. **Universal 64-Bit OS Migration:** Pure Debian 12 Bookworm / Debian 13 Trixie (`aarch64`) runtime with native 64-bit Hamlib bridges and self-healing update shims.
 2. **Single-SD Hardware Parity Across Generations:** A single physical MicroSD card boots interchangeably into either a Raspberry Pi 4 or Raspberry Pi 5 without kernel panic, resolution distortion, or serial communication loss.
-3. **Decoupled HTTP Diagnostic Suite (Port 8088):** Independent telemetry and monitoring server providing an Antenna SWR Mapper, a 24-Hour Amplifier Health Monitor, and an Automated Backup Manager.
+3. **Decoupled HTTP Diagnostic Suite (Port 8088):** Independent telemetry and monitoring server providing an Antenna SWR Mapper, a 24-Hour Amplifier Health Monitor with 60°C emergency thermal unkey protection, Remote Screen mirror, and an Automated Backup Manager.
 4. **Automated Weekly Cron Backup & Disaster Recovery:** Clones the active boot media to an external USB SD card on an operator-selected weekly schedule, enabling the instant "Swap, Boot, Reboot, Run" disaster recovery workflow with 100% data and calibration retention.
 
 ```mermaid
@@ -77,16 +102,6 @@ flowchart TD
 
 ---
 
-## 📚 Master Documentation & Engineering Manuals (`/docs` Folder)
-
-The authoritative 60-page engineering manual, containing 10 standalone vector diagrams, complete register maps, bench calibration steps, and troubleshooting fault trees:
-
-| Document | PDF Edition | Markdown Edition | Description |
-| :--- | :--- | :--- | :--- |
-| **Master Architecture & Engineering Manual** | [📥 `JRFK_EM.pdf`](docs/JRFK_EM.pdf) *(60 pages)* | [📄 `JRFK_EM.md`](docs/JRFK_EM.md) | Exhaustive 64-bit architecture, controller execution flow, 71 SimpleRPC methods, 17-step K7BIT calibration, 10 unit test plans, and troubleshooting matrix. |
-
----
-
 ## 🛠️ Feature Highlights
 
 ### 1. Universal Single-SD Hardware Parity (RPi 4 vs. RPi 5)
@@ -100,14 +115,12 @@ The authoritative 60-page engineering manual, containing 10 standalone vector di
 * Fast hardware protection trip monitoring with < 5 ms automatic cutoff for over-drive (> 28 W) and high SWR (> 3.0:1).
 
 ### 3. Integrated Diagnostic Suite (`rfk_tools_suite` on Port 8088)
-* **Antenna Mapper (`/antenna`):** Visual SWR matrix across 160m–6m, band spinner, horizontal scrollbar, click-to-inspect tuner L/C/K steps, and one-click `@media print` network printing.
-* **Amplifier Health Monitor (`/health`):** 1-hour high-resolution RAM ring buffer (every 5 seconds) and 24-hour historical SQLite datastore (`telemetry_history.db`) for RF power, 53.5V rail sag, DC current, and temperature with 38°C and 42°C fan trigger overlays.
+* **Antenna Mapper (`/antenna`):** Visual SWR matrix across 160m–6m, band ribbon, click-to-inspect tuner L/C steps, and one-click `@media print` network printing.
+* **Amplifier Health Monitor (`/health`):** Real-time gauges and 15-minute rolling Canvas Graphs (Power, Sag, Temp) with 60°C emergency thermal unkey protection and 300s cooldown lockout.
+* **Remote Screen (`/screen`):** 1024x600 virtual HDMI stream (strictly read-only for safe tablet monitoring).
 * **SD Backup & Recovery Manager (`/backup`):** Real-time drive media status, user-configurable weekly cron schedule, and one-click manual backup trigger.
-
-### 4. Automated Weekly Cron Backup & "Swap, Boot, Reboot, Run" Recovery
-* **Automated Weekly Schedule:** Set via Web UI (default: Sundays at 03:00 AM, prior to the 04:00 AM OS upgrade).
-* **Live Partition Streaming:** Uses `piclone` / block streaming to clone to an external USB SD reader while regenerating unique partition UUIDs (`PARTUUID`).
-* **First-Boot Self-Healing Hook (`jrfk_restore_check`):** In an emergency, swap the backup SD card into the internal slot. On power-up, the system self-checks, reboots once, and launches directly into the operational RFKGUI with all user calibrations intact!
+* **System Report (`/report`):** Exhaustive compute, storage wear-leveling, and hardware calibration diagnostics.
+* **Log Viewer (`/logs`):** 4 real-time diagnostic streams (`telemetry_rolling.log`, `rfk_backup.log`, `rfk_gui`, `systemd journal`).
 
 ---
 
@@ -115,47 +128,39 @@ The authoritative 60-page engineering manual, containing 10 standalone vector di
 
 ```text
 D:\JRFK
-├── JRFK_32_to_64Bit_Migration_tool.htm # Windows 11 Interactive Migration Workbench & Reader
+├── JRFK.exe                            # Standalone Windows 11 Executable (Elevated Self-Extracting)
+├── JRFK_32_to_64Bit_Migration_tool.htm # Interactive Migration Workbench & Reader
 ├── JRFK_Migrator.bat                   # One-Click Windows 11 Migration Tool Launcher
-├── docs/
-│   ├── JRFK_EM.md                       # Master Engineering & Migration Manual (Source)
-│   ├── JRFK_EM.html                     # Compiled Standalone HTML Manual with SVG Diagrams
-│   ├── JRFK_EM.pdf                      # Master Publication PDF Manual (56 Pages)
-│   └── images/diagrams/                 # Native Vector SVG Architectural Diagrams
-├── scripts/
-│   ├── finalize_sd.sh                   # Chroot staging script for new 64-bit SD cards
-│   ├── generate_pdf.py                  # WeasyPrint PDF compilation engine
-│   ├── render_diagrams.py               # Mermaid vector SVG rendering pipeline
-│   ├── bridge_hamlib.sh                 # 64-bit aarch64 Hamlib compilation script
-│   └── patch_antialias.py               # PIL.Image.ANTIALIAS self-healing patcher
+├── K7BIT B26 Cookbook Vol 1 R1.5.docx  # Master Source Document for K7BIT Cookbook
+├── docs/                               # Master Station Documentation Library
+│   ├── JRFK_Users_Guide.html / .pdf    # JRFK Operator's Manual & Architecture Guide
+│   ├── JRFK_EM.html / .pdf / .md       # JRFK Engineering Manual (Architecture Deep-Dive)
+│   ├── JRFK_Disaster_Recovery.html/.pdf# Emergency "Swap, Boot, Reboot, Run" Procedure
+│   ├── JRFK_Cookbook.html / .pdf       # Authentic K7BIT Cookbook (193 Pages, 158 Graphics)
+│   └── cookbook_media/                 # All 158 High-Resolution Schematics & Photos
+├── scripts/                            # Diagnostic, Build & Verification Scripts
+│   └── build_comprehensive_manual.py
 └── tools/
-    ├── migrator/                        # Windows 11 Migration Tool Backend & Static Server
-    │   ├── server.py                    # Local HTTP Server & Drive Detection Daemon (Port 8089)
-    │   └── JRFK_32_to_64Bit_Migration_tool.htm
-    └── rfk_tools_suite/                 # Diagnostic Suite Server (Port 8088)
-        ├── server.py                    # Standalone HTTP Server & Telemetry Polling Daemon
-        ├── static/
-        │   ├── antenna_mapper.html      # SWR curve, band spinner, IP printing
-        │   ├── health_monitor.html      # 1hr & 24hr Canvas Graphs (Power, Sag, Temp)
-        │   └── backup_manager.html      # SD media manager & weekly cron scheduler
-        └── bin/
-            ├── rfk_backup.sh            # Live partition cloner & UUID regenerator
-            ├── jrfk_restore_check.sh    # Disaster recovery first-boot verification hook
-            ├── jrfk_restore_check.service# Systemd recovery unit
-            ├── jrfk_weekly_backup.cron  # Weekly backup cron entry
-            ├── jrfk_weekly_upgrade.sh   # Non-interactive OS package upgrade script
-            ├── jrfk_weekly_upgrade.cron # Weekly OS upgrade cron entry (Sundays 04:00 AM)
-            ├── Antenna_Mapper.desktop   # Desktop shortcut
-            ├── Amplifier_Health.desktop # Desktop shortcut
-            └── Backup_Manager.desktop   # Desktop shortcut
+    ├── migrator/                       # Windows 11 Migration Engine & Backend Daemon
+    │   ├── server.py                   # Local HTTP Server & Drive Detection Daemon (Port 8089)
+    │   ├── w11_popup_suppressor.py     # Background Windows 11 Format Prompt Suppressor
+    │   ├── sd_guard.py                 # Multi-Layer Drive Safety Lock
+    │   ├── build_jrfk_exe.py           # C# Compiler Pipeline for JRFK.exe
+    │   └── test_jrfk_e2e.py            # End-to-End Migration Unit Test Suite
+    ├── rfk_tools_suite/                # Raspberry Pi Diagnostic Web Suite (Port 8088)
+    │   ├── server.py                   # Embedded Async HTTP Server & Telemetry Poller
+    │   ├── static/                     # Blueprint UI Screens (Antenna, Health, Docs, Screen, etc.)
+    │   └── docs/                       # Internal Appliance Documentation Files
+    ├── pi_debs/                        # 15 Offline arm64 Debian Packages for First Boot
+    └── py_deps/                        # Offline Python 3.13 Wheels & Compatibility Shims
 ```
 
 ---
 
-## 👥 Author & Community Contributions
+## 👥 Authors & Community Contributions
 
 * **Author:** John Birdlebough (**K7BIT/AE**, Retired Chief Engineer Tektronix, Wang Labs, Marconi, WaMu, HP Cloud)
 * **Contributors:** John Stafford (**Island RF CEO**, RF-KIT US Service Center), Reinhard Förtsch (**DH3NAB**), Mark Mumaw (**NU6X**), and the members of the **RF-KIT B26 Group.IO Community**.
 
 ---
-*For bug reports, pull requests, or technical discussions, please open an issue on the [JRFK Issue Tracker](https://github.com/jbirdlebough1/JRFK/issues).*
+*For bug reports, pull requests, or technical discussions, please open an issue on the [JRFKTools Issue Tracker](https://github.com/jbirdlebough1/JRFKTools/issues).*

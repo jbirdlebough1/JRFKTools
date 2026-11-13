@@ -37,7 +37,7 @@ namespace JrfkLauncher
 
         public StatusForm()
         {
-            Text = "JRFK 32->64-Bit Migrator (Elevated)";
+            Text = "JRFK 32->64-Bit Migrator (Beta 1.0 - Elevated)";
             Size = new Size(640, 400);
             StartPosition = FormStartPosition.CenterScreen;
             FormBorderStyle = FormBorderStyle.FixedDialog;

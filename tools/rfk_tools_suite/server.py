@@ -458,6 +458,14 @@ class RFKToolsHandler(SimpleHTTPRequestHandler):
                     mime = "text/html"
                     if c.endswith(".pdf"):
                         mime = "application/pdf"
+                    elif c.endswith(".png"):
+                        mime = "image/png"
+                    elif c.endswith(".jpg") or c.endswith(".jpeg"):
+                        mime = "image/jpeg"
+                    elif c.endswith(".gif"):
+                        mime = "image/gif"
+                    elif c.endswith(".svg"):
+                        mime = "image/svg+xml"
                     elif c.endswith(".md") or c.endswith(".txt"):
                         mime = "text/plain; charset=utf-8"
                     self.send_response(200)
