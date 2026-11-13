@@ -2,322 +2,92 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JRFK Presentation 1: 13-Slide Complete Master Preview</title>
+    <title>JRFK Deck 1 Master Review - Station K7BIT</title>
     <style>
-        body {
-            margin: 0;
-            padding: 16px;
-            background: #06152b;
-            color: #ffffff;
-            font-family: 'Segoe UI', -apple-system, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
-        .player-container {
-            width: 1080px;
-            background: #0c2340;
-            border: 2px solid #38bdf8;
-            border-radius: 10px;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.75);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-        .slide-frame {
-            width: 1080px;
-            height: 608px;
-            border: none;
-            background: #000;
-            display: block;
-        }
-        .control-panel {
-            padding: 14px 20px;
-            background: #081a33;
-            border-top: 2px solid #1e3a5f;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .top-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .nav-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .btn {
-            background: #0284c7;
-            color: #ffffff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 13px;
-            letter-spacing: 0.5px;
-            transition: background 0.15s ease;
-        }
-        .btn:hover { background: #0369a1; }
-        .btn-green { background: #16a34a; }
-        .btn-green:hover { background: #15803d; }
-        .slide-indicator {
-            font-size: 13.5px;
-            font-weight: 600;
-            color: #38bdf8;
-            letter-spacing: 0.5px;
-        }
-        .audio-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            background: #051329;
-            padding: 8px 14px;
-            border-radius: 6px;
-            border: 1px solid #1e3a5f;
-        }
-        .audio-label {
-            font-size: 12px;
-            color: #94a3b8;
-            font-family: monospace;
-            white-space: nowrap;
-        }
-        audio {
-            flex: 1;
-            height: 36px;
-            outline: none;
-        }
-        .timeline-guide {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11.5px;
-            color: #64748b;
-            font-family: monospace;
-            padding: 0 4px;
-        }
-        .slide-selector {
-            background: #0f2744;
-            color: #ffffff;
-            border: 1px solid #38bdf8;
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0f1d; color: #f8fafc; margin: 0; padding: 25px; }
+        .container { max-width: 1500px; margin: 0 auto; }
+        header { border-bottom: 2px solid #38bdf8; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        h1 { margin: 0; font-size: 26px; color: #38bdf8; font-weight: 800; }
+        .callsign { font-size: 18px; font-weight: bold; background: #0284c7; padding: 6px 16px; border-radius: 4px; letter-spacing: 1.5px; }
+        .viewer { display: flex; gap: 25px; background: #131d31; padding: 25px; border-radius: 10px; box-shadow: 0 6px 30px rgba(0,0,0,0.6); }
+        .slide-view { flex: 3; display: flex; flex-direction: column; align-items: center; }
+        .slide-view img { width: 100%; border-radius: 6px; border: 1px solid #334155; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+        .playlist { flex: 1.1; display: flex; flex-direction: column; gap: 8px; max-height: 780px; overflow-y: auto; padding-right: 5px; }
+        .playlist-btn { background: #0a0f1d; border: 1px solid #1e293b; color: #94a3b8; padding: 12px 14px; border-radius: 6px; cursor: pointer; text-align: left; transition: all 0.2s; font-size: 14px; line-height: 1.3; }
+        .playlist-btn:hover { background: #1e293b; color: #f8fafc; border-color: #38bdf8; }
+        .playlist-btn.active { background: #0284c7; color: #ffffff; border-color: #38bdf8; font-weight: bold; }
+        .controls { width: 100%; margin-top: 15px; background: #0a0f1d; padding: 15px; border-radius: 6px; border: 1px solid #334155; }
+        audio { width: 100%; height: 48px; }
     </style>
 </head>
 <body>
-    <div class="player-container">
-        <!-- 720p Clean Slide Frame -->
-        <iframe id="slideFrame" class="slide-frame" src="slide_01.html"></iframe>
+    <div class="container">
+        <header>
+            <div>
+                <h1>JRFK Modernization Master Deck</h1>
+                <div style="color: #94a3b8; font-size: 15px; margin-top: 4px;">Presentation 1: Architectural Requirement, 32-to-64 Bit Payoff, and Tool Suite Overview</div>
+            </div>
+            <div class="callsign">CALLSIGN: K7BIT</div>
+        </header>
         
-        <!-- Controls & Visible Audio Player -->
-        <div class="control-panel">
-            <div class="top-row">
-                <div class="nav-group">
-                    <button class="btn" onclick="prevSlide()">◀ Previous</button>
-                    <button class="btn" onclick="nextSlide()">Next ▶</button>
-                    <button class="btn btn-green" onclick="restartAudio()">▶ Play Narration</button>
-                    <select id="jumpSelect" class="slide-selector" onchange="jumpToSlide(this.value)">
-                        <option value="0">Slide 1: The Migration Requirement</option>
-                        <option value="1">Slide 2: Why 32-Bit Must Go (Software EOL)</option>
-                        <option value="2">Slide 3: Display Architecture & RF Locks</option>
-                        <option value="3">Slide 4: 64-Bit Architecture Payoff</option>
-                        <option value="4">Slide 5: Tool 1 - JRFK Migrator Engine</option>
-                        <option value="5">Slide 6: Tool 1 - Discovery & Calibration</option>
-                        <option value="6">Slide 7: Tool 2 - 7-Screen Cockpit RF Metering</option>
-                        <option value="7">Slide 8: Tool 2 - PA Health & 4-Way Antennas</option>
-                        <option value="8">Slide 9: Tool 2 - Protection & Calibration</option>
-                        <option value="9">Slide 10: Tool 3 - 3-Min Disaster Recovery</option>
-                        <option value="10">Slide 11: Tool 3 - First-Boot Automation</option>
-                        <option value="11">Slide 12: Tool 4 - Documentation & Cookbook</option>
-                        <option value="12">Slide 13: Summary & Resources</option>
-                    </select>
-                </div>
-                <div class="slide-indicator" id="slideMeta">
-                    Slide 1 of 13: Modernizing the RF-KIT Linear Amplifier
+        <div class="viewer">
+            <div class="slide-view">
+                <img id="slideImg" src="slide_01.png" alt="Current Slide">
+                <div class="controls">
+                    <audio id="audioPlayer" controls autoplay src="slide_01.mp3"></audio>
                 </div>
             </div>
-            
-            <!-- Visible Audio Track with Scrubber -->
-            <div class="audio-wrapper">
-                <span class="audio-label" id="audioLabel">🔊 TRACK: slide_01.mp3 (Christopher Natural)</span>
-                <audio id="audioPlayer" controls preload="auto"></audio>
-            </div>
-            
-            <div class="timeline-guide">
-                <span id="timingStart">Timeline Offset: 00:00.00</span>
-                <span>Voice: en-US-ChristopherNeural • Slide Duration = Audio Duration</span>
-                <span id="timingDur">Duration: Loading...</span>
-            </div>
+            <div class="playlist" id="playlist"></div>
         </div>
     </div>
 
     <script>
         const slides = [
-            {
-            id: "slide_01",
-            title: "Modernizing the RF-KIT Linear Amplifier",
-            png: "slide_01.png",
-            audio: "slide_01.mp3",
-            duration: "28.10s",
-            start: "00:00.00"
-        },
-            {
-            id: "slide_02",
-            title: "Why 32-Bit Must Go: Software End-of-Life",
-            png: "slide_02.png",
-            audio: "slide_02.mp3",
-            duration: "27.26s",
-            start: "00:28.10"
-        },
-            {
-            id: "slide_03",
-            title: "Why 32-Bit Must Go: Display Architecture & RF Locks",
-            png: "slide_03.png",
-            audio: "slide_03.mp3",
-            duration: "33.48s",
-            start: "00:55.37"
-        },
-            {
-            id: "slide_04",
-            title: "64-Bit Architecture Overview: The Technical Payoff",
-            png: "slide_04.png",
-            audio: "slide_04.mp3",
-            duration: "24.79s",
-            start: "01:28.85"
-        },
-            {
-            id: "slide_05",
-            title: "Tool 1: JRFK Standalone Migrator Architecture",
-            png: "slide_05.png",
-            audio: "slide_05.mp3",
-            duration: "30.29s",
-            start: "01:53.64"
-        },
-            {
-            id: "slide_06",
-            title: "Tool 1 in Action: Discovery, Flashing & Calibration",
-            png: "slide_06.png",
-            audio: "slide_06.mp3",
-            duration: "25.08s",
-            start: "02:23.93"
-        },
-            {
-            id: "slide_07",
-            title: "Tool 2: 7-Screen Web Suite — RF Telemetry & Bands",
-            png: "slide_07.png",
-            audio: "slide_07.mp3",
-            duration: "27.12s",
-            start: "02:49.01"
-        },
-            {
-            id: "slide_08",
-            title: "Tool 2: PA Monitoring & 4-Way Antenna Matrix",
-            png: "slide_08.png",
-            audio: "slide_08.mp3",
-            duration: "32.35s",
-            start: "03:16.13"
-        },
-            {
-            id: "slide_09",
-            title: "Tool 2: Protection Systems, Logs & Touch Calibration",
-            png: "slide_09.png",
-            audio: "slide_09.mp3",
-            duration: "26.38s",
-            start: "03:48.48"
-        },
-            {
-            id: "slide_10",
-            title: "Tool 3: The 3-Minute Disaster Recovery Standby Card",
-            png: "slide_10.png",
-            audio: "slide_10.mp3",
-            duration: "26.40s",
-            start: "04:14.86"
-        },
-            {
-            id: "slide_11",
-            title: "Tool 3: First-Boot Automation & Self-Healing Services",
-            png: "slide_11.png",
-            audio: "slide_11.mp3",
-            duration: "24.77s",
-            start: "04:41.26"
-        },
-            {
-            id: "slide_12",
-            title: "Tool 4: Master Engineering Library & Cookbook Reader",
-            png: "slide_12.png",
-            audio: "slide_12.mp3",
-            duration: "27.14s",
-            start: "05:06.02"
-        },
-            {
-            id: "slide_13",
-            title: "Summary & Master Resource Directory",
-            png: "slide_13.png",
-            audio: "slide_13.mp3",
-            duration: "25.18s",
-            start: "05:33.17"
-        }
+            {"id": 1, "title": "01: JRFK Suite: Modernizing RF Controllers", "image": "slide_01.png", "audio": "slide_01.mp3"},
+            {"id": 2, "title": "02: Why 32-Bit Must Go: Software EOL", "image": "slide_02.png", "audio": "slide_02.mp3"},
+            {"id": 3, "title": "03: Why 32-Bit Must Go: Display & RF Locks", "image": "slide_03.png", "audio": "slide_03.mp3"},
+            {"id": 4, "title": "04: 64-Bit Architecture Overview: Payoff", "image": "slide_04.png", "audio": "slide_04.mp3"},
+            {"id": 5, "title": "05: Tool 1: JRFK Standalone Migrator", "image": "slide_05.png", "audio": "slide_05.mp3"},
+            {"id": 6, "title": "06: Tool 1 in Action: Discovery & Flashing", "image": "slide_06.png", "audio": "slide_06.mp3"},
+            {"id": 7, "title": "07: Tool 2: 7-Screen Web Suite — Telemetry", "image": "slide_07.png", "audio": "slide_07.mp3"},
+            {"id": 8, "title": "08: Tool 2: PA Monitoring & Antenna Matrix", "image": "slide_08.png", "audio": "slide_08.mp3"},
+            {"id": 9, "title": "09: Tool 2: Protection Systems & Touch Cal", "image": "slide_09.png", "audio": "slide_09.mp3"},
+            {"id": 10, "title": "10: Tool 3: 3-Min Disaster Recovery Card", "image": "slide_10.png", "audio": "slide_10.mp3"},
+            {"id": 11, "title": "11: Tool 3: First-Boot & Self-Healing", "image": "slide_11.png", "audio": "slide_11.mp3"},
+            {"id": 12, "title": "12: Tool 4: Docs Portal & K7BIT Cookbook", "image": "slide_12.png", "audio": "slide_12.mp3"},
+            {"id": 13, "title": "13: Summary & Master Resource Directory", "image": "slide_13.png", "audio": "slide_13.mp3"}
         ];
-        
-        let currentIdx = 0;
-        const player = document.getElementById('audioPlayer');
 
-        function loadSlide(idx) {
-            currentIdx = idx;
-            const s = slides[currentIdx];
-            document.getElementById('slideFrame').src = s.id + '.html';
-            document.getElementById('slideMeta').innerText = `Slide ${currentIdx + 1} of ${slides.length}: ${s.title}`;
-            document.getElementById('audioLabel').innerText = `🔊 TRACK: ${s.audio} (Christopher Natural)`;
-            document.getElementById('timingStart').innerText = `Timeline Offset: ${s.start}`;
-            document.getElementById('timingDur').innerText = `Duration: ${s.duration} (Exact Match)`;
-            document.getElementById('jumpSelect').value = currentIdx;
+        let currentIndex = 0;
+        const img = document.getElementById('slideImg');
+        const audio = document.getElementById('audioPlayer');
+        const playlist = document.getElementById('playlist');
+
+        function loadSlide(index) {
+            currentIndex = index;
+            img.src = slides[index].image;
+            audio.src = slides[index].audio;
+            audio.play().catch(function(e) { console.log('Autoplay deferred'); });
             
-            player.src = s.audio;
-            player.play().catch(() => {
-                // Handled user gesture requirements
+            document.querySelectorAll('.playlist-btn').forEach(function(btn, idx) {
+                if (idx === index) btn.classList.add('active');
+                else btn.classList.remove('active');
             });
         }
 
-        function restartAudio() {
-            player.currentTime = 0;
-            player.play();
-        }
-
-        function nextSlide() {
-            if (currentIdx < slides.length - 1) {
-                loadSlide(currentIdx + 1);
-            }
-        }
-
-        function prevSlide() {
-            if (currentIdx > 0) {
-                loadSlide(currentIdx - 1);
-            }
-        }
-
-        function jumpToSlide(val) {
-            loadSlide(parseInt(val));
-        }
-
-        // Auto-advance slide when audio finishes
-        player.addEventListener('ended', () => {
-            if (currentIdx < slides.length - 1) {
-                loadSlide(currentIdx + 1);
-            }
+        slides.forEach(function(slide, idx) {
+            const btn = document.createElement('button');
+            btn.className = 'playlist-btn' + (idx === 0 ? ' active' : '');
+            btn.innerText = slide.title;
+            btn.onclick = function() { loadSlide(idx); };
+            playlist.appendChild(btn);
         });
 
-        window.addEventListener('DOMContentLoaded', () => {
-            loadSlide(0);
-        });
+        audio.onended = function() {
+            if (currentIndex + 1 < slides.length) {
+                loadSlide(currentIndex + 1);
+            }
+        };
     </script>
 </body>
 </html>

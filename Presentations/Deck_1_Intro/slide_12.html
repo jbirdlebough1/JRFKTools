@@ -1,207 +1,229 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <style>
-
-:root {
-    --bp-bg: #134679;
-    --bp-grid: rgba(255, 255, 255, 0.12);
-    --bp-line: #ffffff;
-    --bp-line-dim: #cbd5e1;
-    --bp-card: #0a2544;
-    --bp-border: #60a5fa;
-    --accent-green: #22c55e;
-    --accent-cyan: #38bdf8;
-    --accent-amber: #f59e0b;
-}
-* { box-sizing: border-box; }
-body {
-    margin: 0;
-    padding: 24px 32px;
-    width: 1280px;
-    height: 720px;
-    background-color: var(--bp-bg);
-    background-image: 
-        linear-gradient(var(--bp-grid) 1px, transparent 1px),
-        linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px);
-    background-size: 20px 20px;
-    color: var(--bp-line);
-    font-family: 'Segoe UI', -apple-system, sans-serif;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    overflow: hidden;
-}
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid var(--bp-border);
-    padding-bottom: 8px;
-}
-.header-badge {
-    background: #0f3460;
-    color: var(--accent-cyan);
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    border: 1px solid var(--accent-cyan);
-    border-radius: 4px;
-}
-.header-meta {
-    font-size: 13px;
-    color: var(--bp-line-dim);
-    letter-spacing: 1px;
-}
-.title-row {
-    margin-top: 8px;
-}
-.title-row h1 {
-    font-size: 28px;
-    margin: 0;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    color: #ffffff;
-    text-transform: uppercase;
-}
-.title-row .subtitle {
-    font-size: 14px;
-    color: var(--accent-cyan);
-    margin-top: 3px;
-    font-weight: 500;
-}
-.content {
-    flex: 1;
-    display: flex;
-    gap: 20px;
-    margin-top: 12px;
-    align-items: stretch;
-}
-.col-text {
-    flex: 1.25;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    justify-content: center;
-}
-.col-media {
-    flex: 1;
-    background: #06192e;
-    border: 2px solid var(--bp-border);
-    border-radius: 6px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    padding: 8px;
-    position: relative;
-}
-.col-media img {
-    max-width: 100%;
-    max-height: 90%;
-    object-fit: contain;
-    border-radius: 4px;
-}
-.media-caption {
-    font-size: 11px;
-    color: var(--accent-cyan);
-    margin-top: 6px;
-    text-align: center;
-    font-family: monospace;
-}
-.card {
-    background: var(--bp-card);
-    border-left: 4px solid var(--accent-cyan);
-    padding: 9px 13px;
-    border-radius: 0 6px 6px 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-.card-green {
-    border-left-color: var(--accent-green);
-}
-.card-amber {
-    border-left-color: var(--accent-amber);
-}
-.card-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: #ffffff;
-    margin-bottom: 2px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.card-desc {
-    font-size: 12.5px;
-    color: var(--bp-line-dim);
-    line-height: 1.35;
-}
-.station-note-box {
-    background: rgba(15, 23, 42, 0.95);
-    border-left: 4px solid var(--accent-amber);
-    padding: 8px 12px;
-    border-radius: 0 6px 6px 0;
-    font-size: 12.5px;
-    color: #fef08a;
-    line-height: 1.35;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-.footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    padding-top: 6px;
-    font-size: 11.5px;
-    color: var(--bp-line-dim);
-}
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        width: 1920px;
+        height: 1080px;
+        background: #050b14;
+        color: #e2e8f0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 40px 60px;
+        position: relative;
+        overflow: hidden;
+    }
+    body::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: 
+            radial-gradient(circle at 10% 15%, rgba(14, 165, 233, 0.15) 0%, transparent 40%),
+            radial-gradient(circle at 90% 85%, rgba(59, 130, 246, 0.10) 0%, transparent 40%),
+            linear-gradient(to right, rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+        background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
+        pointer-events: none;
+    }
+    .header {
+        border-bottom: 2px solid rgba(56, 189, 248, 0.35);
+        padding-bottom: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        position: relative;
+        z-index: 2;
+    }
+    .header-left {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .tagline {
+        font-family: "Consolas", monospace;
+        font-size: 13px;
+        letter-spacing: 2px;
+        color: #38bdf8;
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+    .title {
+        font-size: 34px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        color: #ffffff;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+    .subtitle {
+        font-size: 16px;
+        color: #94a3b8;
+        font-weight: 400;
+    }
+    .header-right {
+        text-align: right;
+        font-family: "Consolas", monospace;
+        font-size: 13px;
+        color: #64748b;
+        letter-spacing: 1.5px;
+    }
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1.08fr 0.92fr;
+        gap: 36px;
+        align-items: stretch;
+        margin: 20px 0;
+        position: relative;
+        z-index: 2;
+        flex: 1;
+    }
+    .cards-col {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        justify-content: center;
+    }
+    .bullet-card {
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        border-left: 4px solid #38bdf8;
+        border-radius: 6px;
+        padding: 12px 18px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.35);
+    }
+    .bullet-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin-bottom: 3px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .bullet-title::before {
+        content: "■";
+        color: #38bdf8;
+        font-size: 11px;
+    }
+    .bullet-desc {
+        font-size: 13.5px;
+        line-height: 1.4;
+        color: #94a3b8;
+    }
+    .image-col {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 16px;
+    }
+    .graphic-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .image-frame {
+        background: #0b1322;
+        padding: 8px;
+        border-radius: 8px;
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .image-frame img {
+        max-width: 100%;
+        border-radius: 4px;
+        display: block;
+        object-fit: contain;
+    }
+    .image-caption {
+        margin-top: 6px;
+        font-family: "Consolas", monospace;
+        font-size: 11.5px;
+        color: #38bdf8;
+        letter-spacing: 1px;
+        text-align: center;
+    }
+    .footer {
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: "Consolas", monospace;
+        font-size: 12px;
+        color: #64748b;
+        position: relative;
+        z-index: 2;
+    }
+    .footer-left {
+        color: #38bdf8;
+        font-weight: 600;
+    }
 </style>
 </head>
 <body>
     <div class="header">
-        <div class="header-badge">JRFK TOOL 4 • SLIDE 1/1</div>
-        <div class="header-meta">TOOL 4: STATION DOCUMENTATION PORTAL</div>
+        <div class="header-left">
+            <div class="tagline">PART 4/4 • THE JRFK MIGRATION SUITE • TOOL 4: ENGINEERING LIBRARY</div>
+            <div class="title">TOOL 4: MASTER ENGINEERING LIBRARY & COOKBOOK READER</div>
+            <div class="subtitle">4-Volume Engineering Library and K7BIT's Authentic 193-Page B26 Cookbook</div>
+        </div>
+        <div class="header-right">
+            <div>CALLSIGN: K7BIT</div>
+            <div>SLIDE 12 OF 13</div>
+        </div>
     </div>
-    <div class="title-row">
-        <h1>Tool 4: Master Engineering Library & Cookbook Reader</h1>
-        <div class="subtitle">Complete 4-Volume Engineering Library + Integrated John K7BIT 193-Page Manual</div>
-    </div>
-    <div class="content">
+    
+    <div class="content-grid">
+        <div class="cards-col">
+            
+        <div class="bullet-card">
+            <div class="bullet-title">Integrated Shack Technical Portal</div>
+            <div class="bullet-desc">Served locally on port 8088, providing full documentation access completely offline in the ham shack.</div>
+        </div>
         
-            <div class="col-text">
-                
-                    <div class="card card-green">
-                        <div class="card-title">Complete 4-Volume Station Library</div>
-                        <div class="card-desc">Includes the full Operations Manual, 7-Screen User Guide, Engineering Architecture Manual, and Disaster Recovery Card.</div>
-                    </div>
-                    
-                    <div class="card ">
-                        <div class="card-title">John K7BIT's Authentic Cookbook (Rev 1.05)</div>
-                        <div class="card-desc">The complete 193-page historical cookbook is fully indexed in the portal, providing direct access to original pallet schematics and wiring.</div>
-                    </div>
-                    
-                    <div class="card card-amber">
-                        <div class="card-title">Responsive Web Reader</div>
-                        <div class="card-desc">Hosted on GitHub Pages for instant viewing across tablets, laptops, and smartphones with full search capability.</div>
-                    </div>
-                    
+        <div class="bullet-card">
+            <div class="bullet-title">Complete 4-Volume Library</div>
+            <div class="bullet-desc">Includes User Guide, Remote Operations, Emergency Recovery, and Controller Architecture manuals.</div>
+        </div>
+        
+        <div class="bullet-card">
+            <div class="bullet-title">K7BIT 193-Page Master B26 Cookbook</div>
+            <div class="bullet-desc">Authentic engineering reference with complete schematics, relay tables, coupler specs, and wiring.</div>
+        </div>
+        
+        <div class="bullet-card">
+            <div class="bullet-title">Interactive Searchable PDF Viewer</div>
+            <div class="bullet-desc">Embedded JavaScript document viewer allows instant keyword searching, zooming, and schematic tracing.</div>
+        </div>
+        
+        <div class="bullet-card">
+            <div class="bullet-title">Station Operating Note (K7BIT)</div>
+            <div class="bullet-desc">Integrated schematics and wire tables provide immediate on-screen guidance during hardware maintenance and testing.</div>
+        </div>
+        
+        </div>
+        <div class="image-col">
+            
+        <div class="graphic-item">
+            <div class="image-frame">
+                <img src="real_screenshots/screen_docs_viewer.png" style="max-height: 470px;" alt="FIG 19: JRFK 8088 DOCS VIEWER - K7BIT 193-PAGE B26 COOKBOOK & SCHEMATICS PORTAL">
             </div>
-            
-                <div class="col-media">
-                    <img src="file:///D:/JRFK/docs/cookbook_media/img_007.jpeg">
-                    <div class="media-caption">FIG 12: MASTER DOCUMENTATION PORTAL & K7BIT COOKBOOK VIEWER</div>
-                </div>
-                
-            
+            <div class="image-caption">FIG 19: JRFK 8088 DOCS VIEWER - K7BIT 193-PAGE B26 COOKBOOK & SCHEMATICS PORTAL</div>
+        </div>
+        
+        </div>
     </div>
+    
     <div class="footer">
-        <div>JRFK 64-BIT STATION SUITE • AMATEUR RADIO HIGH-POWER LINEAR AMPLIFIERS</div>
-        <div>GITHUB.COM/JBIRDLEBOUGH1/JRFKTOOLS</div>
+        <div class="footer-left">JRFK 64-BIT MODERNIZATION SUITE • AMATEUR RADIO HIGH-POWER STATIONS (K7BIT)</div>
+        <div class="footer-right">GITHUB.COM/BIRDIEBOUGHT/JRFKTOOLS</div>
     </div>
 </body>
 </html>
