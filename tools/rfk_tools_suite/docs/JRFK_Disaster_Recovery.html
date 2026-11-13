@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RF-KIT Linear Amplifier: Emergency Disaster Recovery & Field Hot-Swap Procedure</title>
+    <style>
+        :root {
+            --bp-blue: #1a5695;
+            --bp-dark: #0f3661;
+            --bp-grid: rgba(255, 255, 255, 0.18);
+            --bp-border: #93c5fd;
+            --bp-cyan: #67e8f9;
+            --data-green: #16a34a;
+            --data-yellow: #d97706;
+            --data-red: #dc2626;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --bg-light: #f8fafc;
+            --card-border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px 50px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .header {
+            border-bottom: 4px solid var(--bp-blue);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .badge {
+            display: inline-block;
+            background: var(--bp-blue);
+            color: #ffffff;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        h1 {
+            color: var(--bp-blue);
+            font-size: 26px;
+            margin: 0 0 10px 0;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+        .subtitle {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin: 0 0 15px 0;
+        }
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+            background: #f1f5f9;
+            padding: 12px 16px;
+            border-radius: 6px;
+            border-left: 4px solid var(--bp-blue);
+        }
+
+        h2 {
+            color: var(--bp-blue);
+            font-size: 18px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 6px;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        h2 .num {
+            background: var(--bp-blue);
+            color: #ffffff;
+            font-size: 12px;
+            padding: 2px 7px;
+            border-radius: 3px;
+            font-family: 'Consolas', monospace;
+        }
+
+        .alert {
+            padding: 14px 18px;
+            border-radius: 6px;
+            margin: 18px 0;
+            font-size: 13.5px;
+            line-height: 1.5;
+            border-left: 4px solid;
+        }
+        .alert-danger {
+            background: #fef2f2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .alert-warning {
+            background: #fffbeb;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+        .alert-info {
+            background: #eff6ff;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+        .alert-success {
+            background: #f0fdf4;
+            border-color: #22c55e;
+            color: #166534;
+        }
+
+        /* Step Card */
+        .step-card {
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            padding: 18px 22px;
+            margin-bottom: 18px;
+            background: #ffffff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .step-pill {
+            background: var(--bp-blue);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-family: 'Consolas', monospace;
+        }
+        .step-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: var(--bp-blue);
+            margin: 0;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0 20px 0;
+            font-size: 13px;
+        }
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: var(--bp-blue);
+            font-weight: 700;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+            margin: 10px 0;
+        }
+        .checklist li {
+            padding: 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13.5px;
+        }
+        .checklist input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        @media print {
+            body { background: #ffffff !important; }
+            .container { padding: 0 !important; box-shadow: none !important; width: 100% !important; max-width: 100% !important; }
+            h2 { page-break-before: auto; }
+            .step-card, table, .alert { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <span class="badge">EMERGENCY SHACK PROCEDURAL CARD</span>
+        <h1>RF-KIT Linear Amplifier: Disaster Recovery &amp; Field Hot-Swap Procedure</h1>
+        <div class="subtitle">Complete Rapid-Recovery Walkthrough for Primary MicroSD Failure, Corrupt Filesystem, or Mid-Contest Outages</div>
+        <div class="meta-grid">
+            <div><strong>Document ID:</strong> JRFK-DR-2026-V2.0</div>
+            <div><strong>Target Platforms:</strong> RF2K-S / RF2K+ (RPi 4 &amp; RPi 5)</div>
+            <div><strong>Operating System:</strong> 64-Bit Debian Trixie (aarch64)</div>
+            <div><strong>Target Recovery Time:</strong> Under 3 Minutes</div>
+        </div>
+    </div>
+
+    <div class="alert alert-danger">
+        <strong>SAFETY FIRST:</strong> Always switch off the amplifier's AC mains power switch and unplug the AC power cord before opening the amplifier top cover or handling the internal Raspberry Pi MicroSD card slot. High DC voltages (53.5V @ 55A) and RF potentials exist inside the chassis.
+    </div>
+
+    <h2><span class="num">01</span> The MicroSD Fleet Strategy</h2>
+    <p>The JRFK architecture maintains a multi-card defense fleet so that no single hardware degradation can ever take your station offline:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Card ID</th>
+                <th>Physical Location</th>
+                <th>Condition</th>
+                <th>Role in Emergency Recovery</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>PROD-64</strong></td>
+                <td>Internal RPi Slot</td>
+                <td>Active 64-Bit Production</td>
+                <td>Current operational system running the amplifier. Subject to wear or sudden failure.</td>
+            </tr>
+            <tr>
+                <td><strong>BACKUP-AUTO</strong></td>
+                <td>External USB 2.0 Slot</td>
+                <td>Weekly Clone Target</td>
+                <td>Contains full raw binary backup generated automatically every Sunday at 04:00 GMT. <strong>Primary swap replacement!</strong></td>
+            </tr>
+            <tr>
+                <td><strong>FIELD-64</strong></td>
+                <td>Shack Storage Drawer</td>
+                <td>Cold Spare 64-Bit</td>
+                <td>Pre-configured clone with identical K7BIT calibrations, Wi-Fi, and shims ready for immediate swap.</td>
+            </tr>
+            <tr>
+                <td><strong>GOLD1 / GOLD2</strong></td>
+                <td>Air-Gapped Vault</td>
+                <td>32-Bit Golden Master</td>
+                <td>Original factory 32-bit SD card. <strong>Read-only.</strong> Used to re-provision a fresh 64-bit card in 8 minutes if needed.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2><span class="num">02</span> Rapid Field Hot-Swap Procedure (Under 3 Minutes)</h2>
+
+    <div class="step-card">
+        <div class="step-header">
+            <span class="step-pill">STEP 1</span>
+            <h3 class="step-title">Immediate Shutdown &amp; AC Isolation</h3>
+        </div>
+        <p>Switch the front/rear AC power switch to <strong>OFF</strong>. Disconnect the main AC power cord from the wall outlet. Wait 30 seconds for the internal Eltek Flatpack2 high-capacity filter capacitors to bleed down safely.</p>
+    </div>
+
+    <div class="step-card">
+        <div class="step-header">
+            <span class="step-pill">STEP 2</span>
+            <h3 class="step-title">Extract Degraded MicroSD</h3>
+        </div>
+        <p>Carefully press and release the degraded MicroSD card (<strong>PROD-64</strong>) located in the push-pull card slot on the Raspberry Pi. Remove the card and set it aside for post-incident diagnostic examination on your PC.</p>
+    </div>
+
+    <div class="step-card">
+        <div class="step-header">
+            <span class="step-pill">STEP 3</span>
+            <h3 class="step-title">Insert Backup SD Card</h3>
+        </div>
+        <p>Retrieve either your <strong>BACKUP-AUTO</strong> card (from the amplifier's USB reader) or your pre-provisioned <strong>FIELD-64</strong> spare card. Firmly insert it into the Raspberry Pi internal slot until it clicks securely into place.</p>
+    </div>
+
+    <div class="step-card">
+        <div class="step-header">
+            <span class="step-pill">STEP 4</span>
+            <h3 class="step-title">Power On &amp; Initial Boot Verification</h3>
+        </div>
+        <p>Reconnect the AC power cord and switch the AC power switch to <strong>ON</strong>. The Raspberry Pi will immediately boot:</p>
+        <ul class="checklist">
+            <li><input type="checkbox" checked disabled> <strong>Display Handshake:</strong> The 1024x600 LCD touchscreen illuminates with the RF-KIT boot logo (X11 desktop is completely suppressed).</li>
+            <li><input type="checkbox" checked disabled> <strong>Controller Connection:</strong> The RF-KIT GUI links to <code>/dev/ttyUSB_RFK</code>, displaying DC Bus Voltage (~53.5V) and PA Temperature.</li>
+            <li><input type="checkbox" checked disabled> <strong>Station Network Online:</strong> The amplifier connects to Wi-Fi/Ethernet; web console responds at <code>http://&lt;amplifier-ip&gt;:8088/</code>.</li>
+        </ul>
+        <p><strong>Your amplifier is now 100% operational and ready to transmit.</strong></p>
+    </div>
+
+    <h2><span class="num">03</span> Weekly Automated Backups &amp; Autopatching Overview</h2>
+    <p>Your JRFK 64-bit installation maintains an active system cron (<code>/etc/cron.d/jrfk_weekly_backup</code>) that guarantees your backup card is never out of date:</p>
+    <ul>
+        <li><strong>Schedule:</strong> Every Sunday morning at <strong>04:00 GMT</strong>.</li>
+        <li><strong>Binary Backup:</strong> Compresses the entire production SD card into a timestamped image in <code>/home/pi/backups/</code>.</li>
+        <li><strong>Automated OS Autopatching:</strong> Immediately following backup creation, the cron executes <code>sudo apt update &amp;&amp; sudo apt upgrade -y</code>. This ensures your Debian Trixie 64-bit kernel, security packages, and network drivers remain continually updated with zero manual overhead.</li>
+    </ul>
+
+    <h2><span class="num">04</span> On-Demand Web Backup &amp; Clone Utility</h2>
+    <p>To create a fresh manual backup at any time before major shack changes or firmware upgrades:</p>
+    <ol>
+        <li>Open your browser to <code>http://&lt;amplifier-ip&gt;:8088/backup</code>.</li>
+        <li>Click <strong>⚡ Run Full SD Backup Now</strong>.</li>
+        <li>Monitor live streaming progress in the web log. When complete, the backup image is validated and saved.</li>
+    </ol>
+
+</div>
+
+</body>
+</html>

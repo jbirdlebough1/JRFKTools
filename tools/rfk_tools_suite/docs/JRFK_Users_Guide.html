@@ -6,7 +6,7 @@
     <title>RF-KIT Linear Amplifier: 32-Bit to 64-Bit OS Migration, Disaster Recovery & Operator's Guide</title>
     <style>
         :root {
-            --bp-blue: #1a5695;          /* Medium blueprint cyanotype blue */
+            --bp-blue: #1a5695;          /* Classic medium blueprint cyanotype blue */
             --bp-dark: #0f3661;
             --bp-grid: rgba(255, 255, 255, 0.18);
             --bp-border: #93c5fd;
@@ -45,7 +45,7 @@
         .cover-header {
             border-bottom: 4px solid var(--bp-blue);
             padding-bottom: 25px;
-            margin-bottom: 35px;
+            margin-bottom: 30px;
         }
         .doc-badge {
             display: inline-block;
@@ -85,6 +85,44 @@
             border-left: 4px solid var(--bp-blue);
         }
 
+        /* Quick-Access Banner (Front Matter) */
+        .front-matter-banner {
+            background: #081d33;
+            border: 2px solid var(--bp-blue);
+            color: #ffffff;
+            padding: 18px 24px;
+            border-radius: 6px;
+            margin: 25px 0 35px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .front-matter-text h3 {
+            color: var(--bp-cyan);
+            margin: 0 0 6px 0;
+            font-size: 17px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .front-matter-text p {
+            margin: 0;
+            font-size: 13px;
+            color: #dbeafe;
+        }
+        .url-pill {
+            background: #1e3a8a;
+            border: 1px solid var(--bp-cyan);
+            color: #ffffff;
+            font-family: 'Consolas', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 8px 18px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
         /* Section Headings */
         h2 {
             color: var(--bp-blue);
@@ -114,7 +152,7 @@
             margin-bottom: 10px;
         }
 
-        /* Callout Alerts */
+        /* Callouts */
         .alert {
             padding: 14px 18px;
             border-radius: 6px;
@@ -123,26 +161,10 @@
             line-height: 1.5;
             border-left: 4px solid;
         }
-        .alert-info {
-            background: #eff6ff;
-            border-color: #3b82f6;
-            color: #1e40af;
-        }
-        .alert-warning {
-            background: #fffbeb;
-            border-color: #f59e0b;
-            color: #92400e;
-        }
-        .alert-danger {
-            background: #fef2f2;
-            border-color: #ef4444;
-            color: #991b1b;
-        }
-        .alert-success {
-            background: #f0fdf4;
-            border-color: #22c55e;
-            color: #166534;
-        }
+        .alert-info { background: #eff6ff; border-color: #3b82f6; color: #1e40af; }
+        .alert-warning { background: #fffbeb; border-color: #f59e0b; color: #92400e; }
+        .alert-danger { background: #fef2f2; border-color: #ef4444; color: #991b1b; }
+        .alert-success { background: #f0fdf4; border-color: #22c55e; color: #166534; }
 
         /* Classic Medium-Blue Blueprint Card */
         .blueprint-card {
@@ -218,7 +240,7 @@
             background: #f8fafc;
         }
 
-        /* Mockup screens */
+        /* Screen Mockups */
         .screen-mockup {
             border: 2px solid #1e3a8a;
             background: #0f2c4d;
@@ -241,27 +263,13 @@
             padding: 20px;
         }
 
-        /* Diagrams */
-        .diagram-container {
-            text-align: center;
-            margin: 20px 0;
-            padding: 15px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-        }
-        .diagram-container svg {
-            max-width: 100%;
-            height: auto;
-        }
-
         /* Print formatting */
         @media print {
             body { background: #ffffff !important; }
             .manual-container { padding: 0 !important; box-shadow: none !important; width: 100% !important; max-width: 100% !important; }
             h2 { page-break-before: always; }
             h2:first-of-type { page-break-before: avoid; }
-            .step-block, .blueprint-card, .screen-mockup, table { page-break-inside: avoid; }
+            .step-block, .blueprint-card, .screen-mockup, table, .front-matter-banner { page-break-inside: avoid; }
         }
     </style>
 </head>
@@ -282,18 +290,194 @@
         </div>
     </div>
 
-    <!-- Section 1: Prerequisites & Station Preparation -->
-    <h2><span class="sec-num">01</span> Prerequisites &amp; Hardware Preparation</h2>
-
-    <p>Before initiating the 32-bit to 64-bit migration of your RF-KIT linear amplifier, ensure you have gathered the required hardware components and verified the firmware version of your amplifier. Following these requirements guarantees complete zero-risk protection of your calibration data.</p>
-
-    <div class="alert alert-warning">
-        <strong>CRITICAL FIRMWARE PREREQUISITE:</strong> Your RF-KIT amplifier must run <strong>firmware version v199, v200, or later</strong> prior to starting the migration. Do not attempt migration on obsolete v198 or earlier firmware, as internal controller parameter schemas were updated in v199 to support 64-bit SimpleRPC protocol parity. Run the official RF-KIT online software update first if needed.
+    <!-- Front Matter: Quick Web Access -->
+    <div class="front-matter-banner">
+        <div class="front-matter-text">
+            <h3>🌐 Shack Web Suite: Instant Browser Connection (:8088)</h3>
+            <p>Access the 24/7 amplifier diagnostic console from any PC, tablet, or smartphone on your local network:</p>
+        </div>
+        <div class="url-pill">http://&lt;amplifier-ip&gt;:8088/</div>
     </div>
 
-    <h3>The 6-Card MicroSD Architecture Fleet</h3>
-    <p>Professional broadcast stations and mission-critical amateur stations never rely on a single storage medium. You must procure <strong>six (6) high-endurance 32GB MicroSD cards</strong> (SanDisk Extreme, Ultra, or Pro rated <strong>V30, A2/A3, or faster</strong> with minimum 100 MB/s read and 60 MB/s write speeds) along with a reliable <strong>USB 2.0 MicroSD reader/writer</strong>.</p>
+    <!-- Section 1: Introduction to JRFK.exe and Dual-Architecture -->
+    <h2><span class="sec-num">01</span> System Architecture &amp; Introduction to JRFK.exe</h2>
 
+    <p>The <strong>JRFK 32-to-64-Bit Migration &amp; Diagnostic Suite</strong> provides a bulletproof upgrade path for the RF-KIT RF2K-S and RF2K+ amateur radio power amplifiers. Over years of broadcast and contest operation, legacy 32-bit Raspberry Pi operating systems suffer from lack of upstream security patches, driver deprecation, and slow single-core telemetry polling. JRFK upgrades your amplifier to a high-performance, 64-bit Debian Trixie (<code>aarch64</code>) appliance while guaranteeing <strong>zero data loss</strong> and total preservation of all factory calibrations.</p>
+
+    <h3>The Dual-Architecture Model: PC vs. Amplifier Separation</h3>
+    <p>To avoid confusion, the JRFK ecosystem is split into two completely separate, decoupled components:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Component</th>
+                <th>Hardware Host</th>
+                <th>Port / Access</th>
+                <th>Core Function &amp; Scope</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>PC Migration Utility (<code>JRFK.exe</code>)</strong></td>
+                <td>Windows PC (Host)</td>
+                <td>Port 8089 (Local)</td>
+                <td><strong>One-time offline SD card migration.</strong> Reads 32-bit GOLD SD, verifies safety signatures, wipes and partitions target MicroSD, writes the ~6.28 GB 64-bit OS image, stages factory calibrations, Wi-Fi credentials, and sets up turnkey firstboot. Has NO runtime web sub-pages.</td>
+            </tr>
+            <tr>
+                <td><strong>Amplifier Appliance Suite</strong></td>
+                <td>Raspberry Pi (Inside Amp)</td>
+                <td>Port 8088 (LAN)</td>
+                <td><strong>24/7 operational station diagnostics.</strong> Natively hosts the Technical Blueprint web interface: Antenna Mapper, Health Monitor with 60°C emergency thermal trip, Remote Screen mirror, automated weekly backups, System Report, and Log Viewer.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Section 2: What GOLD Data Migrates to 64-Bit -->
+    <h2><span class="sec-num">02</span> The GOLD Migration Matrix: Preserved Calibration Assets</h2>
+
+    <p>When migrating an existing amplifier, <code>JRFK.exe</code> extracts your station parameters directly from your working 32-bit SD card (<strong>GOLD1</strong>) and maps them cleanly into the 64-bit environment:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Calibration / Data Item</th>
+                <th>32-Bit Source Location</th>
+                <th>64-Bit Destination Target</th>
+                <th>Operational Impact &amp; Role</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>RF-KIT GUI Application</strong></td>
+                <td><code>/home/pi/rf-kit-gui/</code></td>
+                <td><code>/home/pi/rf-kit-gui/</code></td>
+                <td>Preserved in full. Patched with 64-bit Python 3.13 shims (Pillow <code>Image.ANTIALIAS</code> shim and Hamlib bindings).</td>
+            </tr>
+            <tr>
+                <td><strong>PA Calibrations &amp; Offsets</strong></td>
+                <td><code>/home/pi/rf-kit-statics/calibrations.json</code></td>
+                <td><code>/home/pi/rf-kit-statics/calibrations.json</code></td>
+                <td>Retains exact detector null voltages (0.042V / 0.038V), frequency scaling, and power meter calibrations.</td>
+            </tr>
+            <tr>
+                <td><strong>Per-Band ATU Tuning Data</strong></td>
+                <td><code>/home/pi/PA-Files/</code></td>
+                <td><code>/home/pi/PA-Files/</code></td>
+                <td>All tuned segment component tables (inductor nH and capacitor pF relay values) across 160m..6m remain intact.</td>
+            </tr>
+            <tr>
+                <td><strong>Antenna Matrix &amp; Custom Names</strong></td>
+                <td><code>/home/pi/rf-kit-statics/config.json</code></td>
+                <td><code>/home/pi/rf-kit-statics/config.json</code></td>
+                <td>Preserves <code>selected_antennas</code> matrix, custom antenna labels (e.g. Dipole, SteppIR, Beam), and auto-tune thresholds.</td>
+            </tr>
+            <tr>
+                <td><strong>Operator Callsign &amp; CAT Rig</strong></td>
+                <td><code>/home/pi/rf-kit-statics/config.json</code></td>
+                <td><code>/home/pi/rf-kit-statics/config.json</code></td>
+                <td>Retains callsign (<code>customDeviceName</code>), transceiver model (ICOM, Yaesu, Kenwood, Elecraft, Flex), baud rates, and UDP port 50001.</td>
+            </tr>
+            <tr>
+                <td><strong>Wi-Fi &amp; Network Configuration</strong></td>
+                <td><code>/etc/wpa_supplicant/wpa_supplicant.conf</code></td>
+                <td><code>/boot/firmware/wpa_supplicant.conf</code></td>
+                <td>Preserves station SSID and PSK so the amplifier auto-associates with your local network on first boot.</td>
+            </tr>
+            <tr>
+                <td><strong>Linux Password &amp; SSH Auth</strong></td>
+                <td><code>/etc/shadow</code> (User <code>pi</code>)</td>
+                <td><code>/boot/firmware/userconf.txt</code></td>
+                <td>Original user password hash extracted and re-injected. Headless OpenSSH enabled out of the box.</td>
+            </tr>
+            <tr>
+                <td><strong>1024x600 Display Drivers</strong></td>
+                <td>Legacy <code>/boot/config.txt</code> (fkms)</td>
+                <td>Pure KMS <code>/boot/firmware/config.txt</code></td>
+                <td>Upgrades legacy firmware KMS to Full KMS DRM pipeline with hardware CVT 1024x600 60Hz timing. Suppresses desktop background.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Section 3: The 7 Post-Migration Web Utilities -->
+    <h2><span class="sec-num">03</span> Post-Migration Web Diagnostics Suite (Port 8088)</h2>
+
+    <p>Once your amplifier is booted into 64-bit, navigate to <code>http://&lt;amplifier-ip&gt;:8088/</code>. The top navigation bar provides instant access to seven unified tools:</p>
+
+    <h3>1. 🗺️ Antenna Mapper &amp; Tuner Bode Plot (<code>/antenna</code>)</h3>
+    <p>Directly reads your amplifier's <code>config.json</code> and renders your active relay state across the 4 coaxial antenna ports:</p>
+    <ul>
+        <li><strong>Active 4-Port Relay Matrix:</strong> Displays four physical port cards (<code>ANT 1</code>, <code>ANT 2</code>, <code>ANT 3</code>, <code>ANT 4</code>). The currently energized relay glows green with <code>● ACTIVE RELAY</code> while the remaining three show <code>STANDBY</code>.</li>
+        <li><strong>Dynamic Band Routing:</strong> As you switch bands (e.g. 160m &rarr; 20m &rarr; 6m) either on the transceiver, via CAT, or clicking the on-screen band ribbon, the antenna port cards instantly update to reflect your amplifier's actual relay matrix.</li>
+        <li><strong>Bode Plot &amp; Physical Values:</strong> Displays the ATU SWR matching curve across all segment boundaries (marked with <strong>|</strong>). Clicking any segment displays the physical Inductance in nanohenries ($L$ in nH / $\mu$H) and Capacitance in picofarads ($C$ in pF).</li>
+    </ul>
+
+    <h3>2. 📈 Health Monitor &amp; 60°C Thermal Guard (<code>/health</code>)</h3>
+    <p>Provides mission-critical telemetry monitoring designed to protect your LDMOS transistors under heavy contest duty cycles:</p>
+    <ul>
+        <li><strong>5 Real-Time Telemetry Gauges:</strong> Heatsink Temperature (°C), Forward Output Power (W), Reflected Power &amp; SWR, 53.5V DC Rail Voltage, and Drain Current (A).</li>
+        <li><strong>3 Real-Time Canvas Charts:</strong> Historical charts tracking PA temperature trends, RF envelope power, and DC rail stability under high-current load.</li>
+        <li><strong>Multi-Tier Thermal Safety System:</strong>
+            <ul>
+                <li><code>Nominal</code> (&le; 50°C): Normal operation. Front/rear fans engage automatically above 42°C.</li>
+                <li><code>Warning</code> (&gt; 50°C): High duty-cycle warning displayed on web banner.</li>
+                <li><code>Red Alert</code> (&gt; 55°C): Approaching safety ceiling; warning logged.</li>
+                <li><code>Emergency Thermal Trip</code> (&gt; 60°C): <strong>Automatic unkey protection!</strong> The suite triggers an emergency RPC command to force the amplifier into Standby, activates a 300-second live cooldown countdown modal overlay, and locks out re-enabling until the heatsink cools below <strong>50.0°C</strong>.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>3. 📺 Remote Screen Console (<code>/screen</code>)</h3>
+    <p>Streams a crisp, real-time mirror of the physical 1024x600 amplifier screen directly into your browser:</p>
+    <ul>
+        <li>Operates via the Raspberry Pi's secondary display pipeline as a virtual HDMI monitor.</li>
+        <li>Strictly <strong>READ-ONLY</strong>, preventing accidental touches or parameter changes.</li>
+        <li>Ideal for propping up an iPad, tablet, or smartphone beside your logging computer during a contest.</li>
+    </ul>
+
+    <h3>4. 💾 Disaster Recovery &amp; SD Backup Manager (<code>/backup</code>)</h3>
+    <p>Manages automated and on-demand cloning of your active production storage:</p>
+    <ul>
+        <li><strong>Secondary SD Architecture:</strong> A secondary 32GB MicroSD card is placed in a small USB 2.0 reader plugged into the Raspberry Pi rear USB port (labeled <code>BACKUP-AUTO</code>).</li>
+        <li><strong>Weekly Automated Cron:</strong> Every Sunday at 04:00 GMT, the system generates a compressed binary raw disk image (<code>dd | xz</code>) saved to <code>/home/pi/backups/</code>.</li>
+        <li><strong>On-Demand Backups:</strong> Click <em>"⚡ Run Full SD Backup Now"</em> anytime before performing firmware modifications or shack rewiring.</li>
+    </ul>
+
+    <h3>5. ⚙️ Automated RPi OS Autopatching (Sunday Cron)</h3>
+    <p>Keeping an embedded Linux system secure and stable normally requires manual terminal access. JRFK automates this safely:</p>
+    <ul>
+        <li>Immediately after the weekly raw image backup completes on Sunday morning, the cron executes <code>sudo apt update &amp;&amp; sudo apt upgrade -y</code>.</li>
+        <li>Benefits: Keeps the 64-bit kernel, hardware drivers, OpenSSH, and security packages permanently updated without operator intervention.</li>
+        <li>Fail-Safe Protection: Because a complete compressed backup image was written minutes prior, you can instantly roll back if an upstream Debian package ever introduces an issue.</li>
+    </ul>
+
+    <h3>6. 📋 System Report (<code>/report</code>)</h3>
+    <p>An exhaustive, publication-grade technical report covering all hardware and software subsystems:</p>
+    <ul>
+        <li><strong>Host Hardware:</strong> CPU clock rates, SoC silicon temperature, memory allocation, and undervoltage/throttling register flags.</li>
+        <li><strong>Storage Health:</strong> Root filesystem usage, wear-leveling indicator (A2 high-endurance rating), and interface bus speed.</li>
+        <li><strong>Network &amp; CAT:</strong> IP address, MAC address, Wi-Fi RSSI signal quality, active CAT rig, and UDP port bindings.</li>
+        <li><strong>Calibrations:</strong> Detector null voltage offsets (0.042V / 0.038V) and full 64-bit validation audit.</li>
+    </ul>
+
+    <h3>7. 📜 Log Viewer (<code>/logs</code>)</h3>
+    <p>Centralized real-time access to four diagnostic log streams:</p>
+    <ul>
+        <li><code>telemetry_rolling.log</code>: 10MB rotating circular log tracking typ, min, and max values for temperature, power, voltage, and current.</li>
+        <li><code>rfk_backup.log</code>: Audit log of weekly scheduled backups, compression times, image sizes, and apt package upgrades.</li>
+        <li><code>rfk_gui</code>: Live stdout/stderr log from the RF-KIT touch UI, SimpleRPC serial packets, and CAN bus commands.</li>
+        <li><code>systemd journal</code>: Kernel boot messages, USB serial device attachment (<code>/dev/ttyUSB_RFK</code>), and networking events.</li>
+    </ul>
+
+    <!-- Section 4: Hardware Prerequisites -->
+    <h2><span class="sec-num">04</span> Hardware Prerequisites &amp; The 6-Card Fleet</h2>
+
+    <p>Before beginning the migration, ensure you have gathered the required hardware components and verified your amplifier firmware.</p>
+
+    <div class="alert alert-warning">
+        <strong>FIRMWARE PREREQUISITE:</strong> Your RF-KIT amplifier must run <strong>firmware version v199, v200, or later</strong> prior to starting the migration. Internal controller parameter schemas were updated in v199 to support 64-bit SimpleRPC protocol parity.
+    </div>
+
+    <h3>The 6-Card MicroSD Fleet Strategy</h3>
     <table>
         <thead>
             <tr>
@@ -343,441 +527,114 @@
         </tbody>
     </table>
 
-    <h3>Downloading the JRFK Package</h3>
-    <p>Download the entire JRFK package from GitHub to your local Windows PC:</p>
-    <div class="blueprint-card">
-        <div class="bp-title">WINDOWS COMMAND PROMPT / POWERSHELL SETUP</div>
-        git clone https://github.com/jbirdlebough1/JRFK.git D:\JRFK<br>
-        cd D:\JRFK<br>
-        .\JRFK.exe
-    </div>
+    <!-- Section 5: The Golden Rule of Safety -->
+    <h2><span class="sec-num">05</span> The Golden Rule of Safety: Creating GOLD1 &amp; GOLD2</h2>
 
-    <!-- Section 2: Creating GOLD1 & GOLD2 on the 32-Bit Pi -->
-    <h2><span class="sec-num">02</span> The Golden Rule of Safety: Creating GOLD1 &amp; GOLD2</h2>
+    <p>Before writing a single byte of 64-bit software, you will clone your existing 32-bit working system into two physical Golden Masters directly on the Raspberry Pi using the desktop <strong>SD Card Copier</strong> tool (<code>piclone</code>):</p>
 
-    <p>The foundational principle of JRFK is <strong>zero data loss and zero risk</strong>. Before modifying any storage medium or flashing 64-bit binaries, you will clone your existing 32-bit working system into two independent physical Golden Masters directly on the Raspberry Pi.</p>
-
-    <!-- Diagram of Safe Golden Master Cloning -->
-    <div class="diagram-container">
-        <svg viewBox="0 0 750 180" width="750" height="180">
-            <rect x="20" y="40" width="180" height="90" rx="8" fill="#1a5695" stroke="#ffffff" stroke-width="2"/>
-            <text x="110" y="75" fill="#ffffff" font-size="14" font-weight="bold" text-anchor="middle">ACTIVE 32-BIT SD</text>
-            <text x="110" y="100" fill="#dbeafe" font-size="12" text-anchor="middle">/dev/mmcblk0 (Internal)</text>
-
-            <path d="M 200 85 L 280 85" fill="none" stroke="#1a5695" stroke-width="3"/>
-            <rect x="280" y="60" width="170" height="50" rx="6" fill="#0f766e" stroke="#2dd4bf" stroke-width="2"/>
-            <text x="365" y="85" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">Raspberry Pi `piclone`</text>
-            <text x="365" y="102" fill="#ccfbf1" font-size="11" text-anchor="middle">(SD Card Copier Utility)</text>
-
-            <path d="M 450 70 L 530 50" fill="none" stroke="#d97706" stroke-width="2"/>
-            <path d="M 450 100 L 530 120" fill="none" stroke="#d97706" stroke-width="2"/>
-
-            <rect x="530" y="20" width="190" height="60" rx="6" fill="#854d0e" stroke="#facc15" stroke-width="2"/>
-            <text x="625" y="45" fill="#fef08a" font-size="13" font-weight="bold" text-anchor="middle">CARD 1: GOLD1</text>
-            <text x="625" y="65" fill="#ffffff" font-size="11" text-anchor="middle">Air-Gapped Primary Vault</text>
-
-            <rect x="530" y="95" width="190" height="60" rx="6" fill="#854d0e" stroke="#facc15" stroke-width="2"/>
-            <text x="625" y="120" fill="#fef08a" font-size="13" font-weight="bold" text-anchor="middle">CARD 2: GOLD2</text>
-            <text x="625" y="140" fill="#ffffff" font-size="11" text-anchor="middle">Shack Redundant Spare</text>
-        </svg>
-    </div>
-
-    <div class="step-block">
-        <h4><span class="step-badge">STEP 2.1</span> Insert Target MicroSD into USB 2.0 Reader</h4>
-        <p>Plug Card 1 into your USB 2.0 MicroSD reader and connect it to a black USB 2.0 port on the Raspberry Pi while your working 32-bit system is booted.</p>
-    </div>
-
-    <div class="step-block">
-        <h4><span class="step-badge">STEP 2.2</span> Launch SD Card Copier (`piclone`)</h4>
-        <p>On the Raspberry Pi desktop, navigate to <strong>Application Menu (Raspberry icon) &gt; Accessories &gt; SD Card Copier</strong>.</p>
-        <ul>
-            <li><strong>Copy From Device:</strong> Select <code>Internal SD card (/dev/mmcblk0)</code>.</li>
-            <li><strong>Copy To Device:</strong> Select your USB 2.0 reader, e.g. <code>Mass Storage Device (/dev/sda)</code>.</li>
-            <li><strong>New Partition UUIDs:</strong> Leave <em>unchecked</em> (this ensures an exact identical clone).</li>
-            <li>Click <strong>Start</strong>. When the prompt asks for confirmation to wipe the USB card, click <strong>OK</strong>.</li>
-        </ul>
-    </div>
-
-    <div class="step-block">
-        <h4><span class="step-badge">STEP 2.3</span> Label and Repeat for GOLD2</h4>
-        <p>When the cloning process completes (typically 4–8 minutes), remove the card and immediately attach the physical adhesive label: <strong>GOLD1</strong>. Next, insert Card 2 and repeat the identical process to create <strong>GOLD2</strong>.</p>
-    </div>
+    <ol>
+        <li>Boot the amplifier normally into your 32-bit system. Plug a blank 32GB MicroSD card into a USB reader connected to the Raspberry Pi.</li>
+        <li>Open the Raspberry Pi desktop menu &rarr; <em>Accessories</em> &rarr; <em>SD Card Copier</em>.</li>
+        <li>Select <strong>Copy From Device:</strong> <code>Internal SD Card (/dev/mmcblk0)</code>.</li>
+        <li>Select <strong>Copy To Device:</strong> <code>USB Card Reader (/dev/sda)</code>.</li>
+        <li>Click <strong>Start</strong>. Once complete, remove the card and label it <strong>GOLD1</strong>.</li>
+        <li>Repeat this exact procedure with a second blank card and label it <strong>GOLD2</strong>.</li>
+    </ol>
 
     <div class="alert alert-success">
-        <strong>THE ZERO-RISK GUARANTEE:</strong> With GOLD1 and GOLD2 safely in hand, you have complete peace of mind. Both cards contain your exact 32-bit operating system, custom screen calibration, Wi-Fi credentials, and amplifier tuning tables. If at any time you wish to revert, simply insert either GOLD card back into the Raspberry Pi and power on.
+        <strong>ZERO RISK ACHIEVED:</strong> You now possess two independent, bootable, exact physical copies of your factory 32-bit system. Even in the worst-case scenario, re-inserting GOLD1 returns your amplifier to 100% factory operation in under 60 seconds.
     </div>
 
-    <!-- Section 3: Option 1 - Step-by-Step 64-Bit SD Creation (With GOLD) -->
-    <h2><span class="sec-num">03</span> Option 1: 64-Bit OS Migration (With GOLD Card)</h2>
+    <!-- Section 6: Option 1 Migration -->
+    <h2><span class="sec-num">06</span> Option 1: 64-Bit OS Migration with JRFK.exe</h2>
 
-    <p>In this workflow, the automated JRFK Windows application extracts your unique station parameters from <code>GOLD1</code> in read-only mode, flashes the target 64-bit Debian Trixie OS image onto Card 3 (<code>PROD-64</code>), and stages the JRFK payload into the boot partition.</p>
+    <p>With GOLD1 created, you can now generate your production 64-bit SD card (<strong>PROD-64</strong>) using the Windows PC utility:</p>
 
-    <div class="alert alert-info">
-        <strong>PERMANENT LOCAL PC STORAGE:</strong> Once JRFK reads a GOLD card, your station settings, calibration tables, ATU matrices, and network configurations are <strong>permanently stored on your local PC hard drive</strong> (inside <code>D:\JRFK\backups\gold_staging\</code>). Even if both physical GOLD SD cards were misplaced or damaged, your complete amplifier personality remains safely archived on your PC forever.
-    </div>
-
-    <!-- Visual Migration Flow Mockup -->
-    <div class="screen-mockup">
-        <div class="screen-mockup-titlebar">
-            <span>JRFK 32-Bit to 64-Bit Migration Tool v2.4 (K7BIT Architecture)</span>
-            <span>STATUS: READY FOR EXTRACTION</span>
-        </div>
-        <div class="screen-mockup-body">
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                <div>
-                    <span style="color:#67e8f9;">[1] READ-ONLY GOLD EXTRACTION</span> &gt; 
-                    <span style="color:#dbeafe;"> [2] TARGET SD WIPE</span> &gt; 
-                    <span style="color:#dbeafe;"> [3] 64-BIT FLASH &amp; INJECTION</span>
-                </div>
-                <span style="color:#22c55e;">● SYSTEM PROTECTION LOCKED</span>
-            </div>
-            <div style="background:#133d6b; padding:15px; border-radius:4px; font-size:12px; line-height:1.6; border:1px solid #93c5fd;">
-                [+] USB 2.0 Reader Detected: Disk 2 (SanDisk Ultra - 31.9 GB)<br>
-                [+] MBR Signature Verified: 0xfc92c19c (Golden Master 32-Bit)<br>
-                [+] Extracted /home/pi/rf-kit-statics/config.json (Callsign: K7BIT)<br>
-                [+] Extracted directional coupler &amp; RF detector calibration tables<br>
-                [+] Extracted wpa_supplicant.conf Wi-Fi credentials &amp; X11 touch matrices<br>
-                [+] Extracted ATU tuning matrices for all 11 amateur bands<br>
-                [+] STATION ARCHIVE STORED PERMANENTLY ON LOCAL PC (D:\JRFK\backups\gold_staging\)<br>
-                [+] Extraction complete! Please REMOVE Golden Master and insert your NEW target SD.
-            </div>
-        </div>
+    <div class="step-block">
+        <h4><span class="step-badge">STEP 1</span> Launch JRFK.exe on Windows</h4>
+        <p>Connect your USB MicroSD reader to your Windows PC with <strong>GOLD1</strong> inserted. Launch <code>JRFK.exe</code>. Accept the Windows UAC Administrator prompt. The tool will automatically open your default browser to <code>http://127.0.0.1:8089/</code>.</p>
     </div>
 
     <div class="step-block">
-        <h4><span class="step-badge">STEP 3.1</span> Launch JRFK.exe on Your PC</h4>
-        <p>Run <code>JRFK.exe</code> on your Windows workstation. JRFK starts its local administrative engine and opens the migration console in Google Chrome.</p>
+        <h4><span class="step-badge">STEP 2</span> Read-Only GOLD Asset Extraction</h4>
+        <p>Click <strong>1. Validate &amp; Extract GOLD SD</strong>. JRFK reads the Linux ext4 rootfs in strict read-only mode, validating your callsign, Wi-Fi SSID, calibration files, and tuning tables. It computes SHA-256 signatures to confirm data integrity.</p>
     </div>
 
     <div class="step-block">
-        <h4><span class="step-badge">STEP 3.2</span> Insert GOLD1 into PC USB 2.0 Reader</h4>
-        <p>Plug <code>GOLD1</code> into your PC's USB 2.0 reader. JRFK immediately identifies the volume in <strong>strictly read-only mode</strong>. It extracts and archives:</p>
-        <ul>
-            <li><code>/home/pi/rf-kit-statics/config.json</code> (Station callsign, antenna port mappings, custom names)</li>
-            <li>Calibration lookup tables (SWR null, forward/reflected detector polynomials)</li>
-            <li>Antenna Tuner (ATU) band segment matrices (L and C matching values)</li>
-            <li>Network configuration (<code>/etc/wpa_supplicant/wpa_supplicant.conf</code>)</li>
-            <li>Touchscreen alignment parameters (<code>/etc/pointercal</code> and Xorg evdev configs)</li>
-        </ul>
-        <div class="alert alert-info">
-            <strong>HARDWARE WRITE-BLOCKING:</strong> JRFK will strictly refuse to write to or format any disk identified as a Golden Master. Once extraction completes, the application instructs you to remove the GOLD card and set it safely aside.
-        </div>
+        <h4><span class="step-badge">STEP 3</span> Swap to Target Blank SD Card</h4>
+        <p>Eject GOLD1 and safely store it in your shack vault. Insert a fresh blank 32GB card (labeled <strong>PROD-64</strong>). Click <strong>Rescan Disks</strong> and select the target drive.</p>
     </div>
 
     <div class="step-block">
-        <h4><span class="step-badge">STEP 3.3</span> Insert Target Card 3 (PROD-64) &amp; Execute Clean Wipe</h4>
-        <p>Insert your blank Card 3 (<code>PROD-64</code>) into the USB 2.0 reader. JRFK performs strict safety checks:</p>
-        <ol>
-            <li>Verifies the drive is <em>Removable</em> (blocking system drive C:, D:, and fixed NVMe/SSDs).</li>
-            <li>Confirms capacity is &lt;= 64 GB.</li>
-            <li>Executes a low-level DISKPART clean operation to purge corrupt partition tables.</li>
+        <h4><span class="step-badge">STEP 4</span> Write 64-Bit Image &amp; Inject Factory Calibrations</h4>
+        <p>Click <strong>2. Provision SD (Migrate to 64-Bit)</strong>. JRFK wipes the card, flashes the verified 64-bit Debian Trixie image (~6.28 GB), and injects all your preserved calibrations, Wi-Fi network credentials, headless SSH keys, and custom 1024x600 display modelines.</p>
+    </div>
+
+    <!-- Section 7: The 3-Boot Walkthrough -->
+    <h2><span class="sec-num">07</span> The 3-Boot Walkthrough: From Automation to Production</h2>
+
+    <p>Insert the newly created <strong>PROD-64</strong> card into your amplifier's Raspberry Pi and power on. The amplifier will perform an automated 3-boot initialization:</p>
+
+    <ul>
+        <li><strong>Boot 1 (Partition Expansion &amp; Offline Debs):</strong> The system auto-expands the Linux rootfs to utilize the full 32GB card, unpacks the 15 offline Debian packages, installs Python 3.13 shims, and reboots automatically (~90 seconds).</li>
+        <li><strong>Boot 2 (Hardware Link &amp; Controller Handshake):</strong> The system tests the USB serial link to the Arduino / proprietary controller (<code>/dev/ttyUSB_RFK</code>). Once verified, it displays a green completion confirmation and reboots into production mode.</li>
+        <li><strong>Boot 3 (Production Mode):</strong> Boots directly into the fullscreen 1024x600 RF-KIT touchscreen GUI. The Linux desktop is completely hidden. All RF-KIT meters, antenna ports, and menus are live.</li>
+    </ul>
+
+    <!-- Section 8: Option 2 Virgin Setup -->
+    <h2><span class="sec-num">08</span> Option 2: Virgin Fresh 64-Bit Setup (Without GOLD Card)</h2>
+
+    <p>If your original 32-bit SD card was lost or corrupted, JRFK allows building a complete, clean 64-bit OS from scratch:</p>
+    <ol>
+        <li>Open <code>JRFK.exe</code> and navigate to <strong>Option 2: Fresh Setup</strong>.</li>
+        <li>Enter your <strong>Callsign</strong>, <strong>Shack Wi-Fi SSID and Password</strong>, and select your transceiver CAT rig.</li>
+        <li>Click <strong>Build Fresh 64-Bit SD</strong>. JRFK generates a turnkey 64-bit image populated with standard K7BIT cookbook tuning profiles ready for on-air alignment.</li>
+    </ol>
+
+    <!-- Section 9: Disaster Recovery Procedure -->
+    <h2><span class="sec-num">09</span> Emergency Disaster Recovery &amp; Field Hot-Swap</h2>
+
+    <p>If your primary production SD card ever experiences hardware degradation or read errors during a contest:</p>
+
+    <div class="alert alert-danger">
+        <strong>THE 3-MINUTE RECOVERY PROCEDURE:</strong>
+        <ol style="margin-top: 8px;">
+            <li>Switch AC mains power to <strong>OFF</strong>. Disconnect AC power cord. Wait 30 seconds for power supply capacitors to bleed down.</li>
+            <li>Press and remove the degraded card from the internal Raspberry Pi slot.</li>
+            <li>Insert your <strong>BACKUP-AUTO</strong> card (from the rear USB reader) or your pre-provisioned <strong>FIELD-64</strong> card into the internal slot.</li>
+            <li>Reconnect AC power and switch power to <strong>ON</strong>. The amplifier boots immediately into full operation with all calibrations intact.</li>
         </ol>
     </div>
 
-    <div class="step-block">
-        <h4><span class="step-badge">STEP 3.4</span> Flash 64-Bit OS &amp; Inject JRFK Payload</h4>
-        <p>Click <strong>Flash 64-Bit OS &amp; Inject JRFK Payload</strong>. The migrator automatically:</p>
-        <ul>
-            <li>Flashes the official 64-bit Debian Trixie (aarch64) Raspberry Pi OS image.</li>
-            <li>Injects the complete offline package archive into the <code>boot</code> partition (including 15 arm64 .deb packages, <code>fonts-lato</code>, <code>libhamlib</code>, <code>python3-legacy-cgi</code>, and pure-Python <code>simple_rpc</code>).</li>
-            <li>Configures <code>firstboot_setup.sh</code> to run unattended on the amplifier.</li>
-            <li>Sets 1024x600 display resolution timings in <code>cmdline.txt</code> and <code>config.txt</code>.</li>
-        </ul>
-    </div>
-
-    <!-- Section 4: The 3-Boot Walkthrough -->
-    <h2><span class="sec-num">04</span> The 3-Boot Walkthrough: From Automation to Production</h2>
-
-    <p>Once flashing is complete, remove Card 3 from your PC, insert it into the Raspberry Pi in your amplifier, and power the unit on. The migration completes across a fully orchestrated <strong>3-boot sequence</strong>.</p>
-
-    <!-- 3-Boot Diagram -->
-    <div class="diagram-container">
-        <svg viewBox="0 0 750 200" width="750" height="200">
-            <!-- Boot 1 -->
-            <rect x="20" y="30" width="210" height="140" rx="8" fill="#1a5695" stroke="#ffffff" stroke-width="2"/>
-            <text x="125" y="60" fill="#ffffff" font-size="14" font-weight="bold" text-anchor="middle">BOOT 1: FIRSTBOOT</text>
-            <text x="125" y="85" fill="#ffffff" font-size="12" text-anchor="middle">Headless Unattended Setup</text>
-            <text x="125" y="110" fill="#dbeafe" font-size="11" text-anchor="middle">• Expands rootfs to 32GB</text>
-            <text x="125" y="128" fill="#dbeafe" font-size="11" text-anchor="middle">• Installs 15 arm64 .debs</text>
-            <text x="125" y="146" fill="#dbeafe" font-size="11" text-anchor="middle">• Auto-reboots (~3 min)</text>
-
-            <path d="M 230 100 L 270 100" fill="none" stroke="#1a5695" stroke-width="3"/>
-
-            <!-- Boot 2 -->
-            <rect x="270" y="30" width="210" height="140" rx="8" fill="#14532d" stroke="#22c55e" stroke-width="2"/>
-            <text x="375" y="60" fill="#4ade80" font-size="14" font-weight="bold" text-anchor="middle">BOOT 2: VERIFICATION</text>
-            <text x="375" y="85" fill="#ffffff" font-size="12" text-anchor="middle">Green Confirmation Screen</text>
-            <text x="375" y="110" fill="#bbf7d0" font-size="11" text-anchor="middle">• Full-screen 1024x600 GUI</text>
-            <text x="375" y="128" fill="#bbf7d0" font-size="11" text-anchor="middle">• Audits checksum hashes</text>
-            <text x="375" y="146" fill="#bbf7d0" font-size="11" text-anchor="middle">• User taps "Proceed"</text>
-
-            <path d="M 480 100 L 520 100" fill="none" stroke="#22c55e" stroke-width="3"/>
-
-            <!-- Boot 3 -->
-            <rect x="520" y="30" width="210" height="140" rx="8" fill="#1e3a8a" stroke="#60a5fa" stroke-width="2"/>
-            <text x="625" y="60" fill="#93c5fd" font-size="14" font-weight="bold" text-anchor="middle">BOOT 3: PRODUCTION</text>
-            <text x="625" y="85" fill="#ffffff" font-size="12" text-anchor="middle">Live RF-KIT Desktop</text>
-            <text x="625" y="110" fill="#bae6fd" font-size="11" text-anchor="middle">• Native RFK Touch GUI</text>
-            <text x="625" y="128" fill="#bae6fd" font-size="11" text-anchor="middle">• 64-Bit Performance</text>
-            <text x="625" y="146" fill="#bae6fd" font-size="11" text-anchor="middle">• Diagnostic Suite on :8088</text>
-        </svg>
-    </div>
-
-    <div class="step-block">
-        <h4><span class="step-badge">BOOT 1</span> Headless Automated Setup</h4>
-        <p>On initial power-up, the system boots into headless automation mode. You will observe the green ACT LED flashing steadily. During this phase, <code>firstboot_setup.sh</code>:</p>
-        <ol>
-            <li>Expands the root partition to the full 32GB MicroSD capacity.</li>
-            <li>Deploys pre-staged arm64 Debian packages (<code>libhamlib4t64</code>, <code>python3-legacy-cgi</code>, <code>fonts-lato</code>, <code>python3-yaml</code>).</li>
-            <li>Installs pure-Python <code>simple_rpc</code> and applies the Python 3.13 <code>patch_antialias.py</code> compatibility shim.</li>
-            <li>Restores your station calibration files and Wi-Fi credentials from the payload.</li>
-            <li>Configures the Waveshare 7" 1024x600 CVT modeline in X11 and enables SSH password authentication.</li>
-            <li>Automatically executes a clean reboot into Boot 2. (Duration: 3 to 4 minutes).</li>
-        </ol>
-    </div>
-
-    <div class="step-block">
-        <h4><span class="step-badge">BOOT 2</span> The Green Verification Screen (`jrfk_verify_gui`)</h4>
-        <p>The amplifier powers up and displays a full-screen, high-contrast <strong>Green Verification Screen</strong> on the 1024x600 touchscreen.</p>
-        
-        <!-- Screen Mockup for Boot 2 -->
-        <div class="screen-mockup" style="border-color:#22c55e;">
-            <div class="screen-mockup-titlebar" style="background:#14532d; color:#86efac;">
-                <span>JRFK 32-BIT TO 64-BIT TRANSITION VERIFICATION CONSOLE</span>
-                <span>STATUS: MIGRATION SUCCESSFUL</span>
-            </div>
-            <div class="screen-mockup-body" style="background:#052e16;">
-                <div style="font-size:18px; color:#4ade80; font-weight:bold; margin-bottom:12px;">
-                    ✔ 32-BIT TO 64-BIT MIGRATION AUDIT PASSED
-                </div>
-                <div style="font-size:13px; color:#bbf7d0; line-height:1.7;">
-                    [✔] Operating System: Debian GNU/Linux 13 (Trixie) aarch64 (Pure 64-Bit Kernel)<br>
-                    [✔] Station Calibration Checksum: MATCHED (config.json &amp; coupler tables verified)<br>
-                    [✔] Display Modeline: 1024x600 @ 60.00Hz CVT Mode Locked<br>
-                    [✔] SimpleRPC Controller Link: /dev/rfk_ctrl ACTIVE (Mega 2560 / Proprietary V4)<br>
-                    [✔] Network Address: 192.168.12.193 | SSH Port 22 ENABLED<br>
-                    [✔] Diagnostic Suite: Running on http://192.168.12.193:8088
-                </div>
-                <div style="margin-top:18px; border-top:1px solid #166534; padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
-                    <span style="color:#86efac; font-size:12px;">Auto-launching RFK Desktop in 60s...</span>
-                    <span style="background:#22c55e; color:#052e16; font-weight:bold; padding:6px 16px; border-radius:4px;">PROCEED TO RFK DESKTOP</span>
-                </div>
-            </div>
-        </div>
-        <p>Review the audit checklist. You can tap <strong>Proceed to RFK Desktop</strong> on the touchscreen or simply wait 60 seconds for the system to automatically advance to Boot 3.</p>
-    </div>
-
-    <div class="step-block">
-        <h4><span class="step-badge">BOOT 3</span> Production RF-KIT Console Launch</h4>
-        <p>The system reboots cleanly into the native <strong>1024x600 RF-KIT touchscreen application</strong>. Your station callsign, band matrix, forward/reflected power meters, and automatic tuner settings are fully loaded and operational in a pure 64-bit execution environment.</p>
-    </div>
-
-    <!-- Section 5: Option 2 - Virgin Fresh 64-Bit Setup (Without GOLD) -->
-    <h2><span class="sec-num">05</span> Option 2: Virgin Fresh 64-Bit Setup (Without GOLD Card)</h2>
-
-    <p>In scenarios where an operator does not possess a 32-bit Golden Master (for example, if the original SD card suffered physical failure, was lost, or if the amplifier is being rebuilt with a replacement Raspberry Pi 4 or Pi 5), JRFK provides a dedicated <strong>Virgin 64-Bit Setup Mode</strong>.</p>
-
-    <h3>Minimum Inputs Required from User</h3>
-    <p>When running JRFK in Virgin Setup mode, you are prompted for only four parameters to generate a clean, ready-to-run 64-bit appliance:</p>
-    <table>
-        <thead>
-            <tr>
-                <th>Parameter</th>
-                <th>Example Value</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><strong>Callsign</strong></td>
-                <td><code>K7BIT</code></td>
-                <td>Station identification string rendered on the RF-KIT console and web reports.</td>
-            </tr>
-            <tr>
-                <td><strong>Hostname</strong></td>
-                <td><code>rfk-amp1</code></td>
-                <td>Network hostname for local mDNS resolution (<code>rfk-amp1.local</code>).</td>
-            </tr>
-            <tr>
-                <td><strong>Wi-Fi Network</strong></td>
-                <td>SSID &amp; WPA2/WPA3 Passphrase</td>
-                <td>Shack wireless network credentials for headless LAN connectivity.</td>
-            </tr>
-            <tr>
-                <td><strong>Display Profile</strong></td>
-                <td><code>Waveshare 7" 1024x600</code></td>
-                <td>KMS DRM timing profile for the amplifier's internal LCD panel.</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <p>Upon entering these four parameters, JRFK creates the standard directory structure, deploys all 64-bit libraries and dependencies, configures the 1024x600 display timing, and pre-authorizes your network credentials. The amplifier boots directly into a fresh, fully functional 64-bit installation ready for operation.</p>
-
-    <!-- Section 6: RFK Tools Suite Operator's Guide -->
-    <h2><span class="sec-num">06</span> RFK Diagnostic Suite Operator's Guide (Port 8088)</h2>
-
-    <p>The JRFK 64-bit environment includes a standalone diagnostic and disaster recovery web suite operating on <strong>Port 8088</strong> (e.g., <code>http://192.168.12.193:8088</code>). Designed in high-contrast <strong>Medium Blueprint Format</strong> (crisp white typography and white grid on medium cyanotype blue <code>#1a5695</code>), it provides comprehensive real-time telemetry and safety controls.</p>
-
-    <!-- Antenna Mapper Subsection -->
-    <h3>6.1 Antenna Mapper &amp; Tuner Bode Plot (`/antenna`)</h3>
-    <p>The Antenna Mapper renders the live SWR characterization curve for each band segment, syncs directly with the RF-KIT antenna port map, and reports true physical component values.</p>
-
-    <div class="blueprint-card">
-        <div class="bp-title">ANTENNA MAPPER SPECIFICATION &amp; BODE MARKERS</div>
-        • <strong>Segment Boundaries (|):</strong> The Bode plot displays vertical dashed dividing lines with a "|" marker at each segment boundary (e.g., 25 kHz segments on 20m: 14.000, 14.025, 14.050 ... 14.350 MHz).<br>
-        • <strong>Antenna Port Map Synchronization:</strong> The "ACTIVE ANTENNA" indicator dynamically reflects the selected band's antenna port assignment from config.json (e.g., Band 20m &rarr; "ANT 2: SteppIR 20m-6m"). As you change bands via the spinner or buttons, the antenna field and Bode plot update in lockstep.<br>
-        • <strong>Physical Component Values (No Raw Clicks!):</strong> Instead of obscure stepper clicks, the inspector reports true engineering units:
-          - Inductance (L): Displayed in <strong>nanohenries (nH)</strong> and <strong>microhenries (µH)</strong> (e.g., 1,750 nH / 1.75 µH).
-          - Capacitance (C): Displayed in <strong>picofarads (pF)</strong> (e.g., 385 pF).
-          - Matching Topology: Indicates <strong>CL (Cin / Tx Side)</strong> or <strong>LC (Cout / Ant Side)</strong> relay configuration.
-    </div>
-
-    <!-- Health Monitor & Thermal Guard Subsection -->
-    <h3>6.2 Amplifier Health Monitor &amp; 3-Tier Thermal Guard (`/health`)</h3>
-    <p>The Health Monitor provides real-time oversight of the PA heatsink temperature, 53.5V DC rail stability, drain current, and RF power envelope. It features an automated hardware-protective <strong>Thermal Guard State Machine</strong>:</p>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Thermal Tier</th>
-                <th>Heatsink Range</th>
-                <th>Color Indicator</th>
-                <th>System Action &amp; Safety Protocol</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><strong>Tier 1: Normal</strong></td>
-                <td>&lt;= 50.0°C</td>
-                <td><span style="color:#16a34a; font-weight:bold;">GREEN</span></td>
-                <td>Standard operating duty. Cooling fans operate automatically (Fan On &gt; 42°C, Fan Off &lt; 38°C).</td>
-            </tr>
-            <tr>
-                <td><strong>Tier 2: Warning</strong></td>
-                <td>50.1°C - 55.0°C</td>
-                <td><span style="color:#d97706; font-weight:bold;">YELLOW</span></td>
-                <td><strong>Warning Banner Displayed.</strong> Telemetry line turns yellow. High thermal load alert generated.</td>
-            </tr>
-            <tr>
-                <td><strong>Tier 3: Alert</strong></td>
-                <td>55.1°C - 60.0°C</td>
-                <td><span style="color:#dc2626; font-weight:bold;">RED</span></td>
-                <td><strong>Critical Alert Banner.</strong> Telemetry line turns red. Operator warned of imminent safety shutdown.</td>
-            </tr>
-            <tr>
-                <td><strong>Tier 4: Trip Limit</strong></td>
-                <td>&gt; 60.0°C</td>
-                <td><span style="background:#dc2626; color:#fff; padding:2px 6px; font-weight:bold;">UNKEY TRIP</span></td>
-                <td><strong>EMERGENCY UNKEY &amp; PROTECTION LOCKOUT:</strong><br>
-                1. Instantly unkeys amplifier (switches core to Standby).<br>
-                2. Displays full-screen modal alert: <em>"AMPLIFIER DISABLED AND PROTECTED"</em>.<br>
-                3. Initiates live <strong>300-second (5 minute) countdown timer</strong>.<br>
-                4. <strong>Interlock:</strong> Re-enables amplifier ONLY when timer reaches 0 <em>AND</em> heatsink temp cools below 50.0°C.</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <h3>6.3 Circular Telemetry Logging (10 MB Rotating Buffer)</h3>
-    <p>To prevent storage exhaustion and SD card write wear, JRFK implements a strict <strong>10MB rotating circular log</strong> located at <code>/home/pi/rfk_tools/telemetry_rolling.log</code>. The logging engine computes rolling statistical summaries:</p>
-    <ul>
-        <li><strong>PA Temperature (°C):</strong> Current, Typical (running average), Minimum, and Maximum.</li>
-        <li><strong>DC Rail Voltage (V):</strong> Current, Typ, Min, and Max (monitoring 53.5V regulation under heavy CW/SSB key-down).</li>
-        <li><strong>DC Drain Current (A):</strong> Current, Typ, Min, and Max (up to 35A under full 1.5kW carrier).</li>
-        <li><strong>Forward &amp; Reflected Power (W):</strong> Current, Typ, Min, Max, and calculated SWR.</li>
-    </ul>
-
-    <!-- Remote Screen Viewer Subsection -->
-    <h3>6.4 Remote Web Screen Viewer (`/screen`)</h3>
-    <p>Operators can monitor the live 1024x600 amplifier console from any browser on their local network (PC, Mac, iPad, or Android tablet). Navigating to <code>http://&lt;amplifier-ip&gt;:8088/screen</code> opens a high-fidelity live stream of the console display with configurable refresh rates (1.0s, 2.0s, 5.0s, or Pause) and full-screen presentation mode.</p>
-
-    <!-- System Report Subsection -->
-    <h3>6.5 Complete System Report &amp; Archive (`/report`)</h3>
-    <p>Accessing <code>http://&lt;amplifier-ip&gt;:8088/report</code> generates a comprehensive station diagnostic summary in Blueprint format. It provides an exhaustive audit of:</p>
-    <ul>
-        <li><strong>Station Identity:</strong> Callsign, hostname, firmware revision, operate mode, and transceiver CAT link.</li>
-        <li><strong>Storage Subsystem:</strong> Boot and root device identifiers, capacity, used/free space, and USB 2.0 interface health.</li>
-        <li><strong>Calibration Data:</strong> Forward and reflected detector null voltages, scale factors, and SWR bridge balance.</li>
-        <li><strong>Network Configuration:</strong> IP address, MAC, Wi-Fi SSID, signal strength (-dBm), gateway, and SSH port status.</li>
-        <li><strong>Touchscreen Modeline:</strong> Waveshare 7" 1024x600 timing modeline and 1:1 coordinate mapping parameters.</li>
-        <li><strong>ATU Band Segment Map:</strong> Exhaustive matrix across all 11 amateur bands (160m–6m) mapping each segment to its assigned antenna port, physical inductance range (nH), capacitance range (pF), and topology.</li>
-        <li><strong>Print Sheet:</strong> One-click print button formatted cleanly for shack records and station logbooks.</li>
-    </ul>
-
-    <!-- Log Viewer Subsection -->
-    <h3>6.6 Centralized Log Viewer (`/logs`)</h3>
-    <p>Navigating to <code>http://&lt;amplifier-ip&gt;:8088/logs</code> opens the live terminal log viewer. It allows operators to:</p>
-    <ul>
-        <li>Select and monitor all critical logs: <code>rf-kit-gui.log</code> (core app), <code>telemetry_rolling.log</code> (10MB circular log), <code>rfk_backup.log</code> (cloning log), <code>jrfk_firstboot.log</code> (migration log), and <code>Xorg.0.log</code> (display server).</li>
-        <li>Filter and search log entries live using the search toolbar.</li>
-        <li>Enable/disable auto-scroll and trigger manual refreshes.</li>
-        <li>Print formatted log excerpts directly to shack printers.</li>
-    </ul>
-
-    <!-- SD Backup & Disaster Recovery Subsection -->
-    <h3>6.7 Automated SD Backup &amp; Disaster Recovery (`/backup`)</h3>
-    <p>By permanently leaving Card 5 (<code>BACKUP-AUTO</code>) inside the amplifier's external USB 2.0 reader, the system performs unattended weekly whole-disk cloning via <code>/etc/cron.d/jrfk_weekly_backup</code> or instant on-demand replication via the web interface. If the internal production SD ever degrades or fails, simply power down, move Card 5 into the internal Raspberry Pi slot, and power back on—your amplifier is immediately back online with all settings intact.</p>
-
-    <div class="blueprint-card">
-        <div class="bp-title">6-STAGE REPLICATION PIPELINE &amp; MANDATORY PRE-SUCCESS VERIFICATION</div>
-        The JRFK Disaster Recovery Engine strictly prohibits declaring success until a rigorous 5-point post-replication integrity audit completes without errors:
-        <br><br>
-        • <strong>Stage 1 (Unmount):</strong> Unmounts all active volumes on the target USB 2.0 SD device (<code>/dev/sda</code>).<br>
-        • <strong>Stage 2 (Partition):</strong> Writes a standard DOS partition table (512 MB FAT32 Boot + remaining storage EXT4 Rootfs).<br>
-        • <strong>Stage 3 (Format):</strong> Formats pristine target filesystems via <code>mkfs.vfat -F 32</code> and <code>mkfs.ext4</code>.<br>
-        • <strong>Stage 4 (Replication):</strong> Synchronizes bootloader firmware and 64-bit rootfs via differential block <code>rsync</code> (replicating ~6.8 GB of used data in 3–4 minutes, excluding volatile runtimes and swap).<br>
-        • <strong>Stage 5 (UUID Patching):</strong> Extracts unique hardware PARTUUIDs from the new SD partitions and automatically updates target <code>cmdline.txt</code> and <code>/etc/fstab</code> so the card boots independently with zero dependency on the source.<br>
-        • <strong>Stage 6 (Mandatory Verification Suite):</strong>
-          <ol style="margin-left:20px; margin-top:8px;">
-            <li><strong>Bootloader &amp; Kernel Check:</strong> Verifies existence, permissions, and byte length of <code>cmdline.txt</code>, <code>config.txt</code>, and <code>kernel8.img</code>.</li>
-            <li><strong>PARTUUID Alignment Check:</strong> Validates that both <code>cmdline.txt</code> and <code>/etc/fstab</code> target the destination card's PARTUUID.</li>
-            <li><strong>OS Binary Tree Check:</strong> Confirms critical root directory structures (<code>/bin</code>, <code>/sbin</code>, <code>/usr</code>, <code>/etc</code>, <code>/lib</code>, <code>/var</code>) and core binaries.</li>
-            <li><strong>Station Calibration &amp; Tuning Audit:</strong> Compares <code>/home/pi/PA-Files</code>, antenna matrices, null voltage calibrations, and diagnostic suite files against the active amplifier with 100% parity verification.</li>
-            <li><strong>Cache Flush &amp; Non-Destructive Filesystem Check:</strong> Executes hardware buffer flush (<code>sync</code>), unmounts partitions, and runs non-destructive read-only checks (<code>fsck.vfat -n</code> and <code>e2fsck -nf</code>) confirming 0 filesystem errors.</li>
-          </ol>
-        <div style="margin-top:10px; color:var(--data-green); font-weight:bold;">
-            [✓] ONLY WHEN ALL 5 VERIFICATION CHECKS PASS IS SUCCESS REPORTED: "✅ BACKUP VERIFIED &amp; READY"
-        </div>
-    </div>
-
-    <!-- Section 7: Field Troubleshooting & Reference -->
-    <h2><span class="sec-num">07</span> Field Troubleshooting &amp; Diagnostic Reference</h2>
+    <!-- Section 10: Troubleshooting -->
+    <h2><span class="sec-num">10</span> Field Troubleshooting &amp; Diagnostics</h2>
 
     <table>
         <thead>
             <tr>
                 <th>Symptom</th>
                 <th>Probable Root Cause</th>
-                <th>Resolution &amp; Verification Step</th>
+                <th>Remedy &amp; Resolution</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td><strong>Display shows black screen or "Signal Out of Range"</strong></td>
-                <td>Waveshare 7" HDMI EDID timing mismatch in pure KMS mode.</td>
-                <td>Ensure CVT modeline is active: <code>xrandr --newmode "1024x600_60.00" 49.00 1024 1072 1168 1312 600 603 613 624 -hsync +vsync</code>. Codified permanently in <code>/etc/X11/xorg.conf.d/10-rfk-hdmi.conf</code>.</td>
+                <td>Screen displays black or "No Signal" on first boot</td>
+                <td>HDMI cable loose or timing initialization in progress</td>
+                <td>Boot 1 takes ~90 seconds to expand the filesystem. Wait for automated reboot. Check that the micro-HDMI cable is connected to <strong>HDMI 0</strong> (closest to USB-C power).</td>
             </tr>
             <tr>
-                <td><strong>SSH connection refused or "Permission Denied"</strong></td>
-                <td>Default Debian 13 password authentication restriction.</td>
-                <td>JRFK enables password authentication via <code>/etc/ssh/sshd_config.d/01-jrfk-ssh.conf</code> and pre-authorizes the generated <code>id_ed25519.pub</code> key. Connect with: <code>ssh -o UserKnownHostsFile=NUL pi@&lt;ip&gt;</code>.</td>
+                <td>GUI displays "Connecting..." or voltage reads 0.0V</td>
+                <td>Controller serial handshake timeout</td>
+                <td>Verify the internal USB cable from the controller to the Raspberry Pi is seated. Check that <code>/dev/ttyUSB_RFK</code> is listed in the System Report (<code>:8088/report</code>).</td>
             </tr>
             <tr>
-                <td><strong>Controller communication error (`simple_rpc` exception)</strong></td>
-                <td>Python 3.13 deprecation of <code>inspect.getargspec()</code> or missing serial device.</td>
-                <td>Verify symlink <code>ls -l /dev/rfk_ctrl</code>. Confirm <code>simple_rpc</code> pure-Python package is installed with <code>getfullargspec</code> patch.</td>
-            </tr>
-            <tr>
-                <td><strong>Thermal Guard locked in Standby mode</strong></td>
-                <td>PA Heatsink temperature has not dropped below the 50.0°C safety recovery threshold.</td>
-                <td>Wait for cooling fans to lower heatsink temperature below 50.0°C. Once cooled, the system will automatically re-engage Operate mode. Admin override is available on the Health Monitor page.</td>
+                <td>Thermal Alert modal appears on web interface</td>
+                <td>PA heatsink temperature exceeded 60°C safety ceiling</td>
+                <td>Amplifier was automatically unkeyed to prevent damage. Allow the 300-second countdown to complete. Verify fan operation. Amplifier will auto-reenable when $T &lt; 50.0^\circ	ext{C}$.</td>
             </tr>
         </tbody>
     </table>
-
-    <div style="margin-top: 45px; border-top: 2px solid var(--bp-blue); padding-top: 20px; font-size: 12px; color: var(--text-muted); display:flex; justify-content:space-between;">
-        <span>RF-KIT LINEAR AMPLIFIER OPERATING SPECIFICATION &bull; JRFK-UG-2026</span>
-        <span>COPYLEFT &bull; OPEN-SOURCE AMATEUR RADIO INITIATIVE &bull; K7BIT</span>
-    </div>
 
 </div>
 
