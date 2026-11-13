@@ -140,15 +140,15 @@ body {
     color: var(--bp-line-dim);
     line-height: 1.4;
 }
-.station-note-box {
-    background: rgba(15, 23, 42, 0.95);
-    border-left: 4px solid var(--accent-amber);
-    padding: 9px 13px;
-    border-radius: 0 6px 6px 0;
-    font-size: 13px;
+.feynman-box {
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px dashed var(--accent-amber);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-style: italic;
+    font-size: 12.5px;
     color: #fef08a;
-    line-height: 1.4;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    line-height: 1.35;
 }
 .footer {
     display: flex;
@@ -208,8 +208,8 @@ table.clean-table tr:hover td {
                     <div class="card-desc">Independent separation: PC Migrator runs on Port 8089, while the Amplifier Operational Web Suite lives on Port 8088.</div>
                 </div>
                 
-                <div class="station-note-box">
-                    <b>Station Operating Note:</b> When delivering 1500W PEP on HF/6m, rock-solid controller stability and real-time protection loops are mandatory.
+                <div class="feynman-box">
+                    <b>Station Operating Note:</b> Nature cannot be fooled! When a kilowatt amplifier is switching in milliseconds, your software stack must be rock solid.
                 </div>
                 
             </div>
@@ -222,7 +222,7 @@ table.clean-table tr:hover td {
             
     </div>
     <div class="footer">
-        <div>JRFK 64-BIT STATION SUITE • AMATEUR RADIO HIGH-POWER LINEAR AMPLIFIERS</div>
+        <div>JRFK 64-BIT STATION SUITE</div>
         <div>GITHUB.COM/JBIRDLEBOUGH1/JRFKTOOLS</div>
     </div>
 </body>

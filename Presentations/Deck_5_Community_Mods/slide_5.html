@@ -140,15 +140,15 @@ body {
     color: var(--bp-line-dim);
     line-height: 1.4;
 }
-.station-note-box {
-    background: rgba(15, 23, 42, 0.95);
-    border-left: 4px solid var(--accent-amber);
-    padding: 9px 13px;
-    border-radius: 0 6px 6px 0;
-    font-size: 13px;
+.feynman-box {
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px dashed var(--accent-amber);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-style: italic;
+    font-size: 12.5px;
     color: #fef08a;
-    line-height: 1.4;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    line-height: 1.35;
 }
 .footer {
     display: flex;
@@ -188,37 +188,42 @@ table.clean-table tr:hover td {
 <body>
     <div class="header">
         <div class="header-badge">JRFK SERIES • PART 5</div>
-        <div class="header-meta">STATION RFI HARDENING</div>
+        <div class="header-meta">MOD 5: RFI HARDENING</div>
     </div>
     <div class="title-row">
-        <h1>Ferrite Decoupling & RFI Hardening</h1>
-        <div class="subtitle">Suppressing RF Ground Loops and Protecting Ribbon Cable Buses</div>
+        <h1>Mod 5: Ferrite Choking on Display & Buses</h1>
+        <div class="subtitle">Suppressing Common-Mode RF Ingress on HDMI, USB, and I2C Lines</div>
     </div>
     <div class="content">
         
             <div class="col-text">
                 
                 <div class="card card-green">
-                    <div class="card-title">Display Ribbon Protection</div>
-                    <div class="card-desc">Mix 31 ferrite clamp chokes on the HDMI and touch controller ribbon cables eliminate touchscreen lockups.</div>
+                    <div class="card-title">Mix 31 & Mix 43 Snap-On Ferrites</div>
+                    <div class="card-desc">Clamp split-bead ferrite chokes on the 7-inch HDMI display ribbon, USB touchscreen cable, and controller I2C wiring.</div>
                 </div>
                 
                 <div class="card ">
-                    <div class="card-title">I2C & Serial Line Chokes</div>
-                    <div class="card-desc">Mix 43 beads on telemetry buses block stray common-mode RF from entering the Raspberry Pi and Arduino.</div>
+                    <div class="card-title">Why It Works</div>
+                    <div class="card-desc">High-power legal-limit RF fields inside the shack can induce stray voltages on digital lines, causing touchscreen freezes.</div>
                 </div>
                 
                 <div class="card card-amber">
-                    <div class="card-title">Chassis Bonding</div>
-                    <div class="card-desc">Star-ground bonding between the controller chassis, RF deck, and power supply minimizes RF loops.</div>
+                    <div class="card-title">Shielded Pi Housing</div>
+                    <div class="card-desc">Mounting the Raspberry Pi in an all-aluminum shielded enclosure provides a solid RF Faraday cage.</div>
                 </div>
                 
             </div>
             
+                <div class="col-media">
+                    <img src="file:///D:/JRFK/docs/cookbook_media/img_039.jpeg">
+                    <div class="media-caption">FIG 5: 7-INCH DISPLAY HDMI & USB TOUCH INTERFACE CABLING</div>
+                </div>
+                
             
     </div>
     <div class="footer">
-        <div>JRFK 64-BIT STATION SUITE • AMATEUR RADIO HIGH-POWER LINEAR AMPLIFIERS</div>
+        <div>JRFK 64-BIT STATION SUITE</div>
         <div>GITHUB.COM/JBIRDLEBOUGH1/JRFKTOOLS</div>
     </div>
 </body>

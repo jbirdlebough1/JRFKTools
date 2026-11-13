@@ -140,15 +140,15 @@ body {
     color: var(--bp-line-dim);
     line-height: 1.4;
 }
-.station-note-box {
-    background: rgba(15, 23, 42, 0.95);
-    border-left: 4px solid var(--accent-amber);
-    padding: 9px 13px;
-    border-radius: 0 6px 6px 0;
-    font-size: 13px;
+.feynman-box {
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px dashed var(--accent-amber);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-style: italic;
+    font-size: 12.5px;
     color: #fef08a;
-    line-height: 1.4;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    line-height: 1.35;
 }
 .footer {
     display: flex;
@@ -188,37 +188,42 @@ table.clean-table tr:hover td {
 <body>
     <div class="header">
         <div class="header-badge">JRFK SERIES • PART 5</div>
-        <div class="header-meta">LPF & COUPLER HARDENING</div>
+        <div class="header-meta">MOD 3 & 4: FILTERS & COUPLERS</div>
     </div>
     <div class="title-row">
-        <h1>LPF ATC Capacitors & Coupler Shielding</h1>
-        <div class="subtitle">Handling Circulating RF Currents and Eliminating 6m SWR Trips</div>
+        <h1>Mod 3 & 4: ATC Capacitors & Coupler Shielding</h1>
+        <div class="subtitle">Porcelain Dielectrics on 10/12/15m and Stray RF Coupler Isolation</div>
     </div>
     <div class="content">
         
             <div class="col-text">
                 
                 <div class="card card-green">
-                    <div class="card-title">High-Q ATC Porcelain Caps</div>
-                    <div class="card-desc">Replaces standard mica capacitors on 10m/12m filter sections to handle severe circulating RF currents.</div>
+                    <div class="card-title">ATC 100B / 100E Porcelain Caps</div>
+                    <div class="card-desc">Replace dipped mica capacitors on high-frequency LPF boards (10m, 12m, 15m) with high-voltage porcelain caps to prevent RF current breakdown.</div>
                 </div>
                 
                 <div class="card ">
-                    <div class="card-title">Directional Coupler Shield</div>
-                    <div class="card-desc">Adds grounded copper foil shielding over the SWR bridge to eliminate stray RF pickup on 6 meters.</div>
+                    <div class="card-title">Directional Coupler Foil Shielding</div>
+                    <div class="card-desc">Adding copper/brass foil shielding partitions over the SWR coupler bridge stops stray magnetic fields from adjacent LPF coils.</div>
                 </div>
                 
                 <div class="card card-amber">
-                    <div class="card-title">Reliability Benefit</div>
-                    <div class="card-desc">Prevents dielectric breakdown, eliminates filter detuning, and stops nuisance SWR fault trips.</div>
+                    <div class="card-title">Eliminates False Trips</div>
+                    <div class="card-desc">Completely stops mysterious false high-SWR protection trips on 6m and 10m during full-power transmissions.</div>
                 </div>
                 
             </div>
             
+                <div class="col-media">
+                    <img src="file:///D:/JRFK/docs/cookbook_media/img_010.jpeg">
+                    <div class="media-caption">FIG 4: DIRECTIONAL COUPLER SWR BRIDGE & SENSING DIODES</div>
+                </div>
+                
             
     </div>
     <div class="footer">
-        <div>JRFK 64-BIT STATION SUITE • AMATEUR RADIO HIGH-POWER LINEAR AMPLIFIERS</div>
+        <div>JRFK 64-BIT STATION SUITE</div>
         <div>GITHUB.COM/JBIRDLEBOUGH1/JRFKTOOLS</div>
     </div>
 </body>

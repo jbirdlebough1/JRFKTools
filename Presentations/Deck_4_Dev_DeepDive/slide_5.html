@@ -140,15 +140,15 @@ body {
     color: var(--bp-line-dim);
     line-height: 1.4;
 }
-.station-note-box {
-    background: rgba(15, 23, 42, 0.95);
-    border-left: 4px solid var(--accent-amber);
-    padding: 9px 13px;
-    border-radius: 0 6px 6px 0;
-    font-size: 13px;
+.feynman-box {
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px dashed var(--accent-amber);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-style: italic;
+    font-size: 12.5px;
     color: #fef08a;
-    line-height: 1.4;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    line-height: 1.35;
 }
 .footer {
     display: flex;
@@ -188,37 +188,42 @@ table.clean-table tr:hover td {
 <body>
     <div class="header">
         <div class="header-badge">JRFK SERIES • PART 4</div>
-        <div class="header-meta">STATION AUDITABILITY</div>
+        <div class="header-meta">DEVELOPMENT AUDITING</div>
     </div>
     <div class="title-row">
-        <h1>Local Version Control & Session Logging</h1>
-        <div class="subtitle">Deterministic Reproducibility and Complete Session History</div>
+        <h1>Local Git & Complete Session Logging</h1>
+        <div class="subtitle">Saving and Synchronizing Every .jsonl Transcript for Full Auditability</div>
     </div>
     <div class="content">
         
             <div class="col-text">
                 
                 <div class="card card-green">
-                    <div class="card-title">Local Git Tracking</div>
-                    <div class="card-desc">All source changes, scripts, and documentation updates are committed locally for total revision control.</div>
+                    <div class="card-title">Permanent Session Audit Trails</div>
+                    <div class="card-desc">Every AI development turn, command execution, and test output is captured in structured .jsonl session logs.</div>
                 </div>
                 
                 <div class="card ">
-                    <div class="card-title">Session Transcript Archive</div>
-                    <div class="card-desc">Complete prompt and execution history preserved in structured JSONL session records.</div>
+                    <div class="card-title">Committed to Git Repository</div>
+                    <div class="card-desc">Sanitized transcripts are checked directly into the git tree under session_logs/ for total transparency.</div>
                 </div>
                 
                 <div class="card card-amber">
-                    <div class="card-title">Offline Autonomy</div>
-                    <div class="card-desc">No cloud dependencies required—the entire station toolchain runs 100% locally.</div>
+                    <div class="card-title">Reproducible Engineering</div>
+                    <div class="card-desc">Any ham radio developer can clone the repository, review the exact steps taken, and build upon the work with zero guesswork.</div>
                 </div>
                 
             </div>
             
+                <div class="col-media">
+                    <img src="file:///D:/JRFK/docs/cookbook_media/img_042.jpeg">
+                    <div class="media-caption">FIG 5: COMPLETE CONTROLLER ASSEMBLY & AUDIT CHECKPOINT</div>
+                </div>
+                
             
     </div>
     <div class="footer">
-        <div>JRFK 64-BIT STATION SUITE • AMATEUR RADIO HIGH-POWER LINEAR AMPLIFIERS</div>
+        <div>JRFK 64-BIT STATION SUITE</div>
         <div>GITHUB.COM/JBIRDLEBOUGH1/JRFKTOOLS</div>
     </div>
 </body>

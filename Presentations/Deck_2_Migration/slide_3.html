@@ -140,15 +140,15 @@ body {
     color: var(--bp-line-dim);
     line-height: 1.4;
 }
-.station-note-box {
-    background: rgba(15, 23, 42, 0.95);
-    border-left: 4px solid var(--accent-amber);
-    padding: 9px 13px;
-    border-radius: 0 6px 6px 0;
-    font-size: 13px;
+.feynman-box {
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px dashed var(--accent-amber);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-style: italic;
+    font-size: 12.5px;
     color: #fef08a;
-    line-height: 1.4;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    line-height: 1.35;
 }
 .footer {
     display: flex;
@@ -188,29 +188,29 @@ table.clean-table tr:hover td {
 <body>
     <div class="header">
         <div class="header-badge">JRFK SERIES • PART 2</div>
-        <div class="header-meta">STEP 2: PRE-FLIGHT VERIFICATION</div>
+        <div class="header-meta">STEP 2: PRE-FLIGHT CHECKS</div>
     </div>
     <div class="title-row">
-        <h1>Pre-Flight Checks & Safety Isolation</h1>
-        <div class="subtitle">Automatic Network Discovery, Target Validation, and Flash Protection</div>
+        <h1>Step 2: Pre-Flight Hardware Checks</h1>
+        <div class="subtitle">Network Discovery, SSH Key Verification, and Disk Health Inspection</div>
     </div>
     <div class="content">
         
             <div class="col-text">
                 
                 <div class="card ">
-                    <div class="card-title">Subnet Discovery</div>
-                    <div class="card-desc">Scans your local LAN to locate the RF-KIT controller by MAC address and hostname.</div>
+                    <div class="card-title">Automated IP Discovery</div>
+                    <div class="card-desc">The migrator scans your shack subnet and locks onto the amplifier IP (e.g. 192.168.12.193).</div>
                 </div>
                 
                 <div class="card card-green">
-                    <div class="card-title">Firmware Validation</div>
-                    <div class="card-desc">Validates the existing configuration, band settings, and custom calibration constants.</div>
+                    <div class="card-title">SSH Key Handshake</div>
+                    <div class="card-desc">Establishes a secure remote channel to test storage integrity and check current operating parameters.</div>
                 </div>
                 
                 <div class="card card-amber">
-                    <div class="card-title">Strict Drive Locking</div>
-                    <div class="card-desc">Requires explicit multi-factor confirmation before writing to physical target cards.</div>
+                    <div class="card-title">Backup Card Detection</div>
+                    <div class="card-desc">Verifies the secondary USB backup card is present before proceeding with any flash operations.</div>
                 </div>
                 
             </div>
@@ -218,7 +218,7 @@ table.clean-table tr:hover td {
             
     </div>
     <div class="footer">
-        <div>JRFK 64-BIT STATION SUITE • AMATEUR RADIO HIGH-POWER LINEAR AMPLIFIERS</div>
+        <div>JRFK 64-BIT STATION SUITE</div>
         <div>GITHUB.COM/JBIRDLEBOUGH1/JRFKTOOLS</div>
     </div>
 </body>

@@ -1,21 +1,20 @@
-# VSDC Pro Timeline Alignment Map — 7-Screen Operational Web Suite
+# VSDC Pro Timeline Map — Deck_3_Operations
 
-**Total Video Duration:** `01:38.14`
+**Total Presentation Duration:** `01:42.55` (102.6 seconds)
+**Voice Persona:** Richard Feynman Style + Ham Radio Jargon (Microsoft Guy Neural @ +7% rate)
+**Video Format Standard:** 720p HD (1280x720 @ 30 fps)
 
-Use this exact table to position each image and audio track in VSDC Video Editor Pro:
-
-| Slide / Segment | Visual Track (PNG) | Audio Track (MP3) | Timeline Start | Duration | Timeline End |
+| Slide # | Slide Image | Audio Track | Duration | Timeline Start | Timeline End |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Slide 1: The 7-Screen Amplifier Web Cockpit** | `slide_1.png` | `audio/slide_1.mp3` | `00:00.00` | `14.95s` | `00:14.95` |
-| **Slide 2: Screen 1 & 2: RF Dashboard & Band Matrix** | `slide_2.png` | `audio/slide_2.mp3` | `00:15.95` | `15.31s` | `00:31.26` |
-| **Slide 3: Screen 3 & 4: PA Telemetry & Antenna Matrix** | `slide_3.png` | `audio/slide_3.mp3` | `00:32.26` | `14.95s` | `00:47.22` |
-| **Slide 4: Screen 5: Protection Limits & Thermal Guard** | `slide_4.png` | `audio/slide_4.mp3` | `00:48.22` | `15.22s` | `01:03.43` |
-| **Slide 5: Screen 6 & 7: Config, Logs & Touch Calibration** | `slide_5.png` | `audio/slide_5.mp3` | `01:04.43` | `15.72s` | `01:20.15` |
-| **Outro: Master Resources** | `slide_outro.png` | `audio/slide_outro.mp3` | `01:21.15` | `16.99s` | `01:38.14` |
+| **slide_1** | `slide_1.png` | `audio/slide_1.mp3` | 15.96s | `00:00.00` | `00:15.96` |
+| **slide_2** | `slide_2.png` | `audio/slide_2.mp3` | 17.18s | `00:16.96` | `00:34.14` |
+| **slide_3** | `slide_3.png` | `audio/slide_3.mp3` | 16.80s | `00:35.14` | `00:51.94` |
+| **slide_4** | `slide_4.png` | `audio/slide_4.mp3` | 17.28s | `00:52.94` | `01:10.22` |
+| **slide_5** | `slide_5.png` | `audio/slide_5.mp3` | 11.47s | `01:11.22` | `01:22.70` |
+| **slide_outro** | `slide_outro.png` | `audio/slide_outro.mp3` | 17.86s | `01:23.70` | `01:41.55` |
 
 
-### VSDC Setup Instructions:
-1. Set Project Resolution: **1280 x 720 (16:9)** at **30 fps**.
-2. Drag the `.png` slides in order onto Layer 1.
-3. Drag the matching `audio/*.mp3` tracks onto Layer 2, aligning each start time to the `Timeline Start` column above.
-4. Export video via `Export Project` -> `To MP4` (H.264/AAC).
+### How to Import into VSDC Pro:
+1. Open VSDC Video Editor Pro and create a new project: **1280x720, 30 fps, Square Pixels**.
+2. Add **Track 1 (Visual Slides)**: Drag in the PNG slide images sequentially.
+3. Add **Track 2 (Feynman Voiceover)**: Drag in the corresponding `audio/*.mp3` clips aligned to each slide's Timeline Start.

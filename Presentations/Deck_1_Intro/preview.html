@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JRFK Presentation 1: Interactive Ham Radio Preview</title>
+    <title>JRFK Presentation 1: Interactive Preview (Feynman Style + Ham Radio Jargon)</title>
     <style>
         body {
             margin: 0;
@@ -108,7 +108,7 @@
 </head>
 <body>
     <div class="player-container">
-        <!-- Interactive 720p Slide Frame -->
+        <!-- 720p Clean Slide Frame (Clean Station Operating Note on Slide) -->
         <iframe id="slideFrame" class="slide-frame" src="slide_1.html"></iframe>
         
         <!-- Controls & Visible Audio Track -->
@@ -117,23 +117,23 @@
                 <div class="nav-group">
                     <button class="btn" onclick="prevSlide()">◀ Previous Slide</button>
                     <button class="btn" onclick="nextSlide()">Next Slide ▶</button>
-                    <button class="btn btn-green" onclick="restartAudio()">▶ Play Narration</button>
+                    <button class="btn btn-green" onclick="restartAudio()">▶ Play Feynman Audio</button>
                 </div>
                 <div class="slide-indicator" id="slideMeta">
                     Slide 1 of 5: Modernizing the RF-KIT Linear Amplifier
                 </div>
             </div>
             
-            <!-- Visible Audio Track & Real-Time Player -->
+            <!-- Visible Audio Track with Scrubber & Time -->
             <div class="audio-wrapper">
-                <span class="audio-label" id="audioLabel">🔊 TRACK: audio/slide_1.mp3</span>
+                <span class="audio-label" id="audioLabel">🔊 TRACK: audio/slide_1.mp3 (Feynman + Ham Jargon)</span>
                 <audio id="audioPlayer" controls preload="auto"></audio>
             </div>
             
             <div class="timeline-guide">
                 <span id="timingStart">Timeline Offset: 00:00.00</span>
-                <span>Format: 1280x720 30fps • Audio: 44.1kHz Stereo</span>
-                <span id="timingDur">Duration: 24.05s</span>
+                <span>Voice Persona: Richard Feynman Style + Ham Radio Jargon</span>
+                <span id="timingDur">Duration: 22.90s</span>
             </div>
         </div>
     </div>
@@ -145,35 +145,35 @@
                 title: "Modernizing the RF-KIT Linear Amplifier", 
                 audio: "audio/slide_1.mp3",
                 start: "00:00.00",
-                duration: "24.05s"
+                duration: "22.90s"
             },
             { 
                 id: "slide_2", 
                 title: "Why Legacy 32-Bit OS Must Go", 
                 audio: "audio/slide_2.mp3",
-                start: "00:25.05",
-                duration: "21.26s"
+                start: "00:23.90",
+                duration: "23.66s"
             },
             { 
                 id: "slide_3", 
                 title: "Dual-Port Architecture: 8089 vs 8088", 
                 audio: "audio/slide_3.mp3",
-                start: "00:47.31",
-                duration: "21.12s"
+                start: "00:48.56",
+                duration: "26.95s"
             },
             { 
                 id: "slide_4", 
                 title: "4-Volume Documentation & K7BIT Cookbook", 
                 audio: "audio/slide_4.mp3",
-                start: "01:09.43",
-                duration: "20.83s"
+                start: "01:16.51",
+                duration: "20.81s"
             },
             { 
                 id: "slide_outro", 
                 title: "Master Resources & Downloads", 
                 audio: "audio/slide_outro.mp3",
-                start: "01:31.26",
-                duration: "16.99s"
+                start: "01:38.32",
+                duration: "17.86s"
             }
         ];
         
@@ -185,13 +185,13 @@
             const s = slides[currentIdx];
             document.getElementById('slideFrame').src = s.id + '.html';
             document.getElementById('slideMeta').innerText = `Slide ${currentIdx + 1} of ${slides.length}: ${s.title}`;
-            document.getElementById('audioLabel').innerText = `🔊 TRACK: ${s.audio}`;
+            document.getElementById('audioLabel').innerText = `🔊 TRACK: ${s.audio} (Feynman + Ham Jargon)`;
             document.getElementById('timingStart').innerText = `Timeline Offset: ${s.start}`;
             document.getElementById('timingDur').innerText = `Duration: ${s.duration}`;
             
             player.src = s.audio;
             player.play().catch(() => {
-                // Browsers may require user click to start autoplay
+                // Browser user gesture handling
             });
         }
 
@@ -212,7 +212,7 @@
             }
         }
 
-        // Initialize first slide on load
+        // Initialize on load
         window.addEventListener('DOMContentLoaded', () => {
             loadSlide(0);
         });

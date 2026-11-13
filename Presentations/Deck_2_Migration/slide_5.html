@@ -140,15 +140,15 @@ body {
     color: var(--bp-line-dim);
     line-height: 1.4;
 }
-.station-note-box {
-    background: rgba(15, 23, 42, 0.95);
-    border-left: 4px solid var(--accent-amber);
-    padding: 9px 13px;
-    border-radius: 0 6px 6px 0;
-    font-size: 13px;
+.feynman-box {
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px dashed var(--accent-amber);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-style: italic;
+    font-size: 12.5px;
     color: #fef08a;
-    line-height: 1.4;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    line-height: 1.35;
 }
 .footer {
     display: flex;
@@ -191,26 +191,26 @@ table.clean-table tr:hover td {
         <div class="header-meta">STEP 4: DISASTER RECOVERY</div>
     </div>
     <div class="title-row">
-        <h1>The 3-Minute Disaster Recovery Card</h1>
-        <div class="subtitle">Pre-Provisioned Hot-Swap Backup SD Card for Zero Shack Downtime</div>
+        <h1>Step 4: The 3-Minute Recovery Card</h1>
+        <div class="subtitle">Emergency 'Swap, Boot, Reboot, Run' Card Eliminates Shack Downtime</div>
     </div>
     <div class="content">
         
             <div class="col-text">
                 
-                <div class="card card-green">
-                    <div class="card-title">Redundant Standby Card</div>
-                    <div class="card-desc">The migrator provisions an identical secondary SD card containing your full 64-bit OS and calibration files.</div>
+                <div class="card ">
+                    <div class="card-title">Automated Mirroring</div>
+                    <div class="card-desc">The migrator mirrors the entire production system to a secondary USB MicroSD card.</div>
                 </div>
                 
-                <div class="card ">
-                    <div class="card-title">Hot-Swap Simplicity</div>
-                    <div class="card-desc">If your primary SD card ever fails during a contest, swap in the backup card and boot in under three minutes.</div>
+                <div class="card card-green">
+                    <div class="card-title">Under 3 Minutes Target Recovery</div>
+                    <div class="card-desc">If the primary MicroSD ever suffers corruption during a contest, swap the cards and power on.</div>
                 </div>
                 
                 <div class="card card-amber">
-                    <div class="card-title">Zero Re-Configuration</div>
-                    <div class="card-desc">All IP addresses, touch calibration, and amplifier constants are pre-baked into the standby card.</div>
+                    <div class="card-title">Zero Configuration Re-Entry</div>
+                    <div class="card-desc">All callsign settings, calibration coefficients, and antenna matrices are mirrored automatically.</div>
                 </div>
                 
             </div>
@@ -218,7 +218,7 @@ table.clean-table tr:hover td {
             
     </div>
     <div class="footer">
-        <div>JRFK 64-BIT STATION SUITE • AMATEUR RADIO HIGH-POWER LINEAR AMPLIFIERS</div>
+        <div>JRFK 64-BIT STATION SUITE</div>
         <div>GITHUB.COM/JBIRDLEBOUGH1/JRFKTOOLS</div>
     </div>
 </body>
