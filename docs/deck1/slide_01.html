@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 1920px; height: 1080px; overflow: hidden; }
+    body {
+        background-color: #1a5695;
+        background-image: 
+            linear-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+            linear-gradient(rgba(147, 197, 253, 0.35) 2px, transparent 2px),
+            linear-gradient(90deg, rgba(147, 197, 253, 0.35) 2px, transparent 2px);
+        background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+        color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 6px 12px;
+        border: 2px solid #93c5fd;
+    }
+    .master-header {
+        width: 100%;
+        height: 42px;
+        border-bottom: 2px solid #93c5fd;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(26, 86, 149, 0.96);
+        padding: 0 10px;
+        flex-shrink: 0;
+    }
+    .header-left {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        overflow: hidden;
+        white-space: nowrap;
+        flex: 1;
+        min-width: 0;
+    }
+    .header-tagline {
+        font-family: "Consolas", monospace;
+        font-size: 11px;
+        letter-spacing: 1.2px;
+        color: #93c5fd;
+        text-transform: uppercase;
+        font-weight: 700;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .header-title {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+        color: #ffffff;
+        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .header-subtitle {
+        font-size: 12px;
+        color: #bfdbfe;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .header-right {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-family: "Consolas", monospace;
+        font-size: 11.5px;
+        color: #ffffff;
+        letter-spacing: 1px;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+    .badge-callsign {
+        background: #0284c7;
+        padding: 2px 7px;
+        border-radius: 4px;
+        border: 1px solid #93c5fd;
+    }
+    .badge-slide {
+        background: rgba(15, 45, 85, 0.95);
+        padding: 2px 7px;
+        border-radius: 4px;
+        border: 1px solid #60a5fa;
+        color: #7dd3fc;
+    }
+    .master-body-fullscreen {
+        width: 100%;
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 4px 0;
+        overflow: hidden;
+    }
+    .graphic-frame-full {
+        width: 100%;
+        height: 100%;
+        background: rgba(8, 26, 50, 0.98);
+        border: 2px solid #93c5fd;
+        border-radius: 4px;
+        padding: 2px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+        overflow: hidden;
+        position: relative;
+    }
+    .graphic-frame-full img {
+        width: 100%;
+        height: 100%;
+        border-radius: 2px;
+        display: block;
+        object-fit: contain;
+    }
+    .master-footer {
+        width: 100%;
+        height: 22px;
+        border-top: 1px solid #93c5fd;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: "Consolas", monospace;
+        font-size: 10.5px;
+        color: #bfdbfe;
+        background: rgba(26, 86, 149, 0.96);
+        padding: 0 10px;
+        flex-shrink: 0;
+    }
+    .footer-left { color: #93c5fd; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80%; }
+</style>
+</head>
+<body>
+    <div class="master-header">
+        <div class="header-left">
+            <div class="header-tagline">PART 1: ARCHITECTURE • SUITE OVERVIEW • WINDOWS PC APP</div>
+            <div class="header-title">Modernizing the RF-KIT Linear Amplifier</div>
+            <div class="header-subtitle">The 64-Bit Leap: Standalone PC Migrator & On-Amplifier Web Tools Suite</div>
+        </div>
+        <div class="header-right">
+            <div class="badge-callsign">K7BIT</div>
+            <div class="badge-slide">SLIDE 1 OF 15</div>
+        </div>
+    </div>
+    <div class="master-body-fullscreen">
+        <div class="graphic-frame-full">
+            <img id="mainSlideImg" src="real_screenshots/slide_jrfk_exe_window.png" alt="Modernizing the RF-KIT Linear Amplifier" >
+        </div>
+    </div>
+    <div class="master-footer">
+        <div class="footer-left">JRFK MODERNIZATION SUITE: STANDALONE PC MIGRATOR WITH DRIVE GUARD & ON-AMPLIFIER WEB TOOLS</div>
+        <div class="footer-right">JRFK 64-BIT MODERNIZATION SUITE • K7BIT</div>
+    </div>
+    
+</body>
+</html>

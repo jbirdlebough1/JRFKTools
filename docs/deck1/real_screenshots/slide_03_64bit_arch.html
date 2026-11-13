@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background-color: #1a5695;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+        linear-gradient(rgba(147, 197, 253, 0.35) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(147, 197, 253, 0.35) 2px, transparent 2px);
+    background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 50px;
+  }
+  .blueprint-card {
+    width: 1820px;
+    background: rgba(10, 30, 60, 0.96);
+    border: 3px solid #93c5fd;
+    border-radius: 12px;
+    padding: 35px 45px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 3px solid #34d399;
+    padding-bottom: 18px;
+    margin-bottom: 25px;
+  }
+  .title-group h1 {
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+    margin-bottom: 4px;
+  }
+  .title-group .subtitle {
+    font-size: 17px;
+    color: #93c5fd;
+    font-family: monospace;
+  }
+  .badge-container { display: flex; gap: 10px; }
+  .badge {
+    background: #059669;
+    color: white;
+    padding: 5px 14px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 14px;
+    border: 1px solid #6ee7b7;
+  }
+  .grid-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+  .benefit-box {
+    background: rgba(15, 45, 85, 0.95);
+    border: 2px solid #38bdf8;
+    border-radius: 8px;
+    padding: 22px 24px;
+    border-left: 6px solid #34d399;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  }
+  .benefit-tag {
+    font-family: monospace;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #34d399;
+    margin-bottom: 6px;
+  }
+  .benefit-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .benefit-desc {
+    font-size: 15px;
+    line-height: 1.5;
+    color: #dbeafe;
+  }
+  .benefit-desc strong { color: #ffffff; }
+  .status-strip {
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 2px solid rgba(56, 189, 248, 0.4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: monospace;
+    font-size: 13px;
+    color: #bae6fd;
+  }
+  .strip-highlight { color: #34d399; font-weight: bold; }
+</style>
+</head>
+<body>
+  <div class="blueprint-card">
+    <div class="card-header">
+      <div class="title-group">
+        <h1>64-Bit Modernization Architecture &amp; Benefits</h1>
+        <div class="subtitle">64-BIT RASPBERRY PI OS • FULL KMS DIRECT RENDERING • DUAL SERVICE PIPELINE</div>
+      </div>
+      <div class="badge-container">
+        <span class="badge">PRODUCTION UPGRADE</span>
+        <span class="badge" style="background:#0284c7; border-color:#93c5fd;">LONG TERM STABILITY</span>
+      </div>
+    </div>
+
+    <div class="grid-cards">
+      <div class="benefit-box">
+        <div class="benefit-tag">PILLAR 1: PURE 64-BIT OS FOUNDATION</div>
+        <div class="benefit-title">🐧 64-Bit Raspberry Pi OS Kernel 6.12+</div>
+        <div class="benefit-desc">
+          Operates on modern 64-bit architecture with full memory addressing, native hardware instructions, and active upstream security repositories for Raspberry Pi 4 and 5 compute platforms.
+        </div>
+      </div>
+
+      <div class="benefit-box">
+        <div class="benefit-tag">PILLAR 2: DISPLAY ACCELERATION</div>
+        <div class="benefit-title">🖥️ Native Full KMS Direct Framebuffer</div>
+        <div class="benefit-desc">
+          Direct hardware-accelerated DRM/KMS rendering to the 7-inch front panel LCD (1024x600 / 800x480). Eliminates legacy X11 coordinate drift, touch latency, and screen tear during high-rate meter updates.
+        </div>
+      </div>
+
+      <div class="benefit-box">
+        <div class="benefit-tag">PILLAR 3: ROBUST HARDWARE LINK</div>
+        <div class="benefit-title">⚡ Zero Socket Warnings on /dev/rfk_controller</div>
+        <div class="benefit-desc">
+          High-priority SimpleRPC serial communications pipeline at 115200 baud with hardware flow control and millisecond watchdog timeouts. Immune to RF hash, bus contention, and unhandled socket exceptions.
+        </div>
+      </div>
+
+      <div class="benefit-box">
+        <div class="benefit-tag">PILLAR 4: CONCURRENT WEB TELEMETRY</div>
+        <div class="benefit-title">🌐 Concurrent JRFK Web Tools on Port 8088</div>
+        <div class="benefit-desc">
+          Multithreaded lightweight web server runs alongside the native RFK controller using non-blocking shared memory. Delivers real-time 1500W P-E-P telemetry, antenna routing, and SD backup across your station network.
+        </div>
+      </div>
+    </div>
+
+    <div class="status-strip">
+      <div>RESULT: <span class="strip-highlight">MODERN 64-BIT APPLIANCE • ENHANCED RF SAFETY • PRESERVED FACTORY CALIBRATIONS</span></div>
+      <div>64-BIT RASPBERRY PI OS SUITE</div>
+    </div>
+  </div>
+</body>
+</html>

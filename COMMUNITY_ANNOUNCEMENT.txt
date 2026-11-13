@@ -1,48 +1,49 @@
-Subject: [RELEASE] JRFK Beta 1.0 — RF-KIT 64-Bit OS (Bookworm) Migrator, 7-Screen Web Suite & K7BIT Master Cookbook (Rev 1.05)
+Subject: [RELEASE] JRFK Beta 1.0 — RF-KIT 64-Bit Raspberry Pi OS Migrator, Web Tools Suite & Presentation 1 Blueprint
 
 Hello RF-KIT / B26-PA Builders and Operators,
 
-We are pleased to announce the public Beta 1.0 release of JRFKTools—a turnkey solution for modernizing and managing the RF-KIT RF2K+ linear amplifier.
+We are pleased to announce the public Beta 1.0 release of JRFKTools—a turnkey modernization suite for managing and protecting the RF-KIT RF2K+ linear amplifier.
+
+🎬 Presentation 1: Interactive Audio/Visual Technical Blueprint
+Walk through the complete modernization suite, 64-bit upgrade payoff, PC Migrator, and on-amplifier web tools in our auto-advancing, synchronized blueprint player:
+* Interactive Web Player: https://jbirdlebough1.github.io/JRFKTools/deck1/preview.html
+* GitHub Presentation Assets & Transcript: https://github.com/jbirdlebough1/JRFKTools/tree/main/Presentations/Deck_1_Intro
 
 ⚡ Fast Download (No Developer Tools Required)
 Operators who want the pre-compiled, self-contained Windows application can download it directly here:
 * Download JRFK.exe (Beta 1.0):
   https://github.com/jbirdlebough1/JRFKTools/releases/download/v01.00.00-beta/JRFK.exe
 
-🌐 Live Web Documentation Portal
-You can read all four manuals directly in your web browser (desktop, tablet, or shack smartphone) without downloading large PDFs:
+🌐 Live Web Documentation Portal & Repositories
+You can read all manuals and reference documentation directly in your web browser without downloading large files:
 * Documentation Portal: https://jbirdlebough1.github.io/JRFKTools/
 * GitHub Repository: https://github.com/jbirdlebough1/JRFKTools
+* RF-KIT Community Reflector: https://groups.io/g/rf-kit
 
 ---
 
 What’s New in Beta 1.0:
 
-1. Automated 32-bit to 64-bit OS Migration (Bookworm):
-   * Migrates legacy 32-bit Raspberry Pi OS installs to pure 64-bit Debian Bookworm with Python 3.13 deprecation patches and Full KMS DRM 1024x600 display driver support.
-   * Includes automated disaster recovery and secondary MicroSD hot-swap scripts (recovery in under 3 minutes).
+1. Automated 32-Bit to 64-Bit Raspberry Pi OS Migration:
+   * Migrates legacy 32-bit Raspberry Pi OS installs to pure 64-bit Raspberry Pi OS on kernel 6.12 with Full KMS direct rendering and Simple RPC controller communication.
+   * Option A (Gold to Production): Extracts 100% of calibration files, directional coupler nulls, ADC lookup tables, and station Wi-Fi from your existing working SD card.
+   * Option B (Clean Install to Production): Directly provisions a fresh target card with station credentials.
+   * Verified Two-Boot deployment process: Automated root partition expansion on Boot 1, production service on Boot 2.
 
-2. Decoupled Architecture & 7-Screen Web Suite (Port 8088):
-   * Strict Port Separation: PC migration tools run on http://127.0.0.1:8089, completely independent of the amplifier web suite on http://<amp-ip>:8088.
-   * All 7 Amplifier Touch Displays Available in Browser:
-     1. Main RF Dashboard (Forward/Reflected Power, PEP, SWR bar)
-     2. Band Switching & Pre-Selector Matrix
-     3. PA Telemetry & Bias Monitors
-     4. 4x Antenna Selection Matrix
-     5. Protection Limits & Peak Hold
-     6. System Configuration & Event Logs
-     7. Touch Screen Alignment & Calibration
+2. On-Amplifier JRFK Web Tools Suite (Port 8088):
+   * Concurrently served directly by the amplifier on port 8088 alongside the native front-panel GUI.
+   * Health Guard: Real-time Peak Envelope Power metering (up to 1500W), reflected power, 53.5V rail monitoring, and 60°C thermal safety protection.
+   * Remote Screen Viewer: Network HDMI extension providing a live, real-time 1024x600 framebuffer mirror. Crucially, this interface is strictly READ-ONLY for safe visual observation without accidental touch trips.
+   * Antenna Matrix & B26-ATU: Automatic CAT-controlled 4-way antenna port selection, switched relay/PIN-diode component engagement, and real-time SWR Bode plot.
+   * SD Backup Manager & Disaster Recovery: Plug an inexpensive USB SD card reader with a spare card into the amplifier to clone your active system in 15 minutes while remaining on the air. Configured with a scheduled background cron job for automated system updates, upgrades, and standby backups.
+   * Diagnostic Event Logs: Centralized millisecond-timestamped terminal tracking GUI events, Simple RPC transactions, and fault alerts.
+   * Integrated Documentation Portal: Offline technical manuals, build documentation, and B26 operating guides served locally on port 8088.
 
-3. Authentic K7BIT B26-RF2K+ Master Cookbook (Rev 1.05):
-   * The complete, unabridged 193-page reference manual by John Birdlebough (K7BIT/AE) and John Stafford (Island RF).
-   * Includes all 158 original high-resolution schematics, circuit board layouts, photos, and calibration tables with zero missing pages and zero unrendered notation.
+3. Station Reference Library & Manuals:
+   * The complete reference manual for builders and operators, complete with full circuit board layouts, photos, and calibration procedures.
+   * Complete 4-volume documentation library available offline on the amplifier and online via GitHub Pages.
 
-4. Hardware Specifications Clarification:
-   * Documents the Heiwoo 53.5V switching power supply (discrete voltage/current sensing, no CAN bus PSU dependency).
-   * Updated RF deck specifications for the Ampleon BLF189 / BLF189XR 50V LDMOS.
+Feedback and testing reports are welcome on the groups.io reflector!
 
-Feedback and testing reports are welcome!
-
-73,
-John Birdlebough (K7BIT)
+73's K7BIT
 Project Repository: https://github.com/jbirdlebough1/JRFKTools

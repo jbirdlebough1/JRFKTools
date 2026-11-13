@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1920px; height: 1080px; overflow: hidden;
+    background: #0f172a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex; flex-direction: column;
+  }
+  .win-titlebar {
+    height: 38px;
+    background: #1e293b;
+    border-bottom: 1px solid #334155;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 16px;
+    color: #cbd5e1; font-size: 13px; font-weight: 600;
+  }
+  .win-title { display: flex; align-items: center; gap: 8px; }
+  .win-controls { display: flex; gap: 14px; font-size: 14px; color: #94a3b8; }
+  .browser-nav {
+    height: 44px;
+    background: #0f172a;
+    border-bottom: 2px solid #0284c7;
+    display: flex; align-items: center; gap: 14px;
+    padding: 0 16px;
+  }
+  .nav-btn { color: #64748b; font-size: 16px; }
+  .url-bar {
+    flex: 1;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    height: 30px;
+    display: flex; align-items: center;
+    padding: 0 14px;
+    color: #38bdf8; font-family: monospace; font-size: 13px; font-weight: bold;
+    gap: 8px;
+  }
+  .url-bar .lock { color: #10b981; font-size: 12px; }
+  .frame-container {
+    flex: 1;
+    width: 100%;
+    position: relative;
+  }
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+</style>
+</head>
+<body>
+  <div class="win-titlebar">
+    <div class="win-title">
+      <span>🛡️ JRFK.exe — Standalone Windows 64-Bit Appliance Builder (Elevated Administrator)</span>
+    </div>
+    <div class="win-controls">
+      <span>─</span><span>□</span><span>✕</span>
+    </div>
+  </div>
+  <div class="browser-nav">
+    <span class="nav-btn">◀</span>
+    <span class="nav-btn">▶</span>
+    <span class="nav-btn">↻</span>
+    <div class="url-bar">
+      <span class="lock">🔒 Localhost (Safe Drive Guard Active)</span>
+      <span>http://127.0.0.1:8089/</span>
+    </div>
+  </div>
+  <div class="frame-container">
+    <iframe src="file:///D:/JRFK/tools/migrator/JRFK_32_to_64Bit_Migration_tool.htm"></iframe>
+  </div>
+</body>
+</html>
