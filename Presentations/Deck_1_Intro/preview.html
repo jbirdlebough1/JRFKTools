@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JRFK Presentation 1: Interactive Preview (Feynman Style + Ham Radio Jargon)</title>
+    <title>JRFK Presentation 1: 13-Slide Complete Master Preview</title>
     <style>
         body {
             margin: 0;
-            padding: 20px;
+            padding: 16px;
             background: #06152b;
             color: #ffffff;
             font-family: 'Segoe UI', -apple-system, sans-serif;
@@ -19,29 +19,29 @@
             box-sizing: border-box;
         }
         .player-container {
-            width: 1060px;
+            width: 1080px;
             background: #0c2340;
             border: 2px solid #38bdf8;
             border-radius: 10px;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.7);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.75);
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
         .slide-frame {
-            width: 1060px;
-            height: 596px;
+            width: 1080px;
+            height: 608px;
             border: none;
             background: #000;
             display: block;
         }
         .control-panel {
-            padding: 16px 24px;
+            padding: 14px 20px;
             background: #081a33;
             border-top: 2px solid #1e3a5f;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
         .top-row {
             display: flex;
@@ -57,7 +57,7 @@
             background: #0284c7;
             color: #ffffff;
             border: none;
-            padding: 9px 18px;
+            padding: 8px 16px;
             border-radius: 5px;
             cursor: pointer;
             font-weight: 700;
@@ -66,12 +66,10 @@
             transition: background 0.15s ease;
         }
         .btn:hover { background: #0369a1; }
-        .btn-green {
-            background: #16a34a;
-        }
+        .btn-green { background: #16a34a; }
         .btn-green:hover { background: #15803d; }
         .slide-indicator {
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 600;
             color: #38bdf8;
             letter-spacing: 0.5px;
@@ -81,7 +79,7 @@
             align-items: center;
             gap: 14px;
             background: #051329;
-            padding: 10px 14px;
+            padding: 8px 14px;
             border-radius: 6px;
             border: 1px solid #1e3a5f;
         }
@@ -93,88 +91,181 @@
         }
         audio {
             flex: 1;
-            height: 38px;
+            height: 36px;
             outline: none;
         }
         .timeline-guide {
             display: flex;
             justify-content: space-between;
-            font-size: 11px;
+            font-size: 11.5px;
             color: #64748b;
             font-family: monospace;
             padding: 0 4px;
+        }
+        .slide-selector {
+            background: #0f2744;
+            color: #ffffff;
+            border: 1px solid #38bdf8;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <div class="player-container">
-        <!-- 720p Clean Slide Frame (Clean Station Operating Note on Slide) -->
-        <iframe id="slideFrame" class="slide-frame" src="slide_1.html"></iframe>
+        <!-- 720p Clean Slide Frame -->
+        <iframe id="slideFrame" class="slide-frame" src="slide_01.html"></iframe>
         
-        <!-- Controls & Visible Audio Track -->
+        <!-- Controls & Visible Audio Player -->
         <div class="control-panel">
             <div class="top-row">
                 <div class="nav-group">
-                    <button class="btn" onclick="prevSlide()">◀ Previous Slide</button>
-                    <button class="btn" onclick="nextSlide()">Next Slide ▶</button>
-                    <button class="btn btn-green" onclick="restartAudio()">▶ Play Feynman Audio</button>
+                    <button class="btn" onclick="prevSlide()">◀ Previous</button>
+                    <button class="btn" onclick="nextSlide()">Next ▶</button>
+                    <button class="btn btn-green" onclick="restartAudio()">▶ Play Narration</button>
+                    <select id="jumpSelect" class="slide-selector" onchange="jumpToSlide(this.value)">
+                        <option value="0">Slide 1: The Migration Requirement</option>
+                        <option value="1">Slide 2: Why 32-Bit Must Go (Software EOL)</option>
+                        <option value="2">Slide 3: Display Architecture & RF Locks</option>
+                        <option value="3">Slide 4: 64-Bit Architecture Payoff</option>
+                        <option value="4">Slide 5: Tool 1 - JRFK Migrator Engine</option>
+                        <option value="5">Slide 6: Tool 1 - Discovery & Calibration</option>
+                        <option value="6">Slide 7: Tool 2 - 7-Screen Cockpit RF Metering</option>
+                        <option value="7">Slide 8: Tool 2 - PA Health & 4-Way Antennas</option>
+                        <option value="8">Slide 9: Tool 2 - Protection & Calibration</option>
+                        <option value="9">Slide 10: Tool 3 - 3-Min Disaster Recovery</option>
+                        <option value="10">Slide 11: Tool 3 - First-Boot Automation</option>
+                        <option value="11">Slide 12: Tool 4 - Documentation & Cookbook</option>
+                        <option value="12">Slide 13: Summary & Resources</option>
+                    </select>
                 </div>
                 <div class="slide-indicator" id="slideMeta">
-                    Slide 1 of 5: Modernizing the RF-KIT Linear Amplifier
+                    Slide 1 of 13: Modernizing the RF-KIT Linear Amplifier
                 </div>
             </div>
             
-            <!-- Visible Audio Track with Scrubber & Time -->
+            <!-- Visible Audio Track with Scrubber -->
             <div class="audio-wrapper">
-                <span class="audio-label" id="audioLabel">🔊 TRACK: audio/slide_1.mp3 (Feynman + Ham Jargon)</span>
+                <span class="audio-label" id="audioLabel">🔊 TRACK: slide_01.mp3 (Christopher Natural)</span>
                 <audio id="audioPlayer" controls preload="auto"></audio>
             </div>
             
             <div class="timeline-guide">
                 <span id="timingStart">Timeline Offset: 00:00.00</span>
-                <span>Voice Persona: Richard Feynman Style + Ham Radio Jargon</span>
-                <span id="timingDur">Duration: 22.90s</span>
+                <span>Voice: en-US-ChristopherNeural • Slide Duration = Audio Duration</span>
+                <span id="timingDur">Duration: Loading...</span>
             </div>
         </div>
     </div>
 
     <script>
         const slides = [
-            { 
-                id: "slide_1", 
-                title: "Modernizing the RF-KIT Linear Amplifier", 
-                audio: "audio/slide_1.mp3",
-                start: "00:00.00",
-                duration: "22.90s"
-            },
-            { 
-                id: "slide_2", 
-                title: "Why Legacy 32-Bit OS Must Go", 
-                audio: "audio/slide_2.mp3",
-                start: "00:23.90",
-                duration: "23.66s"
-            },
-            { 
-                id: "slide_3", 
-                title: "Dual-Port Architecture: 8089 vs 8088", 
-                audio: "audio/slide_3.mp3",
-                start: "00:48.56",
-                duration: "26.95s"
-            },
-            { 
-                id: "slide_4", 
-                title: "4-Volume Documentation & K7BIT Cookbook", 
-                audio: "audio/slide_4.mp3",
-                start: "01:16.51",
-                duration: "20.81s"
-            },
-            { 
-                id: "slide_outro", 
-                title: "Master Resources & Downloads", 
-                audio: "audio/slide_outro.mp3",
-                start: "01:38.32",
-                duration: "17.86s"
-            }
+            {
+            id: "slide_01",
+            title: "Modernizing the RF-KIT Linear Amplifier",
+            png: "slide_01.png",
+            audio: "slide_01.mp3",
+            duration: "28.10s",
+            start: "00:00.00"
+        },
+            {
+            id: "slide_02",
+            title: "Why 32-Bit Must Go: Software End-of-Life",
+            png: "slide_02.png",
+            audio: "slide_02.mp3",
+            duration: "27.26s",
+            start: "00:28.10"
+        },
+            {
+            id: "slide_03",
+            title: "Why 32-Bit Must Go: Display Architecture & RF Locks",
+            png: "slide_03.png",
+            audio: "slide_03.mp3",
+            duration: "33.48s",
+            start: "00:55.37"
+        },
+            {
+            id: "slide_04",
+            title: "64-Bit Architecture Overview: The Technical Payoff",
+            png: "slide_04.png",
+            audio: "slide_04.mp3",
+            duration: "24.79s",
+            start: "01:28.85"
+        },
+            {
+            id: "slide_05",
+            title: "Tool 1: JRFK Standalone Migrator Architecture",
+            png: "slide_05.png",
+            audio: "slide_05.mp3",
+            duration: "30.29s",
+            start: "01:53.64"
+        },
+            {
+            id: "slide_06",
+            title: "Tool 1 in Action: Discovery, Flashing & Calibration",
+            png: "slide_06.png",
+            audio: "slide_06.mp3",
+            duration: "25.08s",
+            start: "02:23.93"
+        },
+            {
+            id: "slide_07",
+            title: "Tool 2: 7-Screen Web Suite — RF Telemetry & Bands",
+            png: "slide_07.png",
+            audio: "slide_07.mp3",
+            duration: "27.12s",
+            start: "02:49.01"
+        },
+            {
+            id: "slide_08",
+            title: "Tool 2: PA Monitoring & 4-Way Antenna Matrix",
+            png: "slide_08.png",
+            audio: "slide_08.mp3",
+            duration: "32.35s",
+            start: "03:16.13"
+        },
+            {
+            id: "slide_09",
+            title: "Tool 2: Protection Systems, Logs & Touch Calibration",
+            png: "slide_09.png",
+            audio: "slide_09.mp3",
+            duration: "26.38s",
+            start: "03:48.48"
+        },
+            {
+            id: "slide_10",
+            title: "Tool 3: The 3-Minute Disaster Recovery Standby Card",
+            png: "slide_10.png",
+            audio: "slide_10.mp3",
+            duration: "26.40s",
+            start: "04:14.86"
+        },
+            {
+            id: "slide_11",
+            title: "Tool 3: First-Boot Automation & Self-Healing Services",
+            png: "slide_11.png",
+            audio: "slide_11.mp3",
+            duration: "24.77s",
+            start: "04:41.26"
+        },
+            {
+            id: "slide_12",
+            title: "Tool 4: Master Engineering Library & Cookbook Reader",
+            png: "slide_12.png",
+            audio: "slide_12.mp3",
+            duration: "27.14s",
+            start: "05:06.02"
+        },
+            {
+            id: "slide_13",
+            title: "Summary & Master Resource Directory",
+            png: "slide_13.png",
+            audio: "slide_13.mp3",
+            duration: "25.18s",
+            start: "05:33.17"
+        }
         ];
         
         let currentIdx = 0;
@@ -185,13 +276,14 @@
             const s = slides[currentIdx];
             document.getElementById('slideFrame').src = s.id + '.html';
             document.getElementById('slideMeta').innerText = `Slide ${currentIdx + 1} of ${slides.length}: ${s.title}`;
-            document.getElementById('audioLabel').innerText = `🔊 TRACK: ${s.audio} (Feynman + Ham Jargon)`;
+            document.getElementById('audioLabel').innerText = `🔊 TRACK: ${s.audio} (Christopher Natural)`;
             document.getElementById('timingStart').innerText = `Timeline Offset: ${s.start}`;
-            document.getElementById('timingDur').innerText = `Duration: ${s.duration}`;
+            document.getElementById('timingDur').innerText = `Duration: ${s.duration} (Exact Match)`;
+            document.getElementById('jumpSelect').value = currentIdx;
             
             player.src = s.audio;
             player.play().catch(() => {
-                // Browser user gesture handling
+                // Handled user gesture requirements
             });
         }
 
@@ -212,7 +304,17 @@
             }
         }
 
-        // Initialize on load
+        function jumpToSlide(val) {
+            loadSlide(parseInt(val));
+        }
+
+        // Auto-advance slide when audio finishes
+        player.addEventListener('ended', () => {
+            if (currentIdx < slides.length - 1) {
+                loadSlide(currentIdx + 1);
+            }
+        });
+
         window.addEventListener('DOMContentLoaded', () => {
             loadSlide(0);
         });

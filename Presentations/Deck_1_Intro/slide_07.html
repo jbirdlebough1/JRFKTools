@@ -60,7 +60,7 @@ body {
     margin-top: 8px;
 }
 .title-row h1 {
-    font-size: 30px;
+    font-size: 28px;
     margin: 0;
     font-weight: 800;
     letter-spacing: 0.5px;
@@ -68,7 +68,7 @@ body {
     text-transform: uppercase;
 }
 .title-row .subtitle {
-    font-size: 15px;
+    font-size: 14px;
     color: var(--accent-cyan);
     margin-top: 3px;
     font-weight: 500;
@@ -77,11 +77,11 @@ body {
     flex: 1;
     display: flex;
     gap: 20px;
-    margin-top: 14px;
+    margin-top: 12px;
     align-items: stretch;
 }
 .col-text {
-    flex: 1.2;
+    flex: 1.25;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -116,7 +116,7 @@ body {
 .card {
     background: var(--bp-card);
     border-left: 4px solid var(--accent-cyan);
-    padding: 10px 14px;
+    padding: 9px 13px;
     border-radius: 0 6px 6px 0;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
@@ -127,103 +127,80 @@ body {
     border-left-color: var(--accent-amber);
 }
 .card-title {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: #ffffff;
-    margin-bottom: 3px;
+    margin-bottom: 2px;
     display: flex;
     align-items: center;
     gap: 8px;
 }
 .card-desc {
-    font-size: 13px;
+    font-size: 12.5px;
     color: var(--bp-line-dim);
-    line-height: 1.4;
+    line-height: 1.35;
 }
-.feynman-box {
-    background: rgba(15, 23, 42, 0.9);
-    border: 1px dashed var(--accent-amber);
+.station-note-box {
+    background: rgba(15, 23, 42, 0.95);
+    border-left: 4px solid var(--accent-amber);
     padding: 8px 12px;
-    border-radius: 6px;
-    font-style: italic;
+    border-radius: 0 6px 6px 0;
     font-size: 12.5px;
     color: #fef08a;
     line-height: 1.35;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 .footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
-    padding-top: 8px;
-    font-size: 12px;
+    padding-top: 6px;
+    font-size: 11.5px;
     color: var(--bp-line-dim);
-}
-table.clean-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-    background: #081d33;
-    border: 1px solid var(--bp-border);
-}
-table.clean-table th {
-    background: #0f3460;
-    color: var(--accent-cyan);
-    padding: 6px 8px;
-    text-align: left;
-    border-bottom: 2px solid var(--bp-border);
-}
-table.clean-table td {
-    padding: 6px 8px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--bp-line-dim);
-}
-table.clean-table tr:hover td {
-    background: #0c2d54;
-    color: #ffffff;
 }
 
 </style>
 </head>
 <body>
     <div class="header">
-        <div class="header-badge">JRFK SERIES • PART 1</div>
-        <div class="header-meta">THE ARCHITECTURAL PROBLEM</div>
+        <div class="header-badge">JRFK TOOL 2 • SLIDE 1/3</div>
+        <div class="header-meta">TOOL 2: 7-SCREEN COCKPIT • PORT 8088</div>
     </div>
     <div class="title-row">
-        <h1>Why Legacy 32-Bit OS Must Go</h1>
-        <div class="subtitle">End-of-Life Python Runtimes, Display Driver Freezes, and Fragile Scripts</div>
+        <h1>Tool 2: 7-Screen Web Suite — RF Telemetry & Bands</h1>
+        <div class="subtitle">Port Decoupling, Real-Time Power Telemetry & Automated CAT Band Tracking</div>
     </div>
     <div class="content">
         
             <div class="col-text">
                 
-                <div class="card ">
-                    <div class="card-title">End of Support Life</div>
-                    <div class="card-desc">The old 32-bit OS foundation is frozen in time. Modern security patches, network tools, and Python 3 libraries are completely locked out.</div>
-                </div>
-                
-                <div class="card card-amber">
-                    <div class="card-title">Touchscreen & Video Latency</div>
-                    <div class="card-desc">Legacy fake-KMS and legacy X11 display stacks cause occasional frame stutter and unrecoverable touchscreen lockups during RF keying.</div>
-                </div>
-                
-                <div class="card card-green">
-                    <div class="card-title">Turnkey Solution</div>
-                    <div class="card-desc">JRFK brings an automated migrator: zero-touch imaging, automatic recovery, and clean modern services in under three minutes.</div>
-                </div>
-                
+                    <div class="card ">
+                        <div class="card-title">Strict Port Decoupling</div>
+                        <div class="card-desc">PC provisioning runs on port 8089; the permanent operational amplifier suite runs on port 8088 on the Raspberry Pi.</div>
+                    </div>
+                    
+                    <div class="card card-green">
+                        <div class="card-title">Screen 1: Main RF Dashboard</div>
+                        <div class="card-desc">Displays real-time forward PEP power, reflected power, and responsive SWR bar graphs accessible from any shack browser.</div>
+                    </div>
+                    
+                    <div class="card card-amber">
+                        <div class="card-title">Screen 2: Band Switching Matrix</div>
+                        <div class="card-desc">Tracks transceiver frequency automatically via CAT and CI-V protocols, with active hardware lockout against hot-switching.</div>
+                    </div>
+                    
             </div>
             
                 <div class="col-media">
-                    <img src="file:///D:/JRFK/docs/cookbook_media/img_102.jpeg">
-                    <div class="media-caption">FIG 2: LEGACY 32-BIT CONTROLLER SYSTEM ON THE AIR VIA CAT</div>
+                    <img src="file:///D:/JRFK/Presentations/rfk_screen_capture_test.png">
+                    <div class="media-caption">FIG 7: 7-SCREEN COCKPIT — MAIN RF DASHBOARD & BAND MATRIX (PORT 8088)</div>
                 </div>
                 
             
     </div>
     <div class="footer">
-        <div>JRFK 64-BIT STATION SUITE</div>
+        <div>JRFK 64-BIT STATION SUITE • AMATEUR RADIO HIGH-POWER LINEAR AMPLIFIERS</div>
         <div>GITHUB.COM/JBIRDLEBOUGH1/JRFKTOOLS</div>
     </div>
 </body>
