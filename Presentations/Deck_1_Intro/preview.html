@@ -6,69 +6,73 @@
 <title>JRFK Modernization Suite - Auto-Advancing Technical Player - K7BIT</title>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
+    html, body {
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
         background: #091a2e;
         color: #ffffff;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         display: flex;
         flex-direction: column;
-        height: 100vh;
-        overflow: hidden;
     }
     .player-header {
-        height: 60px;
+        height: 48px;
         background: #0f2d4f;
         border-bottom: 2px solid #38bdf8;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 24px;
+        padding: 0 20px;
         flex-shrink: 0;
     }
-    .player-title { font-size: 20px; font-weight: 800; color: #38bdf8; display: flex; align-items: center; gap: 10px; }
+    .player-title { font-size: 16px; font-weight: 800; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
     .player-callsign {
         background: #0284c7;
         color: white;
-        padding: 4px 12px;
+        padding: 3px 10px;
         border-radius: 4px;
         font-family: monospace;
         font-weight: bold;
-        font-size: 14px;
+        font-size: 13px;
     }
     .player-main {
-        flex: 1;
+        flex: 1 1 auto;
+        min-height: 0;
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 16px;
-        position: relative;
+        padding: 8px 12px;
         background: #061524;
+        overflow: hidden;
     }
     .slide-viewport {
         width: 100%;
-        max-width: 1680px;
         height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
-        position: relative;
+        overflow: hidden;
     }
     .slide-img {
         max-width: 100%;
         max-height: 100%;
+        width: auto;
+        height: auto;
         object-fit: contain;
-        border-radius: 8px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        border-radius: 6px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.8);
         border: 2px solid #1e3a5f;
     }
     .player-footer {
-        height: 110px;
+        height: 72px;
         background: #0f2d4f;
         border-top: 2px solid #38bdf8;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        padding: 12px 24px;
+        justify-content: center;
+        gap: 6px;
+        padding: 6px 20px;
         flex-shrink: 0;
     }
     .controls-row {
@@ -77,44 +81,45 @@
         justify-content: space-between;
         gap: 16px;
     }
-    .btn-group { display: flex; gap: 10px; align-items: center; }
+    .btn-group { display: flex; gap: 8px; align-items: center; }
     .btn {
         background: #0284c7;
         color: white;
         border: 1px solid #38bdf8;
-        padding: 8px 18px;
-        border-radius: 6px;
+        padding: 6px 14px;
+        border-radius: 5px;
         font-weight: 700;
         cursor: pointer;
-        font-size: 14px;
+        font-size: 13px;
         transition: background 0.2s;
     }
     .btn:hover { background: #0369a1; }
     .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-play { background: #059669; border-color: #34d399; font-size: 15px; padding: 8px 24px; }
+    .btn-play { background: #059669; border-color: #34d399; font-size: 14px; padding: 6px 20px; }
     .btn-play:hover { background: #047857; }
     .slide-indicator {
         font-family: monospace;
-        font-size: 16px;
+        font-size: 14px;
         font-weight: bold;
         color: #7dd3fc;
     }
     .narration-display {
         color: #e0f2fe;
-        font-size: 14px;
-        line-height: 1.4;
+        font-size: 13px;
+        line-height: 1.35;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 900px;
+        flex: 1;
+        max-width: 800px;
         background: rgba(6, 21, 36, 0.7);
-        padding: 4px 12px;
+        padding: 4px 10px;
         border-radius: 4px;
         border-left: 3px solid #38bdf8;
     }
     .progress-bar-container {
         width: 100%;
-        height: 6px;
+        height: 5px;
         background: #1e3a5f;
         border-radius: 3px;
         overflow: hidden;
@@ -383,12 +388,11 @@
             }
         }
 
-        // When audio ends: Automatically advance to next slide and start playback immediately!
         audio.addEventListener('ended', () => {
             if (currentIndex < slides.length - 1) {
                 setTimeout(() => {
                     loadSlide(currentIndex + 1, true);
-                }, 600); // 600ms natural breathing room between slides
+                }, 600);
             } else {
                 isPlaying = false;
                 btnPlayPause.textContent = '▶ Play';
@@ -429,7 +433,6 @@
             loadSlide(0, true);
         });
 
-        // Keyboard arrow navigation
         window.addEventListener('keydown', (e) => {
             if (e.key === ' ' || e.code === 'Space') {
                 e.preventDefault();
@@ -441,7 +444,6 @@
             }
         });
 
-        // Initial slide load
         loadSlide(0, false);
     </script>
 </body>
