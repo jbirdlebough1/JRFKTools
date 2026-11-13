@@ -32,7 +32,7 @@ SLIDES = [
         "category": "THE JRFK MIGRATION SUITE • 64-BIT REQUIREMENT",
         "title": "MODERNIZING RF AMPLIFIER CONTROLLERS",
         "subtitle": "Engineering Pure 64-Bit Debian Bookworm Systems for High-Power Amateur Radio Amplifiers",
-        "narrative": "Welcome to Part 1 of our technical overview from K7BIT. When you are managing fifteen hundred watts, P-E-P, across one sixty through six meters, the controller supervising your R F deck, low-pass relays, and protection sequencing must be completely deterministic. In this briefing, we examine the technical requirement for migrating from legacy thirty-two-bit operating systems to the pure sixty-four-bit Debian Bookworm architecture provided by the JRFK suite.",
+        "narrative": "Welcome to Part 1 of our technical overview from K7BIT. When you are managing fifteen hundred ... Watts, P, E, P, across one sixty through six meters, the controller supervising your R F deck, low-pass relays, and protection sequencing must be completely deterministic. In this briefing, we examine the technical requirement for migrating from legacy thirty-two-bit operating systems to the pure sixty-four-bit Debian Bookworm architecture provided by the JRFK suite.",
         "graphics": [
             ("jrfk_migrator.png", "FIG 1: JRFK STANDALONE MIGRATOR INTERFACE & PHYSICAL DRIVE GUARD"),
             ("screen_health_monitor.png", "FIG 2: JRFK WEB TOOLS (PORT 8088) - REAL-TIME RF TELEMETRY & METRICS")
@@ -144,7 +144,7 @@ SLIDES = [
         "category": "THE JRFK MIGRATION SUITE • TOOL 2: JRFK WEB TOOLS",
         "title": "TOOL 2: JRFK WEB TOOLS — RF TELEMETRY & BANDS",
         "subtitle": "Port 8088 Operations: Low-Pass Filtering and Forward/Reflected Power Metering",
-        "narrative": "Following migration, topic three presents the seven-screen JRFK Web Tools running permanently on port eighty eighty-eight. This tool decouples live operation from P C maintenance. Screen 1 gives you real-time forward peak envelope power, reflected power, and S W R metering from any browser at K7BIT, while Screen 2 provides automatic low-pass filter band switching synchronized to your transceiver via C A T control with active hot-switch prevention.",
+        "narrative": "The second major tool in the suite is the seven-screen JRFK Web Tools running permanently on port eighty eighty-eight. This tool decouples live operation from P C maintenance. Screen 1 gives you real-time forward P, E, P, reflected power, and S W R metering from any browser at K7BIT, while Screen 2 provides automatic low-pass filter band switching synchronized to your transceiver via C A T control with active hot-switch prevention.",
         "graphics": [
             ("screen_health_monitor.png", "FIG 11: JRFK WEB TOOLS SCREEN 1 - PRECISION RF POWER, VSWR & LPF METERING")
         ],

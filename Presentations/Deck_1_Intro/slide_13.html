@@ -3,12 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <style>
-    /* MASTER BLUEPRINT SLIDE TEMPLATE
-       CANVAS: 1920 x 1080
-       ENFORCED RATIO:
-         - LEFT COLUMN: 600px (Exactly 1/3 of content area with padding)
-         - RIGHT COLUMN: 1200px (Exactly 2/3 of content area with padding)
-    */
     * {
         box-sizing: border-box;
         margin: 0;
@@ -22,32 +16,32 @@
     }
 
     body {
-        background-color: #0b3c68;
-        /* Technical Drafting Blueprint Grid: cyan/white grid on rich cyan-cobalt blueprint blue */
+        background-color: #1a5695;
         background-image: 
-            linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px),
-            linear-gradient(rgba(56, 189, 248, 0.30) 2px, transparent 2px),
-            linear-gradient(90deg, rgba(56, 189, 248, 0.30) 2px, transparent 2px);
+            linear-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+            linear-gradient(rgba(147, 197, 253, 0.35) 2px, transparent 2px),
+            linear-gradient(90deg, rgba(147, 197, 253, 0.35) 2px, transparent 2px);
         background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
         color: #ffffff;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        padding: 35px 50px;
-        border: 4px solid #38bdf8;
+        padding: 30px 45px;
+        border: 4px solid #93c5fd;
     }
 
-    /* Outer Blueprint Technical Title Block Header */
     .master-header {
-        width: 1820px;
-        border-bottom: 3px solid #38bdf8;
+        width: 1830px;
+        border-bottom: 3px solid #93c5fd;
         padding-bottom: 12px;
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
-        background: rgba(11, 60, 104, 0.85);
+        background: rgba(26, 86, 149, 0.90);
+        padding-left: 10px;
+        padding-right: 10px;
     }
 
     .header-left {
@@ -60,13 +54,13 @@
         font-family: "Consolas", monospace;
         font-size: 14px;
         letter-spacing: 2px;
-        color: #7dd3fc;
+        color: #93c5fd;
         text-transform: uppercase;
         font-weight: 700;
     }
 
     .header-title {
-        font-size: 36px;
+        font-size: 34px;
         font-weight: 900;
         letter-spacing: -0.5px;
         color: #ffffff;
@@ -75,7 +69,7 @@
 
     .header-subtitle {
         font-size: 16px;
-        color: #bae6fd;
+        color: #bfdbfe;
         font-weight: 500;
     }
 
@@ -89,19 +83,18 @@
         background: #0284c7;
         padding: 8px 18px;
         border-radius: 4px;
-        border: 1px solid #7dd3fc;
+        border: 1px solid #93c5fd;
     }
 
-    /* ENFORCED 1/3 (600px) VS 2/3 (1200px) SPLIT */
     .master-body {
-        width: 1820px;
-        height: 860px;
+        width: 1830px;
+        height: 870px;
         display: flex;
         gap: 20px;
-        margin: 15px 0;
+        margin: 12px 0;
     }
 
-    /* 1/3 COLUMN: EXACTLY 600px FIXED WIDTH */
+    /* 1/3 WIDTH COLUMN: EXACTLY 600px FIXED WIDTH */
     .col-one-third {
         width: 600px;
         flex-shrink: 0;
@@ -112,9 +105,9 @@
     }
 
     .bullet-card {
-        background: rgba(8, 43, 75, 0.95);
-        border: 2px solid #38bdf8;
-        border-left: 6px solid #7dd3fc;
+        background: rgba(15, 45, 85, 0.95);
+        border: 2px solid #93c5fd;
+        border-left: 6px solid #60a5fa;
         border-radius: 6px;
         padding: 10px 14px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
@@ -132,7 +125,7 @@
 
     .bullet-title::before {
         content: "►";
-        color: #38bdf8;
+        color: #93c5fd;
         font-size: 12px;
     }
 
@@ -142,31 +135,33 @@
         color: #e0f2fe;
     }
 
-    /* 2/3 COLUMN: EXACTLY 1200px FIXED WIDTH */
+    /* 2/3 WIDTH COLUMN: EXACTLY 1200px FIXED WIDTH */
     .col-two-thirds {
-        width: 1200px;
+        width: 1210px;
         flex-shrink: 0;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        gap: 14px;
+        gap: 10px;
     }
 
     .graphic-frame {
-        width: 1200px;
-        background: #061c33;
-        border: 3px solid #38bdf8;
+        width: 1210px;
+        background: rgba(10, 30, 60, 0.95);
+        border: 3px solid #93c5fd;
         border-radius: 8px;
-        padding: 10px;
+        padding: 8px;
         display: flex;
         justify-content: center;
         align-items: center;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+        max-height: 820px;
+        overflow: hidden;
     }
 
     .graphic-frame img {
         width: 100%;
-        max-width: 100%;
+        max-height: 780px;
         border-radius: 4px;
         display: block;
         object-fit: contain;
@@ -175,33 +170,33 @@
     .graphic-caption {
         font-family: "Consolas", monospace;
         font-size: 13px;
-        color: #7dd3fc;
+        color: #93c5fd;
         text-align: center;
         font-weight: 700;
         letter-spacing: 1px;
-        background: rgba(8, 43, 75, 0.90);
+        background: rgba(15, 45, 85, 0.95);
         padding: 4px 8px;
         border-radius: 4px;
-        border: 1px solid rgba(56, 189, 248, 0.4);
-        margin-top: 4px;
+        border: 1px solid rgba(147, 197, 253, 0.5);
     }
 
-    /* Master Blueprint Footer Block */
     .master-footer {
-        width: 1820px;
-        border-top: 2px solid #38bdf8;
-        padding-top: 10px;
+        width: 1830px;
+        border-top: 2px solid #93c5fd;
+        padding-top: 8px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         font-family: "Consolas", monospace;
         font-size: 12px;
-        color: #bae6fd;
-        background: rgba(11, 60, 104, 0.85);
+        color: #bfdbfe;
+        background: rgba(26, 86, 149, 0.90);
+        padding-left: 10px;
+        padding-right: 10px;
     }
 
     .footer-left {
-        color: #7dd3fc;
+        color: #93c5fd;
         font-weight: 700;
     }
 </style>
@@ -209,63 +204,42 @@
 <body>
     <div class="master-header">
         <div class="header-left">
-            <div class="header-tagline">TOPIC 4: RECOVERY & DOCUMENTATION • THE JRFK MIGRATION SUITE • SUMMARY & RESOURCES</div>
-            <div class="header-title">SUMMARY & MASTER RESOURCE DIRECTORY</div>
-            <div class="header-subtitle">64-Bit Modernization Ecosystem: Migrator, JRFK Web Tools, Recovery & Docs</div>
+            <div class="header-tagline">PART 3: JRFK WEB TOOLS • TOOL 3: ANTENNA MATRIX • 4-WAY ROUTING</div>
+            <div class="header-title">Antenna Matrix: 4-Way Routing Grid</div>
+            <div class="header-subtitle">Band-by-band antenna selection, safety interlocks, and relay memory</div>
         </div>
         <div class="header-right">
             <div>CALLSIGN: K7BIT</div>
-            <div>SLIDE 13 OF 13</div>
+            <div>SLIDE 13 OF 20</div>
         </div>
     </div>
 
     <div class="master-body">
-        <!-- 1/3 WIDTH COLUMN (600px) -->
         <div class="col-one-third">
             
-        <div class="bullet-card">
-            <div class="bullet-title">JRFK Standalone Migrator</div>
-            <div class="bullet-desc">Single 166MB Windows executable with elevation launcher, format prompt suppressor, and Drive Guard.</div>
+            <div class="bullet-card">
+                <div class="bullet-title">4-Way Output Matrix</div>
+                <div class="bullet-desc">Routes high-power RF cleanly across four individual antenna ports for all amateur bands.</div>
+            </div>
+            <div class="bullet-card">
+                <div class="bullet-title">Per-Band Memory</div>
+                <div class="bullet-desc">Automatically recalls assigned antenna ports as the transceiver changes frequency.</div>
+            </div>
+            <div class="bullet-card">
+                <div class="bullet-title">Hot-Switching Protection</div>
+                <div class="bullet-desc">Interlocks enforce complete PTT unkey before any antenna relay is allowed to switch.</div>
+            </div>
+            <div class="bullet-card">
+                <div class="bullet-title">Manual Override Controls</div>
+                <div class="bullet-desc">Allows instantaneous port reassignment with clear visual relay state indicators.</div>
+            </div>
         </div>
-        
-        <div class="bullet-card">
-            <div class="bullet-title">7-Screen JRFK Web Tools</div>
-            <div class="bullet-desc">Runs on port 8088 for RF metering, CAT band switching, 53.5V DC rail telemetry, and antenna matrix.</div>
-        </div>
-        
-        <div class="bullet-card">
-            <div class="bullet-title">3-Minute Disaster Recovery</div>
-            <div class="bullet-desc">Pre-cloned standby SD media strategy delivers instant sub-3-minute recovery during contested operation.</div>
-        </div>
-        
-        <div class="bullet-card">
-            <div class="bullet-title">Master Engineering Library</div>
-            <div class="bullet-desc">Local port 8088 docs portal featuring K7BIT's authentic 193-page B26 cookbook and schematics.</div>
-        </div>
-        
-        <div class="bullet-card">
-            <div class="bullet-title">Operating Note (K7BIT)</div>
-            <div class="bullet-desc">73 from K7BIT—engineering reliable, high-power amateur radio stations for modern contest and DX operations.</div>
-        </div>
-        
-        </div>
-        <!-- 2/3 WIDTH COLUMN (1200px) -->
         <div class="col-two-thirds">
             
-        <div class="graphic-item" style="width: 100%;">
-            <div class="graphic-frame">
-                <img src="real_screenshots/jrfk_migrator.png" style="max-height: 360px;" alt="FIG 20: JRFK.EXE MIGRATOR SUITE - WINDOWS STANDALONE EXECUTABLE">
-            </div>
-            <div class="graphic-caption">FIG 20: JRFK.EXE MIGRATOR SUITE - WINDOWS STANDALONE EXECUTABLE</div>
+        <div class="graphic-frame">
+            <img src="real_screenshots/tool2_antenna_matrix_grid.png" alt="Antenna Matrix: 4-Way Routing Grid">
         </div>
-        
-        <div class="graphic-item" style="width: 100%;">
-            <div class="graphic-frame">
-                <img src="real_screenshots/screen_health_monitor.png" style="max-height: 360px;" alt="FIG 21: JRFK WEB TOOLS - 64-BIT CONTROLLER PLATFORM (PORT 8088)">
-            </div>
-            <div class="graphic-caption">FIG 21: JRFK WEB TOOLS - 64-BIT CONTROLLER PLATFORM (PORT 8088)</div>
-        </div>
-        
+        <div class="graphic-caption">ANTENNA MATRIX: 4-WAY SELECTION GRID ACROSS ALL AMATEUR BANDS</div>
         </div>
     </div>
 
