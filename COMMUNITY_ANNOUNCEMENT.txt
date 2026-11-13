@@ -1,0 +1,48 @@
+Subject: [RELEASE] JRFK Beta 1.0 — RF-KIT 64-Bit OS (Bookworm) Migrator, 7-Screen Web Suite & K7BIT Master Cookbook (Rev 1.05)
+
+Hello RF-KIT / B26-PA Builders and Operators,
+
+We are pleased to announce the public Beta 1.0 release of JRFKTools—a turnkey solution for modernizing and managing the RF-KIT RF2K+ linear amplifier.
+
+⚡ Fast Download (No Developer Tools Required)
+Operators who want the pre-compiled, self-contained Windows application can download it directly here:
+* Download JRFK.exe (Beta 1.0):
+  https://github.com/jbirdlebough1/JRFKTools/releases/download/v01.00.00-beta/JRFK.exe
+
+🌐 Live Web Documentation Portal
+You can read all four manuals directly in your web browser (desktop, tablet, or shack smartphone) without downloading large PDFs:
+* Documentation Portal: https://jbirdlebough1.github.io/JRFKTools/
+* GitHub Repository: https://github.com/jbirdlebough1/JRFKTools
+
+---
+
+What’s New in Beta 1.0:
+
+1. Automated 32-bit to 64-bit OS Migration (Bookworm):
+   * Migrates legacy 32-bit Raspberry Pi OS installs to pure 64-bit Debian Bookworm with Python 3.13 deprecation patches and Full KMS DRM 1024x600 display driver support.
+   * Includes automated disaster recovery and secondary MicroSD hot-swap scripts (recovery in under 3 minutes).
+
+2. Decoupled Architecture & 7-Screen Web Suite (Port 8088):
+   * Strict Port Separation: PC migration tools run on http://127.0.0.1:8089, completely independent of the amplifier web suite on http://<amp-ip>:8088.
+   * All 7 Amplifier Touch Displays Available in Browser:
+     1. Main RF Dashboard (Forward/Reflected Power, PEP, SWR bar)
+     2. Band Switching & Pre-Selector Matrix
+     3. PA Telemetry & Bias Monitors
+     4. 4x Antenna Selection Matrix
+     5. Protection Limits & Peak Hold
+     6. System Configuration & Event Logs
+     7. Touch Screen Alignment & Calibration
+
+3. Authentic K7BIT B26-RF2K+ Master Cookbook (Rev 1.05):
+   * The complete, unabridged 193-page reference manual by John Birdlebough (K7BIT/AE) and John Stafford (Island RF).
+   * Includes all 158 original high-resolution schematics, circuit board layouts, photos, and calibration tables with zero missing pages and zero unrendered notation.
+
+4. Hardware Specifications Clarification:
+   * Documents the Heiwoo 53.5V switching power supply (discrete voltage/current sensing, no CAN bus PSU dependency).
+   * Updated RF deck specifications for the Ampleon BLF189 / BLF189XR 50V LDMOS.
+
+Feedback and testing reports are welcome!
+
+73,
+John Birdlebough (K7BIT)
+Project Repository: https://github.com/jbirdlebough1/JRFKTools
