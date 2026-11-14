@@ -10,6 +10,18 @@
 
 ---
 
+## 🎬 Interactive Technical Presentation (Overview & Architecture)
+
+Before downloading or upgrading, you can explore the complete audio-visual technical walkthrough directly in your browser using our auto-advancing blueprint player:
+
+👉 **[Launch Presentation 1: Modernizing the RF-KIT Linear Amplifier (Interactive Web Player)](https://jbirdlebough1.github.io/JRFKTools/deck1/preview.html)**  
+*(15-slide technical blueprint walkthrough: covers the 64-bit architecture payoff, PC Migrator Options A & B, two-boot verification, and all on-amplifier Web Tools with synchronized voiceover narration and live telemetry scrolling)*
+
+* 📁 **Source Assets & Transcript**: [Presentations/Deck_1_Intro](https://github.com/jbirdlebough1/JRFKTools/tree/main/Presentations/Deck_1_Intro)
+* 📖 **Master Documentation Portal**: [https://jbirdlebough1.github.io/JRFKTools/](https://jbirdlebough1.github.io/JRFKTools/)
+
+---
+
 ## ⚡ Fast Download (For Operators — No Developer Tools Required)
 
 If you only want to upgrade or configure your RF-KIT amplifier on Windows 11 without setting up Python, Git, or compilers, download the standalone turnkey migrator:
@@ -73,10 +85,10 @@ The JRFK station library includes four comprehensive, publication-grade manuals 
 
 **JRFK** is a complete, modernized 64-bit operating system appliance, hardware interface layer, and diagnostic tool suite engineered for the **RF-KIT RF2K-S** and **RF2K+** high-power solid-state amateur radio linear power amplifiers.
 
-Historically, the RF-KIT touch user interface and telemetry logic were tied to legacy 32-bit `armhf` Debian distributions (Debian 10/11) on older Raspberry Pi boards. The introduction of modern 64-bit hardware (Raspberry Pi 4 Model B and Raspberry Pi 5) caused severe driver fragmentation, USB PCIe path collisions, DRM graphics distortions, and ELF binary incompatibility.
+Historically, the RF-KIT touch user interface and telemetry logic were tied to legacy 32-bit Raspberry Pi OS on older Raspberry Pi boards. The introduction of modern 64-bit hardware (Raspberry Pi 4 Model B and Raspberry Pi 5) caused severe driver fragmentation, USB PCIe path collisions, DRM graphics distortions, and ELF binary incompatibility.
 
 JRFK resolves these bottlenecks permanently, delivering:
-1. **Universal 64-Bit OS Migration:** Pure Debian 12 Bookworm / Debian 13 Trixie (`aarch64`) runtime with native 64-bit Hamlib bridges and self-healing update shims.
+1. **Universal 64-Bit OS Migration:** Pure 64-Bit Raspberry Pi OS (`aarch64`) runtime with native 64-bit Hamlib bridges and self-healing update shims.
 2. **Single-SD Hardware Parity Across Generations:** A single physical MicroSD card boots interchangeably into either a Raspberry Pi 4 or Raspberry Pi 5 without kernel panic, resolution distortion, or serial communication loss.
 3. **Decoupled HTTP Diagnostic Suite (Port 8088):** Independent telemetry and monitoring server providing an Antenna SWR Mapper, a 24-Hour Amplifier Health Monitor with 60°C emergency thermal unkey protection, Remote Screen mirror, and an Automated Backup Manager.
 4. **Automated Weekly Cron Backup & Disaster Recovery:** Clones the active boot media to an external USB SD card on an operator-selected weekly schedule, enabling the instant "Swap, Boot, Reboot, Run" disaster recovery workflow with 100% data and calibration retention.
@@ -84,13 +96,13 @@ JRFK resolves these bottlenecks permanently, delivering:
 ```mermaid
 flowchart TD
     subgraph Legacy ["Legacy 32-bit Architecture"]
-        A1["Debian 11 Bullseye (armhf)"]
+        A1["Legacy 32-bit Raspberry Pi OS"]
         A2["Python 3.7 (Deprecated)"]
         A3["Bundled 32-bit ARM ELF Shared Objects"]
         A4["Hardcoded Pi 4 VL805 PCIe USB Path"]
     end
-    subgraph Target ["Universal 64-bit Appliance Platform"]
-        B1["Debian Bookworm/Trixie (aarch64)"]
+    subgraph Target ["Universal 64-bit Platform"]
+        B1["64-bit Raspberry Pi OS (aarch64)"]
         B2["Python 3.11/3.13 Runtime Optimized"]
         B3["Native 64-bit Hamlib Bridge"]
         B4["Universal Udev Dual-Link (/dev/rfk_controller)"]
