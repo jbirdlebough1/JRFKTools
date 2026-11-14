@@ -7,6 +7,7 @@ We are pleased to announce the public Beta 1.0 release of JRFKTools—a turnkey 
 🎬 Presentation 1: Interactive Audio/Visual Technical Blueprint
 Walk through the complete modernization suite, 64-bit upgrade payoff, PC Migrator, and on-amplifier web tools in our auto-advancing, synchronized blueprint player:
 * Interactive Web Player: https://jbirdlebough1.github.io/JRFKTools/deck1/preview.html
+* 1-Click Windows 11 Launcher (4 KB): https://raw.githubusercontent.com/jbirdlebough1/JRFKTools/main/Preview_Presentation_1.exe
 * GitHub Presentation Assets & Transcript: https://github.com/jbirdlebough1/JRFKTools/tree/main/Presentations/Deck_1_Intro
 
 ⚡ Fast Download (No Developer Tools Required)

@@ -19,6 +19,7 @@ Before downloading or upgrading, you can explore the complete audio-visual techn
 
 * 📁 **Source Assets & Transcript**: [Presentations/Deck_1_Intro](https://github.com/jbirdlebough1/JRFKTools/tree/main/Presentations/Deck_1_Intro)
 * 📖 **Master Documentation Portal**: [https://jbirdlebough1.github.io/JRFKTools/](https://jbirdlebough1.github.io/JRFKTools/)
+* 💻 **Standalone Windows 1-Click Launcher (4 KB)**: [Download Preview_Presentation_1.exe](https://raw.githubusercontent.com/jbirdlebough1/JRFKTools/main/Preview_Presentation_1.exe) *(Zero install, self-contained — click to launch the presentation instantly in your browser)*
 
 ---
 
